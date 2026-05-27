@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirm Delete - {{ item }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[#fcfcfd] flex flex-col lg:flex-row">
+    <!-- Modern Sidebar -->
+    {% include 'courses/admin_sidebar_snippet.html' %}
+
+    <!-- Main Content Area -->
+    <main class="flex-grow p-6 lg:p-12">
+        <div class="max-w-xl mx-auto my-20">
+            <div class="bg-white rounded-[3rem] shadow-2xl border border-slate-100 p-12 text-center">
+                <div class="w-24 h-24 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-8 text-4xl shadow-lg shadow-rose-100">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                
+                <h1 class="text-3xl font-black text-slate-900 mb-4">Are you sure?</h1>
+                <p class="text-slate-500 mb-10 leading-relaxed font-bold">
+                    You are about to delete the {{ type }}: <br>
+                    <span class="font-black text-rose-600 text-xl">"{{ item }}"</span>. <br>
+                    This action cannot be undone.
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="flex flex-col gap-4">
+                        <button type="submit" class="bg-rose-600 text-white font-black py-5 rounded-2xl hover:bg-rose-700 transition-all shadow-xl shadow-rose-100">
+                            Yes, Delete Permanently
+                        </button>
+                        <a href="javascript:history.back()" class="bg-slate-50 text-slate-500 font-bold py-5 rounded-2xl hover:bg-slate-100 transition-all">
+                            Cancel and Go Back
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

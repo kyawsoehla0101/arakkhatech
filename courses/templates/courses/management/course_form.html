@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<!-- CKEditor 5 CDN -->
+<script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
+
+<div class="min-h-screen bg-[#fcfcfd] flex flex-col lg:flex-row">
+    <!-- Modern Sidebar -->
+    {% include 'courses/admin_sidebar_snippet.html' %}
+
+    <!-- Main Content Area -->
+    <main class="flex-grow p-6 lg:p-12">
+        <div class="max-w-12xl mx-auto">
+            <!-- Top Bar -->
+            {% include 'courses/admin_topbar_snippet.html' with title=title subtitle="သင်တန်းအချက်အလက်များကို ပြည့်စုံစွာ ဖြည့်စွက်ပေးပါ။" %}
+
+            <div class="bg-white rounded-[3rem] shadow-xl border border-slate-100 p-8 md:p-12">
+                <!-- Manual Error Display -->
+                {% if form.errors %}
+                <div class="mb-8 p-6 bg-rose-50 rounded-2xl border border-rose-100">
+                    <h3 class="text-rose-600 font-black text-sm uppercase tracking-widest mb-4">အချက်အလက်များ ပြန်လည်စစ်ဆေးပါ</h3>
+                    <ul class="space-y-2">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li class="text-rose-500 text-xs font-bold flex items-center">
+                                    <i class="fas fa-exclamation-circle mr-2"></i>
+                                    {{ field|title }}: {{ error }}
+                                </li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data" class="space-y-8" novalidate>
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                    <div>
+                        <label for="{{ field.id_for_label }}" class="block text-slate-500 text-xs font-black uppercase tracking-widest mb-3">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <p class="text-[10px] text-slate-400 mt-2 italic">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <p class="text-xs text-rose-500 mt-2 font-bold">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <div class="pt-6 flex flex-col md:flex-row gap-4">
+                        <button type="submit" class="flex-grow custom-gradient text-white font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform shadow-xl shadow-indigo-100">
+                            <i class="fas fa-save mr-3"></i> သိမ်းဆည်းမည်
+                        </button>
+                        <a href="{% url 'manage_courses' %}" class="px-10 py-5 bg-slate-50 text-slate-400 font-bold rounded-2xl hover:bg-slate-100 transition-all text-center">
+                            ပယ်ဖျက်မည်
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            {% include 'courses/admin_footer_snippet.html' %}
+        </div>
+    </main>
+</div>
+
+<script>
+    document.querySelectorAll('.editor').forEach(el => {
+        ClassicEditor
+            .create(el, {
+                toolbar: [
+                    'heading', '|', 
+                    'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|',
+                    'undo', 'redo'
+                ]
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+</script>
+
+<style>
+    .ck-editor__editable {
+        min-height: 200px;
+        border-radius: 0 0 1.5rem 1.5rem !important;
+        background-color: #f8fafc !important;
+        border: 1px solid #f1f5f9 !important;
+        padding: 1.5rem !important;
+    }
+    .ck-toolbar {
+        border-radius: 1.5rem 1.5rem 0 0 !important;
+        background-color: #ffffff !important;
+        border: 1px solid #f1f5f9 !important;
+        padding: 0.5rem !important;
+    }
+    .ck-editor__main {
+        border-radius: 0 0 1.5rem 1.5rem !important;
+    }
+</style>
+{% endblock %}

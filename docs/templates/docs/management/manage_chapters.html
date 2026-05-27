@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Chapters - {{ book.title }}{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[#fcfcfd] flex flex-col lg:flex-row">
+    {% include 'courses/admin_sidebar_snippet.html' %}
+
+    <main class="flex-grow p-6 lg:p-12">
+        {% include 'courses/admin_topbar_snippet.html' with title="Manage Chapters" subtitle=book.title %}
+
+        <div class="mb-8 flex justify-between items-center">
+            <a href="{% url 'manage_books' %}" class="text-indigo-600 font-black hover:-translate-x-1 transition-transform flex items-center">
+                <i class="fas fa-arrow-left mr-3"></i> Back to Books
+            </a>
+            <a href="{% url 'add_chapter' book.pk %}" class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-sm shadow-xl shadow-indigo-200 hover:scale-[1.02] transition-transform flex items-center">
+                <i class="fas fa-plus mr-3"></i> စာမျက်နှာအသစ်ထည့်ရန်
+            </a>
+        </div>
+
+        <div class="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden" data-aos="fade-up">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="text-slate-400 text-[10px] uppercase tracking-widest font-black bg-slate-50/50">
+                        <tr>
+                            <th class="px-10 py-8">Chapter Info</th>
+                            <th class="px-10 py-8 text-center">Order</th>
+                            <th class="px-10 py-8 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        {% for chapter in chapters %}
+                        <tr class="group hover:bg-slate-50/30 transition-all">
+                            <td class="px-10 py-8">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-black mr-6 shadow-sm border border-indigo-100">
+                                        {{ forloop.counter|stringformat:"02d" }}
+                                    </div>
+                                    <div>
+                                        <p class="font-black text-slate-800 text-lg group-hover:text-indigo-600 transition-colors leading-tight">{{ chapter.title }}</p>
+                                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Updated: {{ chapter.updated_at|date:"M d, Y" }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-10 py-8 text-center">
+                                <span class="bg-slate-100 text-slate-500 text-[10px] font-black px-4 py-2 rounded-xl border border-slate-200">{{ chapter.order }}</span>
+                            </td>
+                            <td class="px-10 py-8 text-right">
+                                <div class="flex items-center justify-end space-x-3">
+                                    <a href="{{ chapter.get_absolute_url }}" target="_blank" class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-emerald-50 hover:text-emerald-600 transition-all shadow-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'edit_chapter' chapter.pk %}" class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-indigo-50 hover:text-indigo-600 transition-all shadow-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'delete_chapter' chapter.pk %}" class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-rose-50 hover:text-rose-600 transition-all shadow-sm">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="px-10 py-32 text-center text-slate-400 font-black">No chapters found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% include 'courses/admin_footer_snippet.html' %}
+    </main>
+</div>
+{% endblock %}

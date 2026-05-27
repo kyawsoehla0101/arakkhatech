@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Library & Documentation - Arakkha Tech{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[#fcfcfd] pt-28 pb-20">
+    <div class="container mx-auto px-6">
+        <!-- Hero Section -->
+        <div class="max-w-4xl mx-auto text-center mb-20" data-aos="fade-up">
+            <h1 class="text-4xl md:text-6xl font-black text-slate-900 mb-6 leading-tight">
+                Digital <span class="text-indigo-600">Library</span>
+            </h1>
+            <p class="text-slate-600 text-lg font-medium max-w-2xl mx-auto">
+                နည်းပညာစာအုပ်များနှင့် သင်ခန်းစာလမ်းညွှန်ချက်များကို တစ်နေရာတည်းမှာ အခမဲ့ ဖတ်ရှုလေ့လာနိုင်ပါသည်။
+            </p>
+        </div>
+
+        <!-- Free Books Section -->
+        <div class="mb-24">
+            <div class="flex items-center justify-between mb-12 border-b border-slate-100 pb-6">
+                <h2 class="text-3xl font-black text-slate-800 flex items-center">
+                    <span class="w-2 h-10 bg-indigo-600 rounded-full mr-4"></span> အခမဲ့ နည်းပညာစာအုပ်များ
+                </h2>
+                <span class="text-slate-400 font-bold uppercase tracking-widest text-xs">{{ free_books.count }} Books</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                {% for book in free_books %}
+                <div class="group relative bg-white rounded-[2.5rem] shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden border border-slate-100" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}00">
+                    <!-- Book Cover -->
+                    <div class="aspect-[4/3] relative overflow-hidden bg-slate-100">
+                        {% if book.thumbnail %}
+                            <img src="{{ book.thumbnail.url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        {% else %}
+                            <div class="w-full h-full flex items-center justify-center custom-gradient opacity-20">
+                                <i class="fas fa-book-open text-6xl text-white"></i>
+                            </div>
+                        {% endif %}
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
+                            <p class="text-white text-sm font-bold"><i class="fas fa-eye mr-2"></i> အသေးစိတ်ကြည့်ရန်</p>
+                        </div>
+                    </div>
+
+                    <div class="p-8">
+                        <h3 class="text-2xl font-black text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors">{{ book.title }}</h3>
+                        <p class="text-slate-500 text-sm mb-6 line-clamp-2">{{ book.description|default:"အခြေခံမှ စတင်၍ လေ့လာနိုင်သော နည်းပညာစာအုပ်" }}</p>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="bg-indigo-50 text-indigo-600 text-[10px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest">
+                                {{ book.chapters.count }} Chapters
+                            </span>
+                            <a href="{% url 'book_overview' book.slug %}" class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-indigo-600 transition-colors">
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-full text-center py-20 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200">
+                    <i class="fas fa-book text-slate-200 text-6xl mb-6"></i>
+                    <p class="text-slate-400 font-bold">စာအုပ်များ မကြာမီ လာပါမည်။</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Course Documentation Section (If any) -->
+        {% if course_docs %}
+        <div>
+            <div class="flex items-center justify-between mb-12 border-b border-slate-100 pb-6">
+                <h2 class="text-3xl font-black text-slate-800 flex items-center">
+                    <span class="w-2 h-10 bg-emerald-500 rounded-full mr-4"></span> သင်တန်းလမ်းညွှန်ချက်များ
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {% for book in course_docs %}
+                <a href="{% url 'book_overview' book.slug %}" class="glass p-8 rounded-[2.5rem] flex items-center space-x-6 border-white/50 hover:bg-white hover:shadow-xl transition-all group" data-aos="fade-up">
+                    <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl group-hover:bg-emerald-600 group-hover:text-white transition-all shrink-0">
+                        <i class="fas fa-file-code"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1">{{ book.course.title }}</p>
+                        <h3 class="text-xl font-black text-slate-800">{{ book.title }}</h3>
+                        <p class="text-slate-400 text-xs mt-1">{{ book.chapters.count }} Chapters • Documentation</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

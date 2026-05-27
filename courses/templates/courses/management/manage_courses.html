@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Courses - Arakkha Tech{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[#fcfcfd] flex flex-col lg:flex-row">
+    <!-- Modern Sidebar -->
+    {% include 'courses/admin_sidebar_snippet.html' %}
+
+    <!-- Main Content Area -->
+    <main class="flex-grow p-6 lg:p-12">
+        <!-- Top Bar (Admin Specific Navbar) -->
+        {% include 'courses/admin_topbar_snippet.html' with title="Manage Courses" subtitle="Total "|add:courses.count|add:" active courses on the platform." %}
+
+        <!-- Add Course Action Section -->
+        <div class="mb-10">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                <div class="space-y-1">
+                    <h2 class="text-2xl font-black text-slate-800">သင်တန်းအသစ်ဖွင့်ရန်</h2>
+                    <p class="text-slate-400 text-sm font-medium">သင်တန်းအသစ်များကို စနစ်တကျ ဖန်တီးနိုင်ပါသည်။</p>
+                </div>
+                <a href="{% url 'add_course' %}" class="custom-gradient text-white px-10 py-4 rounded-2xl font-black shadow-xl shadow-indigo-100 hover:scale-105 transition-all flex items-center justify-center group">
+                    <i class="fas fa-plus-circle mr-3 group-hover:rotate-90 transition-transform"></i> သင်တန်းအသစ်ဖွင့်ရန်
+                </a>
+            </div>
+        </div>
+
+        <!-- Courses Table -->
+        <div class="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden" data-aos="fade-up">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="text-slate-400 text-[10px] uppercase tracking-widest font-black bg-slate-50/50">
+                        <tr>
+                            <th class="px-10 py-8">Course Info</th>
+                            <th class="px-10 py-8 text-center">Lessons</th>
+                            <th class="px-10 py-8 text-center">Enrollments</th>
+                            <th class="px-10 py-8 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        {% for course in courses %}
+                        <tr class="group hover:bg-slate-50/30 transition-all">
+                            <td class="px-10 py-8">
+                                <div class="flex items-center">
+                                    <div class="w-24 h-16 rounded-2xl bg-indigo-50 overflow-hidden flex-shrink-0 mr-6 shadow-sm border-4 border-white transition-transform group-hover:scale-105">
+                                        {% if course.thumbnail %}
+                                            <img src="{{ course.thumbnail.url }}" class="w-full h-full object-cover">
+                                        {% else %}
+                                            <div class="w-full h-full flex items-center justify-center text-indigo-200 text-xl">
+                                                <i class="fas fa-image"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <p class="font-black text-slate-800 text-lg group-hover:text-indigo-600 transition-colors leading-tight mb-1">{{ course.title }}</p>
+                                        <div class="flex items-center space-x-3">
+                                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Instructor: {{ course.instructor.username }}</span>
+                                            <span class="w-1 h-1 bg-slate-200 rounded-full"></span>
+                                            <span class="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Published</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-10 py-8 text-center">
+                                <a href="{% url 'manage_lessons' course.pk %}" class="inline-flex items-center bg-indigo-50 text-indigo-600 text-xs font-black px-5 py-2.5 rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm border border-indigo-100">
+                                    <i class="fas fa-layer-group mr-2"></i> {{ course.lessons.count }} Units
+                                </a>
+                            </td>
+                            <td class="px-10 py-8 text-center">
+                                <div class="flex flex-col items-center">
+                                    <span class="text-lg font-black text-slate-800">{{ course.student_count }}</span>
+                                    <span class="text-[10px] font-black text-indigo-400 uppercase tracking-tighter">Students</span>
+                                </div>
+                            </td>
+                            <td class="px-10 py-8 text-right">
+                                <div class="flex items-center justify-end space-x-3">
+                                    <a href="{% url 'edit_course' course.pk %}" class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-indigo-50 hover:text-indigo-600 transition-all shadow-sm">
+                                        <i class="fas fa-pen-nib"></i>
+                                    </a>
+                                    <a href="{% url 'delete_course' course.pk %}" class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-rose-50 hover:text-rose-600 transition-all shadow-sm">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-10 py-32 text-center">
+                                <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8 text-slate-200 text-3xl">
+                                    <i class="fas fa-folder-open"></i>
+                                </div>
+                                <p class="text-slate-400 font-black text-xl">No courses found on the system.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% include 'courses/admin_footer_snippet.html' %}
+    </main>
+</div>
+{% endblock %}

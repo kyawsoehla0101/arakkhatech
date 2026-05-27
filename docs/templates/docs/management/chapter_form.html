@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+
+<div class="min-h-screen bg-[#fcfcfd] flex flex-col lg:flex-row">
+    {% include 'courses/admin_sidebar_snippet.html' %}
+
+    <main class="flex-grow p-6 lg:p-12">
+        <div class="max-w-12xl mx-auto">
+            {% include 'courses/admin_topbar_snippet.html' with title=title subtitle=book.title %}
+
+            <div class="bg-white rounded-[3rem] shadow-xl border border-slate-100 p-8 md:p-12">
+                <form method="post" id="chapter-form" class="space-y-8">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div>
+                        <label class="block text-slate-500 text-xs font-black uppercase tracking-widest mb-3">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}{% for error in field.errors %}<p class="text-xs text-rose-500 mt-2 font-bold">{{ error }}</p>{% endfor %}{% endif %}
+                    </div>
+                    {% endfor %}
+                    <div class="pt-6 flex flex-col md:flex-row gap-4">
+                        <button type="submit" class="flex-grow custom-gradient text-white font-black py-5 rounded-2xl shadow-xl shadow-indigo-100 transition-transform hover:scale-[1.02]">
+                            <i class="fas fa-save mr-3"></i> သိမ်းဆည်းမည်
+                        </button>
+                        <a href="{% url 'manage_chapters' book.pk %}" class="px-10 py-5 bg-slate-50 text-slate-400 font-bold rounded-2xl hover:bg-slate-100 text-center">ပယ်ဖျက်မည်</a>
+                    </div>
+                </form>
+            </div>
+            {% include 'courses/admin_footer_snippet.html' %}
+        </div>
+    </main>
+</div>
+
+<script>
+    const easyMDE = new EasyMDE({
+        element: document.getElementById("markdown-editor"),
+        spellChecker: false,
+        status: ["autosave", "lines", "words", "cursor"],
+        placeholder: "Markdown format ဖြင့် ရေးသားပါ...",
+        forceSync: true,
+        toolbar: ["bold", "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "|", "link", "image", "table", "|", "preview", "side-by-side", "fullscreen"]
+    });
+    document.getElementById('chapter-form').addEventListener('submit', function() { easyMDE.save(); });
+</script>
+
+<style>
+    .CodeMirror { border: 1px solid #f1f5f9 !important; background-color: #f8fafc !important; padding: 1rem !important; border-radius: 1.5rem !important; font-family: 'Plus Jakarta Sans', sans-serif !important; min-height: 400px !important; }
+    .editor-toolbar { border: 1px solid #f1f5f9 !important; background-color: #ffffff !important; border-bottom: none !important; border-radius: 1.5rem 1.5rem 0 0 !important; }
+    .editor-statusbar { border: 1px solid #f1f5f9 !important; border-top: none !important; border-radius: 0 0 1.5rem 1.5rem !important; background-color: #ffffff !important; }
+</style>
+{% endblock %}

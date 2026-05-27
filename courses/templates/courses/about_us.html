@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us - Arakkha Tech{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50 pt-32 pb-20">
+    <div class="container mx-auto px-6">
+        <!-- Hero Section -->
+        <div class="max-w-4xl mx-auto text-center mb-20" data-aos="fade-up">
+            <h4 class="text-indigo-600 font-black uppercase tracking-[0.2em] text-sm mb-4">Our Story</h4>
+            <h1 class="text-5xl md:text-7xl font-black text-slate-900 mb-8 leading-tight">
+                Empowering <span class="text-gradient">Arakkha</span> Through Technology
+            </h1>
+            <p class="text-slate-600 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto">
+                အာရက္ခနည်းပညာသည် ခေတ်မီနည်းပညာများကို အာရက္ခဘာသာစကားဖြင့် အခြေခံမှစတင်ကာ လူငယ်များအတွက် အခမဲ့နှင့် အခပေးသင်တန်းများကို အရည်အသွေးမြင့်မားစွာ သင်ကြားပေးနေသည့် platform တစ်ခုဖြစ်ပါသည်။
+            </p>
+        </div>
+
+        <!-- Vision & Mission -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-32">
+            <div class="bg-white p-12 rounded-[3rem] shadow-sm border border-slate-100" data-aos="fade-right">
+                <div class="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-2xl mb-8">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <h3 class="text-3xl font-black text-slate-900 mb-6">ကျွန်ုပ်တို့၏ မျှော်မှန်းချက်</h3>
+                <p class="text-slate-500 leading-relaxed text-lg">
+                    အာရက္ခပြည်ရှိ လူငယ်တိုင်းသည် မိမိတို့၏ မိခင်ဘာသာစကားဖြင့် ခေတ်မီနည်းပညာများကို အလွယ်တကူ လေ့လာသင်ယူနိုင်ပြီး ကမ္ဘာ့အဆင့်မီ နည်းပညာရှင်များ ဖြစ်လာစေရန်။
+                </p>
+            </div>
+            <div class="bg-white p-12 rounded-[3rem] shadow-sm border border-slate-100" data-aos="fade-left">
+                <div class="w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 text-2xl mb-8">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <h3 class="text-3xl font-black text-slate-900 mb-6">ကျွန်ုပ်တို့၏ ရည်မှန်းချက်</h3>
+                <p class="text-slate-500 leading-relaxed text-lg">
+                    အရည်အသွေးရှိသော သင်ခန်းစာများကို အခြေခံမှစ၍ နားလည်လွယ်သော သင်ကြားမှုပုံစံဖြင့် ဖန်တီးပေးရန်နှင့် နည်းပညာနယ်ပယ်တွင် အောင်မြင်သော လမ်းကြောင်းများ ဖန်တီးပေးရန်။
+                </p>
+            </div>
+        </div>
+
+        <!-- Team/Stats Section -->
+        <div class="glass rounded-[4rem] p-12 md:p-20 text-center relative overflow-hidden mb-32" data-aos="zoom-in">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-600/5 rounded-full -mr-32 -mt-32"></div>
+            <div class="relative z-10 max-w-3xl mx-auto">
+                <h2 class="text-4xl font-black text-slate-900 mb-8">အာရက္ခလူငယ်များအတွက် အကောင်းဆုံး နည်းပညာသင်ကြားရေး</h2>
+                <p class="text-slate-600 text-lg mb-12">
+                    ကျွန်ုပ်တို့သည် လက်ရှိတွင် သင်တန်းသားပေါင်း ၅၀၀ ကျော်ကို သင်ကြားပေးနေပြီး ပိုမိုကောင်းမွန်သော နည်းပညာပတ်ဝန်းကျင်တစ်ခု ဖြစ်ပေါ်လာစေရန် အစဉ်တစိုက် ကြိုးပမ်းလျက်ရှိပါသည်။
+                </p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <div>
+                        <p class="text-3xl font-black text-indigo-600">500+</p>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2">Students</p>
+                    </div>
+                    <div>
+                        <p class="text-3xl font-black text-indigo-600">10+</p>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2">Courses</p>
+                    </div>
+                    <div>
+                        <p class="text-3xl font-black text-indigo-600">50+</p>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2">Lessons</p>
+                    </div>
+                    <div>
+                        <p class="text-3xl font-black text-indigo-600">24/7</p>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2">Support</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

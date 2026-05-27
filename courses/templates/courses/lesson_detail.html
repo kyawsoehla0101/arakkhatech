@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ lesson.title }} - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="bg-slate-900 min-h-screen pt-8 pb-20">
+    <div class="container mx-auto px-6">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8 text-sm font-bold text-slate-500 uppercase tracking-widest" data-aos="fade-down">
+            <a href="{% url 'course_list' %}" class="hover:text-white transition-colors">Courses</a>
+            <span class="mx-3">/</span>
+            <a href="{% url 'course_detail' course.pk %}" class="hover:text-white transition-colors">{{ course.title|truncatechars:30 }}</a>
+            <span class="mx-3">/</span>
+            <span class="text-indigo-400">{{ lesson.title }}</span>
+        </nav>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-10">
+            <!-- Left: Video & Content -->
+            <div class="lg:col-span-3">
+                <!-- Video Player Card -->
+                <div class="bg-black rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/5 mb-10" data-aos="zoom-in">
+                    <div class="aspect-video relative group">
+                        {% if lesson.youtube_id or lesson.video_file %}
+                            <div class="w-full h-full js-player-container">
+                                {% if lesson.youtube_id %}
+                                    <div class="lesson-player" data-plyr-provider="youtube" data-plyr-embed-id="{{ lesson.youtube_id }}"></div>
+                                {% elif lesson.video_file %}
+                                    <video class="lesson-player" playsinline controls {% if lesson.video_poster %}poster="{{ lesson.video_poster.url }}"{% endif %}>
+                                        <source src="{{ lesson.video_file.url }}" type="video/mp4">
+                                    </video>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="w-full h-full flex flex-col items-center justify-center bg-slate-800 text-slate-500">
+                                <i class="fas fa-video-slash text-6xl mb-4 opacity-20"></i>
+                                <p class="font-bold">ဗီဒီယို မရှိသေးပါ။</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Content Card -->
+                <div class="bg-white rounded-[3rem] p-10 md:p-16 shadow-xl" data-aos="fade-up">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12 pb-12 border-b border-slate-50">
+                        <div>
+                            <span class="inline-block bg-indigo-50 text-indigo-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-4">Lesson {{ lesson.order }}</span>
+                            <h1 class="text-3xl md:text-5xl font-black text-slate-800 leading-tight">{{ lesson.title }}</h1>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-4">
+                            {% if lesson.duration %}
+                            <div class="flex-shrink-0 bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-black flex items-center shadow-xl shadow-indigo-100/20">
+                                <i class="far fa-clock mr-3 text-indigo-400"></i> {{ lesson.duration }}
+                            </div>
+                            {% endif %}
+                            
+                            <form id="completionForm" action="{% url 'toggle_lesson_completion' lesson.pk %}" method="POST" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" id="completionBtn" class="flex-shrink-0 {% if is_completed %}bg-emerald-500{% else %}bg-indigo-600{% endif %} text-white px-6 py-3 rounded-2xl text-sm font-black flex items-center shadow-xl shadow-indigo-100/20 hover:scale-105 transition-all">
+                                    {% if is_completed %}
+                                        <i class="fas fa-check-circle mr-3"></i> Completed
+                                    {% else %}
+                                        <i class="far fa-check-circle mr-3"></i> Mark as Complete
+                                    {% endif %}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="prose max-w-none text-slate-600 leading-relaxed text-lg">
+                        {{ lesson.content|safe }}
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="mt-16 pt-12 border-t border-slate-50 flex justify-between items-center">
+                        {% if prev_lesson %}
+                        <a href="{% url 'lesson_detail' course.pk prev_lesson.pk %}" class="flex items-center text-slate-400 font-bold hover:text-indigo-600 transition-colors group">
+                            <i class="fas fa-arrow-left mr-3 transform group-hover:-translate-x-2 transition-transform"></i> Previous Lesson
+                        </a>
+                        {% else %}
+                        <div></div>
+                        {% endif %}
+
+                        {% if next_lesson %}
+                        <a href="{% url 'lesson_detail' course.pk next_lesson.pk %}" class="flex items-center text-slate-800 font-black hover:text-indigo-600 transition-colors group" id="nextLessonBtn">
+                            Next Lesson <i class="fas fa-arrow-right ml-3 transform group-hover:translate-x-2 transition-transform text-indigo-600"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Sidebar Curriculum -->
+            <div class="lg:col-span-1">
+                <div class="glass rounded-[2.5rem] overflow-hidden sticky top-28 border border-white/10 shadow-2xl" data-aos="fade-left">
+                    <div class="custom-gradient p-8 text-white">
+                        <h3 class="text-xl font-black mb-2">သင်ခန်းစာ မာတိကာ</h3>
+                        <div class="flex items-center justify-between text-xs font-bold text-indigo-100 opacity-80 uppercase tracking-widest">
+                            <span>{{ lessons.count }} Lessons</span>
+                            <span class="progress-text">{{ enrollment.progress_percentage }}% Complete</span>
+                        </div>
+                    </div>
+                    
+                    <div class="max-h-[calc(100vh-400px)] overflow-y-auto custom-scrollbar bg-slate-900/40">
+                        {% for l in lessons %}
+                        <a href="{% url 'lesson_detail' course.pk l.pk %}" 
+                           class="group block p-6 border-b border-white/5 hover:bg-white/5 transition-all {% if l.pk == lesson.pk %}bg-indigo-600/20 border-l-4 border-l-indigo-500{% endif %}">
+                            <div class="flex items-start">
+                                <div class="relative flex-shrink-0 mr-4">
+                                    <span class="w-8 h-8 rounded-lg {% if l.pk == lesson.pk %}bg-indigo-500 text-white shadow-lg shadow-indigo-500/50{% else %}bg-white/5 text-slate-500{% endif %} flex items-center justify-center text-[10px] font-black transition-all group-hover:scale-110">
+                                        {{ forloop.counter|stringformat:"02d" }}
+                                    </span>
+                                    {% if l.id in completed_lesson_ids %}
+                                    <div class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-slate-900 lesson-status-icon">
+                                        <i class="fas fa-check text-[8px] text-white"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold {% if l.pk == lesson.pk %}text-white{% else %}text-slate-400 group-hover:text-white{% endif %} line-clamp-2 transition-colors mb-2">
+                                        {{ l.title }}
+                                    </h4>
+                                    <div class="flex items-center space-x-3">
+                                        {% if l.duration %}
+                                        <span class="text-[10px] text-slate-500 font-bold flex items-center">
+                                            <i class="far fa-clock mr-1.5 opacity-50"></i> {{ l.duration }}
+                                        </span>
+                                        {% endif %}
+                                        {% if l.video_url or l.video_file %}
+                                        <span class="text-[10px] text-slate-500 font-bold flex items-center">
+                                            <i class="fas fa-play-circle mr-1.5 opacity-50 text-indigo-500"></i> Video
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Progress Card -->
+                    <div class="p-8 bg-white/5 border-t border-white/5">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Learning Progress</span>
+                            <span class="text-indigo-400 text-xs font-black progress-text">{{ enrollment.progress_percentage }}%</span>
+                        </div>
+                        <div class="w-full bg-white/5 rounded-full h-2 overflow-hidden">
+                            <div class="bg-indigo-500 h-full rounded-full shadow-lg shadow-indigo-500/50 transition-all duration-1000 progress-bar-fill" style="width: {{ enrollment.progress_percentage }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+     document.addEventListener('DOMContentLoaded', () => {
+         // Find the Plyr instance for this lesson's video
+         const playerElement = document.querySelector('.lesson-player');
+         let player = null;
+         
+         if (playerElement) {
+             player = new Plyr(playerElement, {
+                 autoplay: false,
+             });
+ 
+             // Auto-advance logic
+             player.on('ended', () => {
+                 // Auto mark as complete when video ends
+                 markAsComplete(true);
+             });
+         }
+
+         // AJAX for Completion Button
+         const completionForm = document.getElementById('completionForm');
+         const completionBtn = document.getElementById('completionBtn');
+
+         if (completionForm) {
+             completionForm.addEventListener('submit', function(e) {
+                 e.preventDefault();
+                 markAsComplete(false);
+             });
+         }
+
+         function markAsComplete(autoAdvance) {
+             const url = completionForm.action;
+             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+             fetch(url, {
+                 method: 'POST',
+                 headers: {
+                     'X-CSRFToken': csrfToken,
+                     'X-Requested-With': 'XMLHttpRequest'
+                 }
+             })
+             .then(response => response.json())
+             .then(data => {
+                 // Update UI
+                 if (data.completed) {
+                     completionBtn.classList.remove('bg-indigo-600');
+                     completionBtn.classList.add('bg-emerald-500');
+                     completionBtn.innerHTML = '<i class="fas fa-check-circle mr-3"></i> Completed';
+                     
+                     // Show success toast
+                     toastr.success('သင်ခန်းစာကို ပြီးမြောက်ကြောင်း မှတ်သားပြီးပါပြီ။');
+                 } else {
+                     completionBtn.classList.remove('bg-emerald-500');
+                     completionBtn.classList.add('bg-indigo-600');
+                     completionBtn.innerHTML = '<i class="far fa-check-circle mr-3"></i> Mark as Complete';
+                 }
+
+                 // Update progress bars
+                 const progressTexts = document.querySelectorAll('.progress-text');
+                 const progressBars = document.querySelectorAll('.progress-bar-fill');
+                 
+                 progressTexts.forEach(el => el.textContent = data.progress + '%');
+                 progressBars.forEach(el => el.style.width = data.progress + '%');
+
+                 // Update sidebar status icon for current lesson
+                 const currentLessonLink = document.querySelector('a.bg-indigo-600\\/20');
+                 if (currentLessonLink) {
+                     const iconContainer = currentLessonLink.querySelector('.relative.flex-shrink-0');
+                     let statusIcon = iconContainer.querySelector('.lesson-status-icon');
+                     
+                     if (data.completed) {
+                         if (!statusIcon) {
+                             statusIcon = document.createElement('div');
+                             statusIcon.className = 'absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-slate-900 lesson-status-icon';
+                             statusIcon.innerHTML = '<i class="fas fa-check text-[8px] text-white"></i>';
+                             iconContainer.appendChild(statusIcon);
+                         }
+                     } else {
+                         if (statusIcon) {
+                             statusIcon.remove();
+                         }
+                     }
+                 }
+
+                 // Auto advance if video ended
+                 if (autoAdvance) {
+                    const nextBtn = document.getElementById('nextLessonBtn');
+                    if (nextBtn) {
+                        toastr.info('သင်ခန်းစာ ပြီးဆုံးသွားပါပြီ။ နောက်တစ်ခုသို့ အလိုအလျောက် သွားနေပါသည်။', '', {
+                            positionClass: "toast-top-center",
+                            timeOut: 2000,
+                            progressBar: true,
+                            onHidden: function() {
+                                window.location.href = nextBtn.href;
+                            }
+                        });
+                    }
+                 }
+             })
+             .catch(error => console.error('Error:', error));
+         }
+     });
+ </script>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255,255,255,0.2);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us - Arakkha Tech{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50 pt-32 pb-20">
+    <div class="container mx-auto px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col lg:flex-row gap-16 items-start">
+                <!-- Contact Info -->
+                <div class="lg:w-1/2" data-aos="fade-right">
+                    <h4 class="text-indigo-600 font-black uppercase tracking-[0.2em] text-sm mb-4">Get in Touch</h4>
+                    <h1 class="text-5xl font-black text-slate-900 mb-8 leading-tight">ဆက်သွယ်ရန်</h1>
+                    <p class="text-slate-600 text-lg mb-12 leading-relaxed">
+                        သင်တန်းများနှင့် ပတ်သက်၍ သိရှိလိုသည်များ သို့မဟုတ် အကြံပြုချက်များရှိပါက အောက်ပါ လိပ်စာများမှတစ်ဆင့် ဆက်သွယ်နိုင်ပါသည်။
+                    </p>
+
+                    <div class="space-y-8">
+                        <div class="flex items-start space-x-6 group">
+                            <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-indigo-600 text-xl group-hover:custom-gradient group-hover:text-white transition-all">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Email Us</p>
+                                <p class="text-xl font-bold text-slate-800">info@arakkhatech.com</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-6 group">
+                            <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-emerald-500 text-xl group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                <i class="fab fa-facebook-messenger"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Messenger</p>
+                                <p class="text-xl font-bold text-slate-800">m.me/arakkhatech</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-6 group">
+                            <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-rose-500 text-xl group-hover:bg-rose-500 group-hover:text-white transition-all">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Office</p>
+                                <p class="text-xl font-bold text-slate-800">Arakkha, Myanmar</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="lg:w-1/2 w-full" data-aos="fade-left">
+                    <div class="bg-white p-10 md:p-16 rounded-[3.5rem] shadow-2xl border border-slate-100">
+                        <form method="post" class="space-y-8">
+                            {% csrf_token %}
+                            <div>
+                                <label class="block text-slate-500 text-xs font-black uppercase tracking-widest mb-4">Your Name</label>
+                                <input type="text" name="name" required class="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all" placeholder="သင့်အမည် ရေးပါ...">
+                            </div>
+                            <div>
+                                <label class="block text-slate-500 text-xs font-black uppercase tracking-widest mb-4">Email Address</label>
+                                <input type="email" name="email" required class="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all" placeholder="Email လိပ်စာ ရေးပါ...">
+                            </div>
+                            <div>
+                                <label class="block text-slate-500 text-xs font-black uppercase tracking-widest mb-4">Message</label>
+                                <textarea name="message" rows="5" required class="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all" placeholder="မက်ဆေ့ဂျ် ရေးပါ..."></textarea>
+                            </div>
+                            <button type="submit" class="w-full custom-gradient text-white font-black py-5 rounded-2xl shadow-xl shadow-indigo-100 hover:scale-[1.02] transition-transform">
+                                ပေးပို့မည်
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

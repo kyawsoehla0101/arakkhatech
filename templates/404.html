@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}404 - File Not Found{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[#0f172a] flex items-center justify-center px-6 py-20 relative overflow-hidden">
+    <!-- Decorative background elements -->
+    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] -mr-64 -mt-64 animate-pulse"></div>
+    <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-rose-600/10 rounded-full blur-[120px] -ml-64 -mb-64 animate-pulse" style="animation-delay: 2s;"></div>
+
+    <div class="max-w-4xl w-full relative z-10">
+        <!-- Terminal Style Box -->
+        <div class="bg-[#1e1e1e] rounded-[2.5rem] shadow-2xl border border-white/10 overflow-hidden floating-animation" data-aos="zoom-in">
+            <!-- Terminal Header -->
+            <div class="bg-[#2d2d2d] px-8 py-4 flex items-center justify-between border-b border-white/5">
+                <div class="flex items-center space-x-3">
+                    <div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56] shadow-lg shadow-[#ff5f56]/20"></div>
+                    <div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e] shadow-lg shadow-[#ffbd2e]/20"></div>
+                    <div class="w-3.5 h-3.5 rounded-full bg-[#27c93f] shadow-lg shadow-[#27c93f]/20"></div>
+                </div>
+                <div class="flex items-center space-x-2 text-slate-500 font-mono text-[10px] font-black uppercase tracking-widest">
+                    <i class="fas fa-terminal text-[8px]"></i>
+                    <span>error_handler.sh</span>
+                </div>
+                <div class="w-12"></div> <!-- Spacer -->
+            </div>
+
+            <!-- Code Content -->
+            <div class="p-10 md:p-16 font-mono text-sm md:text-lg leading-relaxed">
+                <div class="space-y-6">
+                    <div class="flex items-start">
+                        <span class="text-slate-600 mr-6 select-none">01</span>
+                        <span class="text-[#c586c0]">function</span>
+                        <span class="text-[#dcdcaa] ml-3">handleNotFoundError </span> <span class="text-[#fff]"> () {</span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-slate-600 mr-6 select-none">02</span>
+                        <span class="text-[#9cdcfe] ml-8">const</span>
+                        <span class="text-[#4fc1ff] ml-3">errorCode</span>
+                        <span class="text-white ml-3">=</span>
+                        <span class="text-[#b5cea8] ml-3">404</span>;
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-slate-600 mr-6 select-none">03</span>
+                        <span class="text-[#9cdcfe] ml-8">const</span>
+                        <span class="text-[#4fc1ff] ml-3">message</span>
+                        <span class="text-white ml-3">=</span>
+                        <span class="text-[#ce9178] ml-3">"Page Not Found"</span>;
+                    </div>
+                    <div class="flex items-start min-h-[1.5em]">
+                        <span class="text-slate-600 mr-6 select-none">04</span>
+                        <span class="text-[#6a9955] ml-8">// <span id="error-typewriter"></span></span>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-slate-600 mr-6 select-none">05</span>
+                        <span class="text-[#c586c0] ml-8">throw</span>
+                        <span class="text-[#4ec9b0] ml-3">new</span>
+                        <span class="text-[#4ec9b0] ml-3">RouterException</span>(message);
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-slate-600 mr-6 select-none">06</span>
+                        <span class="text-white">}</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons in Terminal -->
+                <div class="mt-16 flex flex-wrap gap-6 pt-10 border-t border-white/5">
+                    <a href="{% url 'course_list' %}" class="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-indigo-600/20 hover:scale-105 transition-all flex items-center group">
+                        <i class="fas fa-home mr-3 group-hover:-translate-y-1 transition-transform"></i>
+                        Return Home
+                    </a>
+                    <a href="javascript:history.back()" class="px-8 py-4 bg-white/5 text-slate-300 rounded-2xl font-black text-sm hover:bg-white/10 transition-all border border-white/5">
+                        <i class="fas fa-undo mr-3"></i> Go Back
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Message -->
+        <div class="mt-12 text-center" data-aos="fade-up" data-aos-delay="500">
+            <p class="text-slate-500 font-bold text-xs uppercase tracking-[0.3em]">
+                System Status: <span class="text-rose-500 animate-pulse">Request Failed</span> | Path: {{ request.path }}
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+    .floating-animation {
+        animation: float 6s ease-in-out infinite;
+    }
+</style>
+
+<script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        new Typed('#error-typewriter', {
+            strings: [
+                'တောင်းပန်ပါတယ်၊ သင်ရှာနေတဲ့ စာမျက်နှာကို ရှာမတွေ့ပါ။',
+                'URL မှားယွင်းနေခြင်း သို့မဟုတ် ဖျက်လိုက်ခြင်း ဖြစ်နိုင်ပါတယ်။',
+                'ကျေးဇူးပြု၍ လမ်းကြောင်း ပြန်လည်စစ်ဆေးပေးပါ။'
+            ],
+            typeSpeed: 40,
+            backSpeed: 20,
+            backDelay: 3000,
+            loop: true,
+            showCursor: true,
+            cursorChar: '_'
+        });
+    });
+</script>
+{% endblock %}

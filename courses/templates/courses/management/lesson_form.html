@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<!-- CKEditor 5 CDN -->
+<script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
+
+<div class="min-h-screen bg-[#fcfcfd] flex flex-col lg:flex-row">
+    <!-- Modern Sidebar -->
+    {% include 'courses/admin_sidebar_snippet.html' %}
+
+    <!-- Main Content Area -->
+    <main class="flex-grow p-6 lg:p-12">
+        <div class="max-w-12xl mx-auto">
+            <!-- Top Bar (Admin Specific Navbar) -->
+            {% include 'courses/admin_topbar_snippet.html' with title=title subtitle="သင်ခန်းစာအချက်အလက်များကို ဖြည့်စွက်ပေးပါ။" %}
+
+            <div class="bg-white rounded-[3rem] shadow-xl border border-slate-100 p-8 md:p-12">
+                <!-- Course Indicator (If pre-selected) -->
+                {% if course %}
+                <div class="mb-10 p-6 bg-indigo-50 rounded-2xl border border-indigo-100 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center text-white mr-4 shadow-lg shadow-indigo-200">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Target Course</p>
+                            <h3 class="text-lg font-black text-indigo-900">{{ course.title }}</h3>
+                        </div>
+                    </div>
+                    <span class="bg-white/50 text-indigo-600 text-[10px] font-black px-4 py-2 rounded-xl border border-indigo-100 uppercase tracking-widest">Pre-selected</span>
+                </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data" class="space-y-8" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {% for field in form %}
+                            <div class="{% if field.name == 'title' or field.name == 'content' or field.name == 'course' %}md:col-span-2{% endif %}">
+                                <label for="{{ field.id_for_label }}" class="block text-slate-500 text-xs font-black uppercase tracking-widest mb-3">
+                                    {{ field.label }}
+                                </label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <p class="text-[10px] text-slate-400 mt-2 italic">{{ field.help_text }}</p>
+                                {% endif %}
+                                {% if field.errors %}
+                                    {% for error in field.errors %}
+                                        <p class="text-xs text-rose-500 mt-2 font-bold">{{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="pt-6 flex flex-col md:flex-row gap-4">
+                        <button type="submit" class="flex-grow custom-gradient text-white font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform shadow-xl shadow-indigo-100">
+                            <i class="fas fa-save mr-3"></i> သိမ်းဆည်းမည်
+                        </button>
+                        <a href="{% if course %}{% url 'manage_lessons' course.pk %}{% else %}{% url 'manage_all_lessons' %}{% endif %}" class="px-10 py-5 bg-slate-50 text-slate-400 font-bold rounded-2xl hover:bg-slate-100 transition-all text-center">
+                            ပယ်ဖျက်မည်
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            {% include 'courses/admin_footer_snippet.html' %}
+        </div>
+    </main>
+</div>
+
+<script>
+    document.querySelectorAll('.editor').forEach(el => {
+        ClassicEditor
+            .create(el, {
+                toolbar: [
+                    'heading', '|', 
+                    'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|',
+                    'undo', 'redo'
+                ]
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+</script>
+
+<style>
+    .ck-editor__editable {
+        min-height: 300px;
+        border-radius: 0 0 1.5rem 1.5rem !important;
+        background-color: #f8fafc !important;
+        border: 1px solid #f1f5f9 !important;
+        padding: 1.5rem !important;
+    }
+    .ck-toolbar {
+        border-radius: 1.5rem 1.5rem 0 0 !important;
+        background-color: #ffffff !important;
+        border: 1px solid #f1f5f9 !important;
+        padding: 0.5rem !important;
+    }
+</style>
+{% endblock %}

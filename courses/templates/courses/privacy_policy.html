@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Privacy Policy - Arakkha Tech{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50 pt-32 pb-20">
+    <div class="container mx-auto px-6">
+        <div class="max-w-4xl mx-auto bg-white p-12 md:p-20 rounded-[4rem] shadow-sm border border-slate-100">
+            <h4 class="text-indigo-600 font-black uppercase tracking-[0.2em] text-sm mb-4">Legal Information</h4>
+            <h1 class="text-4xl md:text-5xl font-black text-slate-900 mb-12">Privacy Policy</h1>
+            
+            <div class="prose prose-slate max-w-none space-y-12">
+                <section>
+                    <h3 class="text-2xl font-black text-slate-800 mb-6">၁။ အချက်အလက်များ စုဆောင်းခြင်း</h3>
+                    <p class="text-slate-500 leading-relaxed text-lg">
+                        သင်သည် ကျွန်ုပ်တို့၏ ဝဘ်ဆိုဒ်တွင် အကောင့်ဖွင့်သည့်အခါ သို့မဟုတ် သင်တန်းများ တက်ရောက်သည့်အခါတွင် သင်၏ အမည်၊ အီးမေးလ်လိပ်စာ နှင့် အခြားသော လိုအပ်သော ကိုယ်ရေးအချက်အလက်များကို စုဆောင်းနိုင်ပါသည်။
+                    </p>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-black text-slate-800 mb-6">၂။ အချက်အလက်များကို အသုံးပြုပုံ</h3>
+                    <p class="text-slate-500 leading-relaxed text-lg">
+                        စုဆောင်းရရှိထားသော အချက်အလက်များကို အောက်ပါရည်ရွယ်ချက်များအတွက် အသုံးပြုပါသည် -
+                    </p>
+                    <ul class="list-disc list-inside text-slate-500 mt-4 space-y-2 ml-4">
+                        <li>သင်တန်းဝန်ဆောင်မှုများ ပေးအပ်ရန်</li>
+                        <li>အကောင့်လုံခြုံရေးအတွက် စစ်ဆေးရန်</li>
+                        <li>နောက်ဆုံးရသတင်းများနှင့် အပ်ဒိတ်များကို အသိပေးရန်</li>
+                        <li>ဝန်ဆောင်မှုများကို ပိုမိုကောင်းမွန်အောင် ပြုလုပ်ရန်</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-black text-slate-800 mb-6">၃။ အချက်အလက် လုံခြုံရေး</h3>
+                    <p class="text-slate-500 leading-relaxed text-lg">
+                        သင်၏ ကိုယ်ရေးအချက်အလက်များကို လုံခြုံစွာ ထိန်းသိမ်းရန် ခေတ်မီနည်းပညာများကို အသုံးပြုထားပါသည်။ သင်၏ ခွင့်ပြုချက်မပါဘဲ မည်သည့် တတိယအဖွဲ့အစည်းကိုမျှ သင်၏အချက်အလက်များကို ရောင်းချခြင်း သို့မဟုတ် မျှဝေခြင်း ပြုလုပ်မည်မဟုတ်ပါ။
+                    </p>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-black text-slate-800 mb-6">၄။ Cookies များ အသုံးပြုခြင်း</h3>
+                    <p class="text-slate-500 leading-relaxed text-lg">
+                        ကျွန်ုပ်တို့၏ ဝဘ်ဆိုဒ်ကို အသုံးပြုရာတွင် ပိုမိုအဆင်ပြေချောမွေ့စေရန်အတွက် Cookies များကို အသုံးပြုနိုင်ပါသည်။ သင်သည် မိမိ၏ Browser Settings တွင် Cookies များကို ပိတ်ထားနိုင်ပါသည်။
+                    </p>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-black text-slate-800 mb-6">၅။ ဆက်သွယ်ရန်</h3>
+                    <p class="text-slate-500 leading-relaxed text-lg">
+                        ဤ Privacy Policy နှင့် ပတ်သက်၍ မေးမြန်းလိုပါက <a href="{% url 'contact' %}" class="text-indigo-600 font-bold underline">Contact Us</a> စာမျက်နှာမှတစ်ဆင့် ဆက်သွယ်နိုင်ပါသည်။
+                    </p>
+                </section>
+
+                <div class="pt-12 border-t border-slate-100 mt-20">
+                    <p class="text-slate-400 text-sm italic text-center">နောက်ဆုံးပြင်ဆင်သည့်ရက်စွဲ - မေလ ၂၇၊ ၂၀၂၆</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 
 {% block title %}{{ title }}{% endblock %}
-
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
 {% block content %}
-<div class="min-h-screen bg-[#fcfcfd] flex flex-col lg:flex-row pt-20">
+<div class="min-h-screen bg-[#fcfcfd] flex flex-col lg:flex-row ">
     <!-- Modern Sidebar -->
     {% include 'courses/admin_sidebar_snippet.html' %}
 

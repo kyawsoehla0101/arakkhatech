@@ -446,9 +446,9 @@ def course_list(request):
     
     # Static data for landing page sections
     features = [
-        {'icon': 'fas fa-rocket', 'title': 'အမြန်ဆုံး သင်ယူမှု', 'desc': 'စနစ်ကျသော roadmap များဖြင့် အချိန်တိုအတွင်း တတ်မြောက်စေရမည်။'},
-        {'icon': 'fas fa-certificate', 'title': 'လက်မှတ်ရရှိခြင်း', 'desc': 'သင်တန်းပြီးဆုံးပါက အရည်အသွေးမီ လက်မှတ်များကို ထုတ်ပေးပါသည်။'},
-        {'icon': 'fas fa-users', 'title': 'Community Support', 'desc': 'သင်တန်းသားအချင်းချင်း ဆွေးနွေးနိုင်မည့် community ရှိပါသည်။'},
+        {'icon': 'fas fa-rocket', 'title': 'အယင်ဆုံး သင်ယူမှု', 'desc': 'စနစ်ကျသော roadmap များဖြင့် အချိန်တိုအတွင်း တတ်မြောက်စီရမည်။'},
+        {'icon': 'fas fa-certificate', 'title': 'လက်မှတ်ရဟိခြင်း', 'desc': 'သင်တန်းပြီးဆုံးပါက အရည်အသွေးမီ လက်မှတ်များကို ထုတ်ပီးပါသည်။'},
+        {'icon': 'fas fa-users', 'title': 'Community Support', 'desc': 'သင်တန်းသားအချင်းချင်း ဆွေးနွေးနိုင်မည့် community ဟိပါသည်။'},
     ]
     
     stats = [
@@ -459,13 +459,13 @@ def course_list(request):
     ]
     
     testimonials = [
-        {'name': 'Kyaw Zayar', 'role': 'Frontend Developer', 'text': 'ဒီ platform ကနေ လေ့လာရတာ တကယ့်ကို ထိရောက်ပါတယ်။ ဗီဒီယိုတွေကလည်း ရှင်းလင်းပါတယ်။'},
+        {'name': 'Kyaw Zayar', 'role': 'Frontend Developer', 'text': 'အေ platform ကနိန်ပနာ လိလာရစွာ တကယ့်ကို ထိရောက်ပါတယ်။ ဗီဒီယိုတွေကလည်း ရှင်းလင်းပါတယ်။'},
         {'name': 'Hsu Myat', 'role': 'Student', 'text': 'Tailwind CSS သင်တန်းက အရမ်းကောင်းပါတယ်။ UI တွေကလည်း အရမ်းလှပါတယ်။'},
     ]
     
     faqs = [
         {'q': 'သင်တန်းတိကို ဇာပိုင်စတင်လိလာရဖို့လဲ?', 'a': 'အကောင့်အရင်ဖွင့်ပြီး သင်တန်းစာမျက်နှာမှာ Enroll နှိပ်လိုက်ကေရပါယာ။'},
-        {'q': 'လက်မှတ် ရနိုင်ပါသလား?', 'a': 'ဟုတ်ပါရေ၊ သင်ခန်းစာအားလုံး ပြီးဆုံးပါက Certificate ထုတ်ပီးပါတယ်။'},
+        {'q': 'လက်မှတ် ရနိုင်ပါသလား?', 'a': 'ဟုတ်ပါရေ၊ သင်ခန်းစာအားလုံး ပြီးဆုံးပါက Certificate ထုတ်ပီးပါရေ။'},
     ]
 
     return render(request, 'courses/course_list.html', {

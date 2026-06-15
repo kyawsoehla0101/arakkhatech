@@ -2,6 +2,24 @@
 
 {% block title %}Arakkha Tech - Premium Learning Platform{% endblock %}
 
+{% block extra_css %}
+<style>
+    .swiper-button-next, .swiper-button-prev {
+        transition: all 0.3s ease;
+    }
+    .swiper-button-next:hover, .swiper-button-prev:hover {
+        background-color: #6366f1;
+        color: white !important;
+        transform: scale(1.1);
+    }
+    .swiper-pagination-bullet-active {
+        background: #6366f1 !important;
+        width: 24px !important;
+        border-radius: 5px !important;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- Hero Section -->
 <section class="relative min-h-[90vh] flex items-center pt-10 overflow-hidden bg-slate-50">
@@ -17,7 +35,7 @@
                     <span>အဂုကပင် စတင်လိလာလိုက်ပါ</span>
                 </div>
                 <h1 class="text-5xl lg:text-7xl font-black text-slate-900 leading-tight mb-8">
-                    သင့်ရဲ့ <span class="text-gradient">Career</span> ကို <br> အဆင့်မြှင့်တင်ပါ
+                    Upgrade Your <span class="text-gradient"> Career</span>
                 </h1>
                 <p class="text-slate-500 text-lg lg:text-xl leading-relaxed mb-10 max-w-xl">
                     အာရက္ခနည်းပညာသည် ခေတ်မီနည်းပညာများကို အာရက္ခဘာသာဖြင့် အခြီခံမှစ၍ လက်တွိကျကျ သင်ကြားပီးနိန်သော platform ဖြစ်ပါသည်။
@@ -160,7 +178,7 @@
             {% empty %}
             <div class="col-span-full py-20 text-center bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200">
                 <i class="fas fa-search text-5xl text-slate-200 mb-6"></i>
-                <p class="text-slate-400 font-bold italic">သင်ရှာဖွေနေသော သင်တန်းမတွေ့ရှိပါ။</p>
+                <p class="text-slate-400 font-bold italic">သင်ယှာနိန်ရေ သင်တန်းမတွိပါ။</p>
             </div>
             {% endfor %}
         </div>
@@ -174,39 +192,89 @@
         <h2 class="text-4xl lg:text-5xl font-black text-slate-800">ကျောင်းသားများ၏ ထင်မြင်ချက်များ</h2>
     </div>
     <div class="container mx-auto px-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {% for voice in community_voices %}
-            <div class="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-50 hover:shadow-xl transition-all" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
-                <div class="flex items-center mb-6">
-                    <div class="w-14 h-14 rounded-2xl custom-gradient flex items-center justify-center text-white text-xl font-black mr-4 shadow-lg shadow-indigo-100">
-                        {{ voice.user.username|slice:":1"|upper }}
-                    </div>
-                    <div>
-                        <h4 class="font-black text-slate-800 text-lg">{{ voice.user.username }}</h4>
-                        <p class="text-xs font-bold text-indigo-500 uppercase tracking-widest">Verified Student</p>
-                    </div>
-                </div>
-                <p class="text-slate-500 leading-relaxed italic">"{{ voice.content }}"</p>
-            </div>
-            {% empty %}
-            {% for t in testimonials %}
-            <div class="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-50 hover:shadow-xl transition-all" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
-                <div class="flex items-center mb-6">
-                    <div class="w-14 h-14 rounded-2xl custom-gradient flex items-center justify-center text-white text-xl font-black mr-4 shadow-lg shadow-indigo-100">
-                        {{ t.name|slice:":1"|upper }}
-                    </div>
-                    <div>
-                        <h4 class="font-black text-slate-800 text-lg">{{ t.name }}</h4>
-                        <p class="text-xs font-bold text-indigo-500 uppercase tracking-widest">{{ t.role }}</p>
+        <!-- Swiper -->
+        <div class="swiper community-swiper pb-16">
+            <div class="swiper-wrapper">
+                {% for voice in community_voices %}
+                <div class="swiper-slide h-auto">
+                    <div class="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-50 hover:shadow-xl transition-all h-full flex flex-col justify-between" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+                        <div>
+                            <div class="flex items-center mb-6">
+                                <div class="w-14 h-14 rounded-2xl custom-gradient flex items-center justify-center text-white text-xl font-black mr-4 shadow-lg shadow-indigo-100">
+                                    {{ voice.user.username|slice:":1"|upper }}
+                                </div>
+                                <div>
+                                    <h4 class="font-black text-slate-800 text-lg">{{ voice.user.username }}</h4>
+                                    <p class="text-xs font-bold text-indigo-500 uppercase tracking-widest">Verified Student</p>
+                                </div>
+                            </div>
+                            <p class="text-slate-500 leading-relaxed italic">"{{ voice.content }}"</p>
+                        </div>
                     </div>
                 </div>
-                <p class="text-slate-500 leading-relaxed italic">"{{ t.text }}"</p>
+                {% empty %}
+                {% for t in testimonials %}
+                <div class="swiper-slide h-auto">
+                    <div class="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-50 hover:shadow-xl transition-all h-full flex flex-col justify-between" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+                        <div>
+                            <div class="flex items-center mb-6">
+                                <div class="w-14 h-14 rounded-2xl custom-gradient flex items-center justify-center text-white text-xl font-black mr-4 shadow-lg shadow-indigo-100">
+                                    {{ t.name|slice:":1"|upper }}
+                                </div>
+                                <div>
+                                    <h4 class="font-black text-slate-800 text-lg">{{ t.name }}</h4>
+                                    <p class="text-xs font-bold text-indigo-500 uppercase tracking-widest">{{ t.role }}</p>
+                                </div>
+                            </div>
+                            <p class="text-slate-500 leading-relaxed italic">"{{ t.text }}"</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% endfor %}
             </div>
-            {% endfor %}
-            {% endfor %}
+            <!-- Add Pagination -->
+            <div class="swiper-pagination !-bottom-2"></div>
+            <!-- Add Navigation -->
+            <div class="hidden md:block">
+                <div class="swiper-button-next !text-indigo-600 !w-12 !h-12 bg-white rounded-full shadow-lg after:!text-xl"></div>
+                <div class="swiper-button-prev !text-indigo-600 !w-12 !h-12 bg-white rounded-full shadow-lg after:!text-xl"></div>
+            </div>
         </div>
     </div>
 </section>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        new Swiper('.community-swiper', {
+            slidesPerView: 1,
+            spaceBetween: 30,
+            loop: true,
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            breakpoints: {
+                768: {
+                    slidesPerView: 2,
+                },
+                1024: {
+                    slidesPerView: 3,
+                },
+            }
+        });
+    });
+</script>
+{% endblock %}
 
 <!-- FAQ Section -->
 <section class="py-32 bg-white">

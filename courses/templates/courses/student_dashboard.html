@@ -34,7 +34,7 @@
                                 <span id="hero-typewriter"></span>
                             </h1>
                             <p class="text-indigo-100 text-lg font-medium max-w-2xl opacity-90">
-                                {% if user.profile.bio %}{{ user.profile.bio }}{% else %}သင်ယူမှုခရီးစဉ်ကို ဆက်လက်လျှောက်လှမ်းလိုက်ပါ။ အောက်မှာ သင်အပ်နှံထားတဲ့ သင်တန်းတွေကို ကြည့်ရှုနိုင်ပါတယ်။{% endif %}
+                                {% if user.profile.bio %}{{ user.profile.bio }}{% else %}သင်ယူမှုခရီးစဉ်ကို ဆက်လက်လျှောက်လှမ်းလိုက်ပါ။ အောက်မှာ သင်အပ်နှံထားရေ သင်တန်းတိကို ကြည့်ရှုနိုင်ပါရေ။{% endif %}
                             </p>
                         </div>
                     </div>
@@ -171,9 +171,9 @@
                 <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8 text-slate-200 text-4xl">
                     <i class="fas fa-graduation-cap"></i>
                 </div>
-                <h3 class="text-2xl font-black text-slate-900 mb-4">သင်တန်းများ မရှိသေးပါ</h3>
+                <h3 class="text-2xl font-black text-slate-900 mb-4">သင်တန်းများ မဟိသိမ့်ပါ။</h3>
                 <p class="text-slate-400 font-bold max-w-md mx-auto mb-10">
-                    လက်ရှိမှာ သင်အပ်နှံထားတဲ့ သင်တန်းမရှိသေးပါဘူး။ သင်တန်းတက်ရောက်လိုပါက Admin ကို ဆက်သွယ်ပေးပါ။
+                    လက်ရှိမှာ သင်အပ်နှံထားရေ သင်တန်းမဟိသိမ့်ပါ။ သင်တန်းတက်ရောက်လိုပါက Admin ကို ဆက်သွယ်ပီးပါ။
                 </p>
                 <a href="{% url 'course_list' %}" class="inline-flex items-center text-indigo-600 font-black uppercase tracking-widest hover:underline">
                     Browse All Courses <i class="fas fa-arrow-right ml-2"></i>
@@ -249,7 +249,7 @@
                             {{ voice_form.content }}
                         </div>
                         <button type="submit" class="w-full custom-gradient text-white font-black py-6 rounded-[2rem] hover:scale-[1.02] transition-transform shadow-2xl shadow-indigo-200 flex items-center justify-center group text-lg">
-                            <span>ပေးပို့မည်</span>
+                            <span>ပီးပို့မည်</span>
                             <i class="fas fa-paper-plane ml-3 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
                         </button>
                     </form>
@@ -275,9 +275,9 @@
         // Hero Section Typewriter
         new Typed('#hero-typewriter', {
             strings: [
-                'မင်္ဂလာပါ၊ {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %} 👋',
-                'သင်ယူမှုကို အခုပဲ စတင်လိုက်ပါ။ 🚀',
-                'သင့်ရဲ့ အနာဂတ်ကို ဒီမှာ တည်ဆောက်ပါ။ ✨'
+                'သာလီစွပါ {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}',
+                'သင်ယူမှုကို အဂုကပင် စတင်လိုက်ပါ။',
+                'အနာဂတ်ကို အေမှာ တည်ဆောက်ပါ။'
             ],
             typeSpeed: 60,
             backSpeed: 30,
@@ -294,7 +294,7 @@
             showCursor: false,
             onComplete: (self) => {
                 new Typed('#typewriter-line-2', {
-                    strings: ['အားလုံးသိအောင် မျှဝေလိုက်ပါ။'],
+                    strings: ['အားလုံးသိအောင် မျှဝီလိုက်ပါ။'],
                     typeSpeed: 50,
                     showCursor: true,
                     cursorChar: '_',

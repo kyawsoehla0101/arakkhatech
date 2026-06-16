@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-cx-hcn(u-i#v^ca#jty45@c$blslnuwu_pq-#sl5stwhi1c69n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'arakkhatech.onrender.com']
 CSRF_TRUSTED_ORIGINS = ['https://arakkhatech.onrender.com']
 
 # Application definition

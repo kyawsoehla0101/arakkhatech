@@ -7,7 +7,28 @@ from .forms import CourseForm, LessonForm, StudentCreationForm, ManualEnrollment
 from django.db.models import Q, Count
 
 def is_admin(user):
-    return user.is_superuser
+    if user.is_superuser:
+        return True
+    if hasattr(user, 'profile'):
+        return user.profile.role == 'admin'
+    return False
+
+def is_instructor(user):
+    if user.is_superuser:
+        return True
+    if hasattr(user, 'profile'):
+        return user.profile.role == 'instructor'
+    return False
+
+def can_manage_course(user, course):
+    if is_admin(user):
+        return True
+    return course.instructor == user
+
+def can_manage_book(user, book):
+    if is_admin(user):
+        return True
+    return book.author == user
 
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
@@ -196,31 +217,25 @@ from datetime import timedelta
 
 # Course Management Views
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def manage_courses(request):
-    courses = Course.objects.annotate(student_count=Count('enrolled_students')).order_by('-created_at')
+    if is_admin(request.user):
+        courses = Course.objects.annotate(student_count=Count('enrolled_students')).order_by('-created_at')
+    else:
+        courses = Course.objects.filter(instructor=request.user).annotate(student_count=Count('enrolled_students')).order_by('-created_at')
     return render(request, 'courses/management/manage_courses.html', {'courses': courses})
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def add_course(request):
     if request.method == 'POST':
         form = CourseForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-                course = form.save()
-                
-                # Notify all students about the new course using bulk_create for performance
-                students = User.objects.filter(is_superuser=False)
-                notifications = [
-                    Notification(
-                        user=student,
-                        title="New Course Available! 🎓",
-                        message=f"A new course '{course.title}' has been published. Check it out now!",
-                        is_admin_notification=False
-                    ) for student in students
-                ]
-                Notification.objects.bulk_create(notifications)
+                course = form.save(commit=False)
+                if not is_admin(request.user):
+                    course.instructor = request.user
+                course.save()
                 
                 messages.success(request, "သင်တန်းအသစ်ကို အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ")
                 return redirect('manage_courses')
@@ -238,14 +253,20 @@ def add_course(request):
     return render(request, 'courses/management/course_form.html', {'form': form, 'title': 'သင်တန်းအသစ်ဖွင့်ရန်'})
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def edit_course(request, pk):
     course = get_object_or_404(Course, pk=pk)
+    if not can_manage_course(request.user, course):
+        messages.error(request, "ဤသင်တန်းကို ပြင်ဆင်ခွင့်မရှိပါ။")
+        return redirect('manage_courses')
     if request.method == 'POST':
         form = CourseForm(request.POST, request.FILES, instance=course)
         if form.is_valid():
             try:
-                form.save()
+                course = form.save(commit=False)
+                if not is_admin(request.user):
+                    course.instructor = request.user
+                course.save()
                 messages.success(request, "သင်တန်းအချက်အလက်များကို ပြင်ဆင်ပြီးပါပြီ")
                 return redirect('manage_courses')
             except Exception as e:
@@ -260,9 +281,12 @@ def edit_course(request, pk):
     return render(request, 'courses/management/course_form.html', {'form': form, 'title': 'သင်တန်းပြင်ဆင်ရန်'})
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def delete_course(request, pk):
     course = get_object_or_404(Course, pk=pk)
+    if not can_manage_course(request.user, course):
+        messages.error(request, "ဤသင်တန်းကို ဖျက်သိမ်းခွင့်မရှိပါ။")
+        return redirect('manage_courses')
     if request.method == 'POST':
         course.delete()
         messages.success(request, "သင်တန်းကို ဖျက်သိမ်းပြီးပါပြီ")
@@ -271,19 +295,27 @@ def delete_course(request, pk):
 
 # Lesson Management Views
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def manage_all_lessons(request):
-    lessons = Lesson.objects.all().select_related('course').order_by('course', 'order')
+    if is_admin(request.user):
+        lessons = Lesson.objects.all().select_related('course').order_by('course', 'order')
+    else:
+        lessons = Lesson.objects.filter(course__instructor=request.user).select_related('course').order_by('course', 'order')
     return render(request, 'courses/management/manage_all_lessons.html', {'lessons': lessons})
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def add_lesson_general(request):
     if request.method == 'POST':
         form = LessonForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-                form.save()
+                lesson = form.save(commit=False)
+                course = lesson.course
+                if not can_manage_course(request.user, course):
+                    messages.error(request, "ဤသင်တန်းအတွက် သင်ခန်းစာထည့်ခွင့်မရှိပါ။")
+                    return redirect('manage_all_lessons')
+                lesson.save()
                 messages.success(request, "သင်ခန်းစာအသစ် ထည့်သွင်းပြီးပါပြီ")
                 return redirect('manage_all_lessons')
             except Exception as e:
@@ -294,25 +326,38 @@ def add_lesson_general(request):
                 for error in errors:
                     messages.error(request, f"{field}: {error}")
     else:
-        form = LessonForm()
+        if is_admin(request.user):
+            form = LessonForm()
+        else:
+            # For instructors, only show their own courses in the form
+            form = LessonForm()
+            form.fields['course'].queryset = Course.objects.filter(instructor=request.user)
     return render(request, 'courses/management/lesson_form.html', {'form': form, 'title': 'သင်ခန်းစာအသစ်ထည့်ရန်'})
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def manage_lessons(request, course_pk):
     course = get_object_or_404(Course, pk=course_pk)
+    if not can_manage_course(request.user, course):
+        messages.error(request, "ဤသင်တန်းကို ကြည့်ရှုခွင့်မရှိပါ။")
+        return redirect('manage_courses')
     lessons = course.lessons.all().order_by('order')
     return render(request, 'courses/management/manage_lessons.html', {'course': course, 'lessons': lessons})
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def add_lesson(request, course_pk):
     course = get_object_or_404(Course, pk=course_pk)
+    if not can_manage_course(request.user, course):
+        messages.error(request, "ဤသင်တန်းအတွက် သင်ခန်းစာထည့်ခွင့်မရှိပါ။")
+        return redirect('manage_courses')
     if request.method == 'POST':
         form = LessonForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-                lesson = form.save()
+                lesson = form.save(commit=False)
+                lesson.course = course
+                lesson.save()
                 messages.success(request, "သင်ခန်းစာအသစ် ထည့်သွင်းပြီးပါပြီ")
                 return redirect('manage_lessons', course_pk=lesson.course.pk)
             except Exception as e:
@@ -328,9 +373,12 @@ def add_lesson(request, course_pk):
     return render(request, 'courses/management/lesson_form.html', {'form': form, 'course': course, 'title': 'သင်ခန်းစာအသစ်ထည့်ရန်'})
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def edit_lesson(request, pk):
     lesson = get_object_or_404(Lesson, pk=pk)
+    if not can_manage_course(request.user, lesson.course):
+        messages.error(request, "ဤသင်ခန်းစာကို ပြင်ဆင်ခွင့်မရှိပါ။")
+        return redirect('manage_courses')
     if request.method == 'POST':
         form = LessonForm(request.POST, request.FILES, instance=lesson)
         if form.is_valid():
@@ -351,9 +399,12 @@ def edit_lesson(request, pk):
     return render(request, 'courses/management/lesson_form.html', {'form': form, 'course': lesson.course, 'title': 'သင်ခန်းစာပြင်ဆင်ရန်'})
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def delete_lesson(request, pk):
     lesson = get_object_or_404(Lesson, pk=pk)
+    if not can_manage_course(request.user, lesson.course):
+        messages.error(request, "ဤသင်ခန်းစာကို ဖျက်သိမ်းခွင့်မရှိပါ။")
+        return redirect('manage_courses')
     course_pk = lesson.course.pk
     if request.method == 'POST':
         lesson.delete()
@@ -419,7 +470,7 @@ def enroll_student(request, student_pk=None):
 @login_required
 @user_passes_test(is_admin)
 def manage_students(request):
-    students = User.objects.filter(is_superuser=False).annotate(enrollment_count=Count('enrollments')).prefetch_related('enrollments', 'enrollments__course', 'enrollments__completed_lessons')
+    students = User.objects.filter(is_superuser=False).annotate(enrollment_count=Count('enrollments')).prefetch_related('enrollments', 'enrollments__course', 'enrollments__completed_lessons', 'profile')
     
     # Add average progress to each student object
     for student in students:
@@ -431,6 +482,95 @@ def manage_students(request):
             student.average_progress = 0
             
     return render(request, 'courses/management/manage_students.html', {'students': students})
+
+# User Management Views (All Users including Admins/Instructors)
+@login_required
+@user_passes_test(is_admin)
+def manage_users(request):
+    users = User.objects.all().annotate(enrollment_count=Count('enrollments')).prefetch_related('enrollments', 'profile').order_by('-date_joined')
+    
+    return render(request, 'courses/management/manage_users.html', {'users': users})
+
+@login_required
+@user_passes_test(is_admin)
+def add_user(request):
+    if request.method == 'POST':
+        user_form = StudentCreationForm(request.POST)
+        
+        if user_form.is_valid():
+            user = user_form.save()
+            # Now update the profile (which was created by the signal)
+            profile_form = ProfileForm(request.POST, request.FILES, instance=user.profile)
+            if profile_form.is_valid():
+                profile_form.save()
+                
+                # Admin notification
+                Notification.objects.create(
+                    user=request.user,
+                    title="New User Created",
+                    message=f"New account for {user.username} (Role: {user.profile.role}) has been created successfully.",
+                    is_admin_notification=True
+                )
+                
+                messages.success(request, f"User {user.username} ကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ")
+                return redirect('manage_users')
+            else:
+                # If profile form is invalid, delete the created user
+                user.delete()
+                messages.error(request, "အချက်အလက်များ မှားယွင်းနေပါသည်။ ပြန်လည်စစ်ဆေးပေးပါ။")
+        else:
+            profile_form = ProfileForm(request.POST, request.FILES)
+            messages.error(request, "အချက်အလက်များ မှားယွင်းနေပါသည်။ ပြန်လည်စစ်ဆေးပေးပါ။")
+    else:
+        user_form = StudentCreationForm()
+        profile_form = ProfileForm()
+    
+    return render(request, 'courses/management/user_form.html', {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'title': 'User အသစ်ဖန်တီးရန်'
+    })
+
+@login_required
+@user_passes_test(is_admin)
+def edit_user(request, user_pk):
+    user = get_object_or_404(User, pk=user_pk)
+    
+    if request.method == 'POST':
+        user_form = UserUpdateForm(request.POST, instance=user)
+        profile_form = ProfileForm(request.POST, request.FILES, instance=user.profile)
+        
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            
+            messages.success(request, f"User {user.username} ကို အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ")
+            return redirect('manage_users')
+        else:
+            messages.error(request, "အချက်အလက်များ မှားယွင်းနေပါသည်။ ပြန်လည်စစ်ဆေးပေးပါ။")
+    else:
+        user_form = UserUpdateForm(instance=user)
+        profile_form = ProfileForm(instance=user.profile)
+    
+    return render(request, 'courses/management/user_form.html', {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'user_obj': user,
+        'title': 'User ပြင်ဆင်ရန်'
+    })
+
+@login_required
+@user_passes_test(is_admin)
+def delete_user(request, user_pk):
+    user = get_object_or_404(User, pk=user_pk)
+    
+    if request.method == 'POST':
+        username = user.username
+        user.delete()
+        messages.success(request, f"User {username} ကို ဖျက်သိမ်းပြီးပါပြီ")
+        return redirect('manage_users')
+    
+    return render(request, 'courses/confirm_delete.html', {'item': user, 'type': 'User'})
 
 def course_list(request):
     query = request.GET.get('q')

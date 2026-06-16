@@ -8,15 +8,15 @@ class ChapterInline(admin.StackedInline):
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
-    list_display = ('title', 'course', 'is_free_book', 'order')
-    list_filter = ('course', 'is_free_book')
+    list_display = ('title', 'author', 'course', 'is_free_book', 'order')
+    list_filter = ('author', 'course', 'is_free_book')
     prepopulated_fields = {'slug': ('title',)}
-    search_fields = ('title',)
+    search_fields = ('title', 'author__username')
     inlines = [ChapterInline]
 
     fieldsets = (
         ('စာအုပ်အချက်အလက်များ', {
-            'fields': ('title', 'slug', 'description', 'thumbnail', 'order')
+            'fields': ('title', 'slug', 'description', 'thumbnail', 'author', 'order')
         }),
         ('ဆက်တင်များ', {
             'fields': ('is_free_book', 'course'),

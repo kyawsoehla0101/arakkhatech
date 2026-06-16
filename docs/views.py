@@ -5,9 +5,31 @@ from django.contrib import messages
 from django.db.models import Q
 from .models import Book, Chapter
 from .forms import BookForm, ChapterForm
+from courses.models import Course
 
 def is_admin(user):
-    return user.is_superuser
+    if user.is_superuser:
+        return True
+    if hasattr(user, 'profile'):
+        return user.profile.role == 'admin'
+    return False
+
+def is_instructor(user):
+    if user.is_superuser:
+        return True
+    if hasattr(user, 'profile'):
+        return user.profile.role == 'instructor'
+    return False
+
+def can_manage_course(user, course):
+    if is_admin(user):
+        return True
+    return course.instructor == user
+
+def can_manage_book(user, book):
+    if is_admin(user):
+        return True
+    return book.author == user
 
 # Public Views
 def docs_list(request):
@@ -56,11 +78,14 @@ def chapter_detail(request, book_slug, slug):
 
 # Admin CRUD Views
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def manage_books(request):
     query = request.GET.get('q', '')
     filter_type = request.GET.get('type', 'all')
-    books = Book.objects.all().order_by('order')
+    if is_admin(request.user):
+        books = Book.objects.all().order_by('order')
+    else:
+        books = Book.objects.filter(author=request.user).order_by('order')
     
     if query:
         books = books.filter(Q(title__icontains=query) | Q(description__icontains=query))
@@ -76,40 +101,58 @@ def manage_books(request):
     })
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def add_book(request):
     if request.method == 'POST':
         form = BookForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            book = form.save(commit=False)
+            if not is_admin(request.user):
+                book.author = request.user
+            book.save()
             messages.success(request, "စာအုပ်အသစ်ကို ထည့်သွင်းပြီးပါပြီ")
             return redirect('manage_books')
         else:
             messages.error(request, "အချက်အလက်များ မှားယွင်းနေပါသည်။ ပြန်လည်စစ်ဆေးပေးပါ။")
     else:
         form = BookForm()
+        if not is_admin(request.user):
+            # For instructors, only show their own courses in the form
+            form.fields['course'].queryset = Course.objects.filter(instructor=request.user)
     return render(request, 'docs/management/book_form.html', {'form': form, 'title': 'စာအုပ်အသစ်ထည့်ရန်'})
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def edit_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
+    if not can_manage_book(request.user, book):
+        messages.error(request, "ဤစာအုပ်ကို ပြင်ဆင်ခွင့်မရှိပါ။")
+        return redirect('manage_books')
     if request.method == 'POST':
         form = BookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
-            form.save()
+            book = form.save(commit=False)
+            if not is_admin(request.user):
+                book.author = request.user
+            book.save()
             messages.success(request, "စာအုပ်အချက်အလက်များကို ပြင်ဆင်ပြီးပါပြီ")
             return redirect('manage_books')
         else:
             messages.error(request, "အချက်အလက်များ မှားယွင်းနေပါသည်။ ပြန်လည်စစ်ဆေးပေးပါ။")
     else:
         form = BookForm(instance=book)
+        if not is_admin(request.user):
+            # For instructors, only show their own courses in the form
+            form.fields['course'].queryset = Course.objects.filter(instructor=request.user)
     return render(request, 'docs/management/book_form.html', {'form': form, 'title': 'စာအုပ်ပြင်ဆင်ရန်'})
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def delete_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
+    if not can_manage_book(request.user, book):
+        messages.error(request, "ဤစာအုပ်ကို ဖျက်သိမ်းခွင့်မရှိပါ။")
+        return redirect('manage_books')
     if request.method == 'POST':
         book.delete()
         messages.success(request, "စာအုပ်ကို ဖျက်သိမ်းပြီးပါပြီ")
@@ -118,16 +161,22 @@ def delete_book(request, pk):
 
 # Chapter Management
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def manage_chapters(request, book_pk):
     book = get_object_or_404(Book, pk=book_pk)
+    if not can_manage_book(request.user, book):
+        messages.error(request, "ဤစာအုပ်ကို ကြည့်ရှုခွင့်မရှိပါ။")
+        return redirect('manage_books')
     chapters = book.chapters.all().order_by('order')
     return render(request, 'docs/management/manage_chapters.html', {'book': book, 'chapters': chapters})
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def add_chapter(request, book_pk):
     book = get_object_or_404(Book, pk=book_pk)
+    if not can_manage_book(request.user, book):
+        messages.error(request, "ဤစာအုပ်အတွက် အခန်းထည့်ခွင့်မရှိပါ။")
+        return redirect('manage_books')
     if request.method == 'POST':
         form = ChapterForm(request.POST)
         if form.is_valid():
@@ -143,9 +192,12 @@ def add_chapter(request, book_pk):
     return render(request, 'docs/management/chapter_form.html', {'form': form, 'book': book, 'title': 'စာမျက်နှာအသစ်ထည့်ရန်'})
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def edit_chapter(request, pk):
     chapter = get_object_or_404(Chapter, pk=pk)
+    if not can_manage_book(request.user, chapter.book):
+        messages.error(request, "ဤစာမျက်နှာကို ပြင်ဆင်ခွင့်မရှိပါ။")
+        return redirect('manage_books')
     if request.method == 'POST':
         form = ChapterForm(request.POST, instance=chapter)
         if form.is_valid():
@@ -159,9 +211,12 @@ def edit_chapter(request, pk):
     return render(request, 'docs/management/chapter_form.html', {'form': form, 'book': chapter.book, 'title': 'စာမျက်နှာပြင်ဆင်ရန်'})
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
 def delete_chapter(request, pk):
     chapter = get_object_or_404(Chapter, pk=pk)
+    if not can_manage_book(request.user, chapter.book):
+        messages.error(request, "ဤစာမျက်နှာကို ဖျက်သိမ်းခွင့်မရှိပါ။")
+        return redirect('manage_books')
     book_pk = chapter.book.pk
     if request.method == 'POST':
         chapter.delete()

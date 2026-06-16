@@ -23,6 +23,11 @@ urlpatterns = [
     path('manage/students/<int:student_pk>/enroll/', views.enroll_student, name='enroll_student_manual'),
     path('manage/enroll/', views.enroll_student, name='enroll_student_general'),
     
+    path('manage/users/', views.manage_users, name='manage_users'),
+    path('manage/users/add/', views.add_user, name='add_user'),
+    path('manage/users/<int:user_pk>/edit/', views.edit_user, name='edit_user'),
+    path('manage/users/<int:user_pk>/delete/', views.delete_user, name='delete_user'),
+    
     path('admin-search/', views.admin_search, name='admin_search'),
     path('notifications/', views.all_notifications, name='all_notifications'),
     path('notifications/mark-read/', views.mark_notifications_read, name='mark_notifications_read'),

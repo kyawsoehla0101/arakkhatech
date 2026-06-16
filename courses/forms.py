@@ -15,11 +15,20 @@ class UserUpdateForm(forms.ModelForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['avatar', 'bio']
+        fields = ['avatar', 'bio', 'role']
         widgets = {
             'avatar': forms.FileInput(attrs={'class': 'block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100'}),
             'bio': forms.Textarea(attrs={'class': 'block w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-[2rem] focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-medium leading-relaxed', 'rows': 3, 'placeholder': 'သင့်အကြောင်း အနည်းငယ် ရေးသားပါ...'}),
+            'role': forms.Select(attrs={'class': 'block w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-slate-700'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            if not isinstance(field.widget, forms.CheckboxInput) and not isinstance(field.widget, forms.FileInput):
+                field.widget.attrs.update({
+                    'class': 'block w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-slate-700 placeholder-slate-400'
+                })
 
 class CommunityVoiceForm(forms.ModelForm):
     class Meta:
@@ -59,14 +68,18 @@ class CourseForm(forms.ModelForm):
             self.fields['description'].widget.attrs.update({'class': self.fields['description'].widget.attrs.get('class', '') + ' editor'})
 
 class StudentCreationForm(UserCreationForm):
-    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'block w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all'}))
+    email = forms.EmailField(required=True)
     
     class Meta:
         model = User
         fields = ['username', 'email']
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'block w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all'}),
-        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({
+                'class': 'block w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-[2rem] focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-slate-700 placeholder-slate-400'
+            })
 
 class ManualEnrollmentForm(forms.ModelForm):
     class Meta:

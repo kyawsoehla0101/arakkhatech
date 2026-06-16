@@ -28,12 +28,8 @@ urlpatterns = [
     path('docs/', include('docs.urls')),
     path('', include('courses.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
+    path("__reload__/", include("django_browser_reload.urls")),
 ]
-
-if settings.DEBUG:
-    urlpatterns += [
-        path("__reload__/", include("django_browser_reload.urls")),
-    ]
 
 handler404 = 'courses.views.preview_404'
 

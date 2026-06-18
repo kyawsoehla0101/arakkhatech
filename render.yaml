@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: arakkhatech
+    env: python
+    plan: starter
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn arakkhatech.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "false"
+      - key: SITE_NAME
+        value: Arakkha Tech
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+    autoDeploy: true
+
+databases:
+  - name: arakkhatech-db
+    plan: starter

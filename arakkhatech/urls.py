@@ -30,6 +30,7 @@ urlpatterns = [
     path('docs/', include('docs.urls')),
     path('', include('courses.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/', include('allauth.urls')),
 ]
 
 if settings.DEBUG:

@@ -4,31 +4,8 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from .models import Course, Lesson, Enrollment, Notification, CommunityVoice, NewsletterSubscriber
 from .forms import CourseForm, LessonForm, StudentCreationForm, ManualEnrollmentForm, CommunityVoiceForm, ProfileForm, UserUpdateForm
+from .helpers import is_admin, is_instructor, can_manage_course, can_manage_book
 from django.db.models import Q, Count
-
-def is_admin(user):
-    if user.is_superuser:
-        return True
-    if hasattr(user, 'profile'):
-        return user.profile.role == 'admin'
-    return False
-
-def is_instructor(user):
-    if user.is_superuser:
-        return True
-    if hasattr(user, 'profile'):
-        return user.profile.role == 'instructor'
-    return False
-
-def can_manage_course(user, course):
-    if is_admin(user):
-        return True
-    return course.instructor == user
-
-def can_manage_book(user, book):
-    if is_admin(user):
-        return True
-    return book.author == user
 
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm

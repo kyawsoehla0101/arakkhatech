@@ -25,6 +25,8 @@ from django.conf.urls import handler404
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/v1/', include('courses.urls_api')),
+    path('api/v1/', include('docs.urls_api')),
     path('docs/', include('docs.urls')),
     path('', include('courses.urls')),
     path('accounts/', include('django.contrib.auth.urls')),

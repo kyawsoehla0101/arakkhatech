@@ -258,3 +258,25 @@ REST_FRAMEWORK = {
 CORS_ALLOW_ALL_ORIGINS = True  # For development, restrict in production
 CORS_ALLOW_CREDENTIALS = True
 
+# Logging for production debugging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+    },
+}
+

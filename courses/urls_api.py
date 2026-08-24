@@ -1,4 +1,5 @@
 from django.urls import path, include
+from docs.views_api import BookViewSet
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -14,6 +15,7 @@ router = DefaultRouter()
 router.register(r'courses', CourseViewSet)
 router.register(r'lessons', LessonViewSet)
 router.register(r'enrollments', EnrollmentViewSet)
+router.register(r'books', BookViewSet)
 router.register(r'notifications', NotificationViewSet)
 router.register(r'community-voices', CommunityVoiceViewSet)
 router.register(r'profiles', ProfileViewSet)

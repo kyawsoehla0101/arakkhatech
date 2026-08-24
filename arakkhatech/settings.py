@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-cx-hcn(u-i#v^ca#jty45@c$blslnuwu_pq-#sl5stwhi1c69n')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ['*']
 
@@ -90,10 +90,7 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
 ]
 
-# Only include django-browser-reload in development
-if DEBUG:
-    INSTALLED_APPS.append('django_browser_reload')
-    MIDDLEWARE.append("django_browser_reload.middleware.BrowserReloadMiddleware")
+# (Temporarily removed django-browser-reload to fix AttributeError)
 
 ROOT_URLCONF = 'arakkhatech.urls'
 
@@ -192,26 +189,53 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # WhiteNoise settings for static file serving
-if not DEBUG:
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-else:
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # For production, we'd want to use a media storage service like Cloudinary or AWS S3
 # For Render, let's check if we have cloudinary configured
-if config('CLOUDINARY_URL', default=None):
-    INSTALLED_APPS.append('cloudinary')
-    INSTALLED_APPS.append('cloudinary_storage')
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
-        'API_KEY': config('CLOUDINARY_API_KEY', default=''),
-        'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
+
+# Media Storage - Supabase Storage
+if config('SUPABASE_S3_ENDPOINT', default=None):
+
+    INSTALLED_APPS += [
+        'storages',
+    ]
+
+    STORAGES = {
+        'default': {
+            'BACKEND': 'storages.backends.s3.S3Storage',
+        },
+        'staticfiles': {
+            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        },
     }
 
+    AWS_S3_ENDPOINT_URL = config('SUPABASE_S3_ENDPOINT')
+    AWS_ACCESS_KEY_ID = config('SUPABASE_S3_ACCESS_KEY')
+    AWS_SECRET_ACCESS_KEY = config('SUPABASE_S3_SECRET_KEY')
+
+    AWS_STORAGE_BUCKET_NAME = config(
+        'SUPABASE_S3_BUCKET',
+        default='media'
+    )
+
+    AWS_S3_REGION_NAME = 'us-east-1'
+
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_DEFAULT_ACL = None
+
+    AWS_QUERYSTRING_AUTH = False
+
+    AWS_S3_CUSTOM_DOMAIN = (
+        f"{config('SUPABASE_S3_ENDPOINT').split('/storage/v1/s3')[0]}"
+        f"/storage/v1/object/public/"
+        f"{AWS_STORAGE_BUCKET_NAME}"
+    )
+
+    MEDIA_URL = f"{AWS_S3_CUSTOM_DOMAIN}/"
 # Security settings for production
 if not DEBUG:
     CSRF_COOKIE_SECURE = True

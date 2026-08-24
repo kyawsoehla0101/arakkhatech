@@ -33,10 +33,13 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
 ]
 
-if settings.DEBUG:
-    urlpatterns += [
-        path("__reload__/", include("django_browser_reload.urls")),
-    ]
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# (Temporarily removed django-browser-reload to fix AttributeError)
 
+# Serve media files in both dev and production (even if not persistent on Render)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT
+    )
 handler404 = 'courses.views.preview_404'

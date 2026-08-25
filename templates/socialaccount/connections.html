@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}လိပ်ပြာချိတ်ဆက်ရန် - Arakkha Tech{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto my-12 md:my-20">
+    <div class="bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100">
+        <div class="custom-gradient p-10 md:p-14 text-white relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
+            <div class="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full -ml-24 -mb-24"></div>
+            <div class="relative z-10 text-center">
+                <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-xl mx-auto">
+                    <i class="fas fa-link text-indigo-600 text-2xl"></i>
+                </div>
+                <h1 class="text-3xl md:text-5xl font-black mb-4 leading-tight">Social Account ချိတ်ဆက်ရန်</h1>
+                <p class="text-indigo-100 text-lg opacity-90 max-w-2xl mx-auto">
+                    သင်၏ပြင်ပအကောင့်များကို ချိတ်ဆက်ပြီး လွယ်ကူစွာ ဝင်ရောက်နိုင်ပါသည်။
+                </p>
+            </div>
+        </div>
+
+        <div class="p-10 md:p-16 space-y-8">
+            {% if form.accounts %}
+            <div>
+                <p class="text-slate-600 font-medium mb-5">ချိတ်ဆက်ပြီးသော Social Accounts များ -</p>
+                <form method="post" action="{% url 'socialaccount_connections' %}" class="space-y-4">
+                    {% csrf_token %}
+                    {% for base_account in form.accounts %}
+                    {% with base_account.get_provider_account as account %}
+                    <div class="flex items-center justify-between p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-all">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-11 h-11 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shadow-sm">
+                                <i class="fab fa-{{ account.get_brand.id|default:'google' }} text-xl text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-black text-slate-800">{{ account }}</p>
+                                <p class="text-xs text-slate-400 font-bold">{{ account.get_brand.name }}</p>
+                            </div>
+                        </div>
+                        <button type="submit" name="account" value="{{ base_account.pk }}" class="px-5 py-2.5 bg-rose-50 text-rose-500 rounded-xl font-black hover:bg-rose-500 hover:text-white transition-all text-sm border border-rose-100 hover:border-rose-500">
+                            ဖြုတ်မည်
+                        </button>
+                    </div>
+                    {% endwith %}
+                    {% endfor %}
+                </form>
+            </div>
+            {% else %}
+            <div class="p-6 rounded-2xl bg-indigo-50/40 border border-indigo-100 text-center">
+                <p class="text-slate-500 font-medium">မည်သည့် Social Account မျှ ချိတ်ဆက်ထားခြင်း မရှိသေးပါ။</p>
+            </div>
+            {% endif %}
+
+            <div class="pt-6 border-t border-slate-100">
+                <p class="text-slate-600 font-medium mb-5">အသစ် ချိတ်ဆက်မည် -</p>
+                <div class="max-w-md mx-auto space-y-4">
+                    {% include "socialaccount/snippets/provider_list.html" with process="connect" %}
+                    <a href="{% url 'student_dashboard' %}" class="block w-full text-center py-4.5 bg-slate-50 text-slate-600 rounded-2xl hover:bg-slate-100 transition-all font-black py-5 text-base">
+                        <i class="fas fa-arrow-left mr-2"></i> Dashboard သို့ ပြန်သွားရန်
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

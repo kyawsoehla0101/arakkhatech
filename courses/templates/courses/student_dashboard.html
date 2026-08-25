@@ -60,6 +60,70 @@
                             </div>
                         </div>
                     </div>
+                    {% if is_instructor_user or is_admin_user %}
+                    <div class="mt-10 flex flex-col sm:flex-row flex-wrap justify-center lg:justify-start gap-4" data-aos="fade-up" data-aos-delay="150">
+                        <a href="{% url 'manage_courses' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-indigo-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
+                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                                <i class="fas fa-chalkboard-teacher text-lg"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-sm font-black tracking-wide">သင်တန်းစီမံရန်</p>
+                                <p class="text-[10px] text-indigo-100 opacity-80 font-bold uppercase tracking-widest">Manage Courses</p>
+                            </div>
+                            <i class="fas fa-arrow-right ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+                        </a>
+                        <a href="{% url 'add_course' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-indigo-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
+                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                                <i class="fas fa-plus-circle text-lg"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-sm font-black tracking-wide">သင်တန်းအသစ်ဖွင့်ရန်</p>
+                                <p class="text-[10px] text-indigo-100 opacity-80 font-bold uppercase tracking-widest">New Course</p>
+                            </div>
+                            <i class="fas fa-arrow-right ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+                        </a>
+                        <a href="{% url 'manage_enrollments' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-indigo-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
+                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                                <i class="fas fa-user-graduate text-lg"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-sm font-black tracking-wide">Enrollment စီမံရန်</p>
+                                <p class="text-[10px] text-indigo-100 opacity-80 font-bold uppercase tracking-widest">Manage Students</p>
+                            </div>
+                            <i class="fas fa-arrow-right ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+                        </a>
+                        <a href="{% url 'enroll_student_general' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-indigo-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
+                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                                <i class="fas fa-user-plus text-lg"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-sm font-black tracking-wide">ကျောင်းသား Enroll လုပ်ရန်</p>
+                                <p class="text-[10px] text-indigo-100 opacity-80 font-bold uppercase tracking-widest">New Enrollment</p>
+                            </div>
+                            <i class="fas fa-arrow-right ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+                        </a>
+                        <a href="{% url 'manage_books' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-indigo-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
+                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                                <i class="fas fa-book-open text-lg"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-sm font-black tracking-wide">စာအုပ်စီမံရန်</p>
+                                <p class="text-[10px] text-indigo-100 opacity-80 font-bold uppercase tracking-widest">Manage Books</p>
+                            </div>
+                            <i class="fas fa-arrow-right ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+                        </a>
+                        <a href="{% url 'add_book' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-indigo-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
+                            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                                <i class="fas fa-book-medical text-lg"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-sm font-black tracking-wide">စာအုပ်အသစ်ထည့်ရန်</p>
+                                <p class="text-[10px] text-indigo-100 opacity-80 font-bold uppercase tracking-widest">New Book</p>
+                            </div>
+                            <i class="fas fa-arrow-right ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+                        </a>
+                    </div>
+                    {% endif %}
                 </div>
 
                 <!-- Code Style Element -->

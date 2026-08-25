@@ -3,12 +3,32 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.contrib.auth.models import User
 from .models import Course, Lesson, Enrollment, Notification, CommunityVoice, NewsletterSubscriber
-from .forms import CourseForm, LessonForm, StudentCreationForm, ManualEnrollmentForm, CommunityVoiceForm, ProfileForm, UserUpdateForm
+from .forms import CourseForm, LessonForm, StudentCreationForm, ManualEnrollmentForm, CommunityVoiceForm, ProfileForm, UserUpdateForm, SignUpForm
 from .helpers import is_admin, is_instructor, can_manage_course, can_manage_book
 from django.db.models import Q, Count
 
-from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth import update_session_auth_hash, login
 from django.contrib.auth.forms import PasswordChangeForm
+
+def signup(request):
+    if request.user.is_authenticated:
+        return redirect('student_dashboard')
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            user.refresh_from_db()
+            if hasattr(user, 'profile'):
+                user.profile.role = 'student'
+                user.profile.save()
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            messages.success(request, f"မင်္ဂလာပါ {user.get_full_name() or user.username}! Arakkha Tech တွင် စာရင်းသွင်းခြင်း အောင်မြင်ပါသည်")
+            return redirect('student_dashboard')
+        else:
+            messages.error(request, "စာရင်းသွင်းရာတွင် အမှားအယွင်းရှိနေပါသည်။ အောက်ပါပြဿနာများကို ပြန်လည်စစ်ဆေးပေးပါ။")
+    else:
+        form = SignUpForm()
+    return render(request, 'registration/signup.html', {'form': form})
 
 @login_required
 def change_password(request):
@@ -59,7 +79,7 @@ def edit_profile(request):
     profile = request.user.profile
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
-        p_form = ProfileForm(request.POST, request.FILES, instance=profile)
+        p_form = ProfileForm(request.POST, request.FILES, instance=profile, editing_user=request.user)
         
         if u_form.is_valid() and p_form.is_valid():
             u_form.save()
@@ -68,7 +88,7 @@ def edit_profile(request):
             return redirect('student_dashboard')
     else:
         u_form = UserUpdateForm(instance=request.user)
-        p_form = ProfileForm(instance=profile)
+        p_form = ProfileForm(instance=profile, editing_user=request.user)
         
     return render(request, 'courses/profile_form.html', {
         'u_form': u_form,
@@ -206,14 +226,10 @@ def manage_courses(request):
 @user_passes_test(is_instructor)
 def add_course(request):
     if request.method == 'POST':
-        form = CourseForm(request.POST, request.FILES)
+        form = CourseForm(request.POST, request.FILES, editing_user=request.user)
         if form.is_valid():
             try:
-                course = form.save(commit=False)
-                if not is_admin(request.user):
-                    course.instructor = request.user
-                course.save()
-                
+                course = form.save()
                 messages.success(request, "သင်တန်းအသစ်ကို အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ")
                 return redirect('manage_courses')
             except Exception as e:
@@ -225,8 +241,7 @@ def add_course(request):
                 for error in errors:
                     messages.error(request, f"{field}: {error}")
     else:
-        # Default instructor to current user in initial data
-        form = CourseForm(initial={'instructor': request.user})
+        form = CourseForm(initial={'instructor': request.user}, editing_user=request.user)
     return render(request, 'courses/management/course_form.html', {'form': form, 'title': 'သင်တန်းအသစ်ဖွင့်ရန်'})
 
 @login_required
@@ -237,13 +252,10 @@ def edit_course(request, pk):
         messages.error(request, "ဤသင်တန်းကို ပြင်ဆင်ခွင့်မရှိပါ။")
         return redirect('manage_courses')
     if request.method == 'POST':
-        form = CourseForm(request.POST, request.FILES, instance=course)
+        form = CourseForm(request.POST, request.FILES, instance=course, editing_user=request.user)
         if form.is_valid():
             try:
-                course = form.save(commit=False)
-                if not is_admin(request.user):
-                    course.instructor = request.user
-                course.save()
+                course = form.save()
                 messages.success(request, "သင်တန်းအချက်အလက်များကို ပြင်ဆင်ပြီးပါပြီ")
                 return redirect('manage_courses')
             except Exception as e:
@@ -254,7 +266,7 @@ def edit_course(request, pk):
                 for error in errors:
                     messages.error(request, f"{field}: {error}")
     else:
-        form = CourseForm(instance=course)
+        form = CourseForm(instance=course, editing_user=request.user)
     return render(request, 'courses/management/course_form.html', {'form': form, 'title': 'သင်တန်းပြင်ဆင်ရန်'})
 
 @login_required
@@ -411,7 +423,19 @@ def add_student(request):
     return render(request, 'courses/management/student_form.html', {'form': form, 'title': 'ကျောင်းသားအသစ်အတွက် အကောင့်ဖွင့်ရန်'})
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_instructor)
+def manage_enrollments(request):
+    if is_admin(request.user):
+        enrollments = Enrollment.objects.select_related('student', 'student__profile', 'course', 'course__instructor') \
+            .prefetch_related('completed_lessons').order_by('-date_enrolled')
+    else:
+        enrollments = Enrollment.objects.filter(course__instructor=request.user) \
+            .select_related('student', 'student__profile', 'course', 'course__instructor') \
+            .prefetch_related('completed_lessons').order_by('-date_enrolled')
+    return render(request, 'courses/management/manage_enrollments.html', {'enrollments': enrollments})
+
+@login_required
+@user_passes_test(is_instructor)
 def enroll_student(request, student_pk=None):
     if student_pk:
         student = get_object_or_404(User, pk=student_pk)
@@ -420,29 +444,56 @@ def enroll_student(request, student_pk=None):
         initial_data = {}
 
     if request.method == 'POST':
-        form = ManualEnrollmentForm(request.POST)
+        form = ManualEnrollmentForm(request.POST, user=request.user)
         if form.is_valid():
-            enrollment = form.save()
-            # Create notification for admin (Management notification)
+            enrollment = form.save(commit=False)
+            if not is_admin(request.user):
+                if enrollment.course.instructor_id != request.user.id:
+                    messages.error(request, "ဤသင်တန်းကို ကျောင်းသားများအား enroll လုပ်ခွင့်မရှိပါ")
+                    return redirect('manage_enrollments')
+            enrollment.save()
+            # Create notification for instructor/admin who enrolled
             Notification.objects.create(
-                user=request.user, # The admin who enrolled
+                user=request.user,
                 title="New Enrollment",
                 message=f"Student {enrollment.student.username} has been enrolled in {enrollment.course.title}.",
-                is_admin_notification=True # Set to Admin Panel
+                is_admin_notification=is_admin(request.user)
             )
-            # Create notification for student (Personal notification)
+            # Create notification for student
             Notification.objects.create(
                 user=enrollment.student,
                 title="New Course Access",
-                message=f"You have been given access to the course: {enrollment.course.title}.",
-                is_admin_notification=False # Set to Student/Public
+                message=f"You have been given access to the course: {enrollment.course.title} by {request.user.get_full_name() or request.user.username}.",
+                is_admin_notification=False
             )
             messages.success(request, "သင်တန်းအတွက် Access ပေးခြင်း အောင်မြင်ပါသည်")
-            return redirect('manage_students')
+            return redirect('manage_enrollments')
     else:
-        form = ManualEnrollmentForm(initial=initial_data)
+        form = ManualEnrollmentForm(initial=initial_data, user=request.user)
         
     return render(request, 'courses/management/enroll_student_form.html', {'form': form, 'title': 'သင်တန်း Access ပေးရန်'})
+
+@login_required
+@user_passes_test(is_instructor)
+def remove_enrollment(request, enrollment_pk):
+    enrollment = get_object_or_404(Enrollment, pk=enrollment_pk)
+    if not is_admin(request.user):
+        if enrollment.course.instructor_id != request.user.id:
+            messages.error(request, "ဤenrollment ကို ဖျက်သိမ်းခွင့်မရှိပါ")
+            return redirect('manage_enrollments')
+    if request.method == 'POST':
+        course_title = enrollment.course.title
+        student_name = enrollment.student.username
+        enrollment.delete()
+        Notification.objects.create(
+            user=enrollment.student,
+            title="Course Access Removed",
+            message=f"Your access to the course: {course_title} has been removed.",
+            is_admin_notification=False
+        )
+        messages.success(request, f"{student_name} ကို {course_title} မှ ထုတ်ပယ်ပြီးပါပြီ")
+        return redirect('manage_enrollments')
+    return render(request, 'courses/management/confirm_delete.html', {'item': enrollment, 'type': f'Enrollment ({enrollment.student.username} - {enrollment.course.title})'})
 
 @login_required
 @user_passes_test(is_admin)

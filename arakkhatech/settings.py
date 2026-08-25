@@ -176,6 +176,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
 
                 'courses.context_processors.notifications',
+                'courses.context_processors.user_roles',
             ],
         },
     },
@@ -216,7 +217,15 @@ ACCOUNT_EMAIL_VERIFICATION = 'optional'
 
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = False
 
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_LOGOUT_REDIRECT_URL = 'course_list'
+ACCOUNT_SIGNUP_REDIRECT_URL = 'student_dashboard'
+ACCOUNT_LOGIN_REDIRECT_URL = 'student_dashboard'
+SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'
+SOCIALACCOUNT_STORE_TOKENS = False
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -226,7 +235,10 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         'AUTH_PARAMS': {
             'access_type': 'online',
+            'prompt': 'select_account',
         },
+        'FETCH_USERINFO': True,
+        'EMAIL_AUTHENTICATION_AUTO_CONNECT': True,
     }
 }
 
@@ -454,9 +466,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # LOGIN / LOGOUT
 # ============================================================
 
-LOGIN_REDIRECT_URL = 'course_list'
+LOGIN_REDIRECT_URL = 'student_dashboard'
 
 LOGOUT_REDIRECT_URL = 'course_list'
+
+LOGIN_URL = 'login'
 
 
 # ============================================================

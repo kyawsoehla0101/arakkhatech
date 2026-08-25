@@ -4,11 +4,19 @@ from .models import (
     Course, Lesson, Enrollment, Notification, 
     CommunityVoice, Profile, NewsletterSubscriber
 )
+from .helpers import is_admin
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ['id', 'avatar', 'bio', 'role']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        context = kwargs.get('context', {})
+        request = context.get('request')
+        if request and request.user and not is_admin(request.user):
+            self.fields['role'].read_only = True
 
 class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(read_only=True)

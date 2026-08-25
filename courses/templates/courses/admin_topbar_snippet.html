@@ -77,7 +77,9 @@
                         {{ user.username }}
                     {% endif %}
                 </p>
-                <p class="text-[10px] font-bold text-slate-400 uppercase">Administrator</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase">
+                    {% if is_admin_user %}Administrator{% elif is_instructor_user %}Instructor{% else %}User{% endif %}
+                </p>
             </div>
             <form action="{% url 'logout' %}" method="post" class="ml-2">
                 {% csrf_token %}

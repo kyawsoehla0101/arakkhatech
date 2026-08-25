@@ -104,7 +104,57 @@ from django.dispatch import receiver
 
 @receiver(post_save, sender=User)
 def save_or_create_user_profile(sender, instance, created, **kwargs):
-    Profile.objects.get_or_create(user=instance)
+    if created:
+        Profile.objects.get_or_create(user=instance, defaults={'role': 'student'})
+    else:
+        Profile.objects.get_or_create(user=instance, defaults={'role': 'student'})
+
+# ============================================================
+# allauth Social Login (Google) Signals
+# ============================================================
+try:
+    from allauth.account.signals import user_signed_up as _allauth_signed_up
+    from allauth.socialaccount.signals import pre_social_login as _pre_social_login
+except Exception:
+    _allauth_signed_up = None
+    _pre_social_login = None
+
+if _pre_social_login is not None:
+    @receiver(_pre_social_login)
+    def social_login_populate_user(request, sociallogin, **kwargs):
+        try:
+            account = getattr(sociallogin, 'account', None)
+            user = getattr(sociallogin, 'user', None)
+            if account and user:
+                extra = account.extra_data or {}
+                if not user.first_name:
+                    user.first_name = extra.get('given_name') or extra.get('first_name') or ''
+                if not user.last_name:
+                    user.last_name = extra.get('family_name') or extra.get('last_name') or ''
+                if not user.email and account.provider == 'google':
+                    user.email = extra.get('email') or ''
+                if not user.username and user.email:
+                    try:
+                        base = user.email.split('@')[0]
+                        candidate = base
+                        suffix = 1
+                        from django.contrib.auth.models import User as U
+                        while U.objects.filter(username=candidate).exists() and getattr(user, 'pk', None) is None:
+                            candidate = f"{base}{suffix}"
+                            suffix += 1
+                        user.username = candidate
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+
+if _allauth_signed_up is not None:
+    @receiver(_allauth_signed_up)
+    def social_signup_ensure_profile(request, user, **kwargs):
+        profile, created = Profile.objects.get_or_create(user=user, defaults={'role': 'student'})
+        if not created and not profile.role:
+            profile.role = 'student'
+            profile.save(update_fields=['role'])
 
 class NewsletterSubscriber(models.Model):
     email = models.EmailField(unique=True)

@@ -13,6 +13,7 @@ from .serializers import (
     ProfileSerializer, NewsletterSubscriberSerializer, UserSerializer
 )
 from .helpers import is_instructor, is_admin
+from .permissions import IsInstructorOrAdmin, IsAdminOnly, CanManageCourse
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
@@ -22,15 +23,20 @@ class CourseViewSet(viewsets.ModelViewSet):
     ordering_fields = ['created_at', 'title']
     
     def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [permissions.IsAuthenticated(), permissions.DjangoModelPermissions()]
+        if self.action in ['create']:
+            return [permissions.IsAuthenticated(), IsInstructorOrAdmin()]
+        if self.action in ['update', 'partial_update', 'destroy']:
+            return [permissions.IsAuthenticated(), IsInstructorOrAdmin(), CanManageCourse()]
         return [permissions.AllowAny()]
     
     def perform_create(self, serializer):
         serializer.save(instructor=self.request.user)
     
     def perform_update(self, serializer):
-        serializer.save(instructor=self.request.user)
+        if is_admin(self.request.user):
+            serializer.save()
+        else:
+            serializer.save(instructor=self.request.user)
 
 class LessonViewSet(viewsets.ModelViewSet):
     queryset = Lesson.objects.all()
@@ -40,7 +46,7 @@ class LessonViewSet(viewsets.ModelViewSet):
     
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [permissions.IsAuthenticated(), permissions.DjangoModelPermissions()]
+            return [permissions.IsAuthenticated(), IsInstructorOrAdmin()]
         return [permissions.IsAuthenticatedOrReadOnly()]
 
 class EnrollmentViewSet(viewsets.ModelViewSet):
@@ -128,7 +134,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         user = self.request.user
-        if user.is_authenticated and (user.is_superuser or (hasattr(user, 'profile') and user.profile.role == 'admin')):
+        if user.is_authenticated and is_admin(user):
             return Profile.objects.all()
         if user.is_authenticated:
             return Profile.objects.filter(user=user)
@@ -136,6 +142,15 @@ class ProfileViewSet(viewsets.ModelViewSet):
     
     def get_object(self):
         return self.request.user.profile
+    
+    def perform_update(self, serializer):
+        instance = serializer.instance
+        if not is_admin(self.request.user):
+            validated_data = dict(serializer.validated_data)
+            validated_data.pop('role', None)
+            serializer.save(**validated_data)
+        else:
+            serializer.save()
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()

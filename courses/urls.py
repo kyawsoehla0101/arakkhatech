@@ -1,8 +1,11 @@
 from django.urls import path
 from . import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', views.course_list, name='course_list'),
+    path('register/', views.signup, name='signup'),
+    path('signup/', views.signup, name='register'),
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     
     # Management URLs
@@ -22,6 +25,8 @@ urlpatterns = [
     path('manage/students/add/', views.add_student, name='add_student'),
     path('manage/students/<int:student_pk>/enroll/', views.enroll_student, name='enroll_student_manual'),
     path('manage/enroll/', views.enroll_student, name='enroll_student_general'),
+    path('manage/enrollments/', views.manage_enrollments, name='manage_enrollments'),
+    path('manage/enrollments/<int:enrollment_pk>/remove/', views.remove_enrollment, name='remove_enrollment'),
     
     path('manage/users/', views.manage_users, name='manage_users'),
     path('manage/users/add/', views.add_user, name='add_user'),

@@ -81,21 +81,15 @@ def manage_books(request):
 @user_passes_test(is_instructor)
 def add_book(request):
     if request.method == 'POST':
-        form = BookForm(request.POST, request.FILES)
+        form = BookForm(request.POST, request.FILES, editing_user=request.user)
         if form.is_valid():
-            book = form.save(commit=False)
-            if not is_admin(request.user):
-                book.author = request.user
-            book.save()
+            book = form.save()
             messages.success(request, "စာအုပ်အသစ်ကို ထည့်သွင်းပြီးပါပြီ")
             return redirect('manage_books')
         else:
             messages.error(request, "အချက်အလက်များ မှားယွင်းနေပါသည်။ ပြန်လည်စစ်ဆေးပေးပါ။")
     else:
-        form = BookForm()
-        if not is_admin(request.user):
-            # For instructors, only show their own courses in the form
-            form.fields['course'].queryset = Course.objects.filter(instructor=request.user)
+        form = BookForm(editing_user=request.user)
     return render(request, 'docs/management/book_form.html', {'form': form, 'title': 'စာအုပ်အသစ်ထည့်ရန်'})
 
 @login_required
@@ -106,21 +100,15 @@ def edit_book(request, pk):
         messages.error(request, "ဤစာအုပ်ကို ပြင်ဆင်ခွင့်မရှိပါ။")
         return redirect('manage_books')
     if request.method == 'POST':
-        form = BookForm(request.POST, request.FILES, instance=book)
+        form = BookForm(request.POST, request.FILES, instance=book, editing_user=request.user)
         if form.is_valid():
-            book = form.save(commit=False)
-            if not is_admin(request.user):
-                book.author = request.user
-            book.save()
+            book = form.save()
             messages.success(request, "စာအုပ်အချက်အလက်များကို ပြင်ဆင်ပြီးပါပြီ")
             return redirect('manage_books')
         else:
             messages.error(request, "အချက်အလက်များ မှားယွင်းနေပါသည်။ ပြန်လည်စစ်ဆေးပေးပါ။")
     else:
-        form = BookForm(instance=book)
-        if not is_admin(request.user):
-            # For instructors, only show their own courses in the form
-            form.fields['course'].queryset = Course.objects.filter(instructor=request.user)
+        form = BookForm(instance=book, editing_user=request.user)
     return render(request, 'docs/management/book_form.html', {'form': form, 'title': 'စာအုပ်ပြင်ဆင်ရန်'})
 
 @login_required
@@ -155,7 +143,7 @@ def add_chapter(request, book_pk):
         messages.error(request, "ဤစာအုပ်အတွက် အခန်းထည့်ခွင့်မရှိပါ။")
         return redirect('manage_books')
     if request.method == 'POST':
-        form = ChapterForm(request.POST)
+        form = ChapterForm(request.POST, book=book, editing_user=request.user)
         if form.is_valid():
             chapter = form.save(commit=False)
             chapter.book = book
@@ -165,7 +153,7 @@ def add_chapter(request, book_pk):
         else:
             messages.error(request, "အချက်အလက်များ မှားယွင်းနေပါသည်။ ပြန်လည်စစ်ဆေးပေးပါ။")
     else:
-        form = ChapterForm(initial={'book': book})
+        form = ChapterForm(initial={'book': book}, book=book, editing_user=request.user)
     return render(request, 'docs/management/chapter_form.html', {'form': form, 'book': book, 'title': 'စာမျက်နှာအသစ်ထည့်ရန်'})
 
 @login_required
@@ -176,7 +164,7 @@ def edit_chapter(request, pk):
         messages.error(request, "ဤစာမျက်နှာကို ပြင်ဆင်ခွင့်မရှိပါ။")
         return redirect('manage_books')
     if request.method == 'POST':
-        form = ChapterForm(request.POST, instance=chapter)
+        form = ChapterForm(request.POST, instance=chapter, editing_user=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, "စာမျက်နှာကို ပြင်ဆင်ပြီးပါပြီ")
@@ -184,7 +172,7 @@ def edit_chapter(request, pk):
         else:
             messages.error(request, "အချက်အလက်များ မှားယွင်းနေပါသည်။ ပြန်လည်စစ်ဆေးပေးပါ။")
     else:
-        form = ChapterForm(instance=chapter)
+        form = ChapterForm(instance=chapter, editing_user=request.user)
     return render(request, 'docs/management/chapter_form.html', {'form': form, 'book': chapter.book, 'title': 'စာမျက်နှာပြင်ဆင်ရန်'})
 
 @login_required

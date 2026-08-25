@@ -41,13 +41,36 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {% for field in form %}
-                            <div class="{% if field.name == 'title' or field.name == 'content' or field.name == 'course' %}md:col-span-2{% endif %}">
-                                <label for="{{ field.id_for_label }}" class="block text-slate-500 text-xs font-black uppercase tracking-widest mb-3">
-                                    {{ field.label }}
+                            <div class="{% if field.name == 'video_url' or field.name == 'title' or field.name == 'content' or field.name == 'course' %}md:col-span-2{% endif %}">
+                                <label for="{{ field.id_for_label }}" class="block text-slate-500 text-xs font-black uppercase tracking-widest mb-3 flex items-center space-x-2">
+                                    {% if field.name == 'video_url' %}
+                                        <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-rose-50 text-rose-500 text-xs mr-1.5">
+                                            <i class="fab fa-youtube"></i>
+                                        </span>
+                                    {% elif field.name == 'video_file' %}
+                                        <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-indigo-50 text-indigo-500 text-xs mr-1.5">
+                                            <i class="fas fa-file-upload"></i>
+                                        </span>
+                                    {% elif field.name == 'video_poster' %}
+                                        <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-violet-50 text-violet-500 text-xs mr-1.5">
+                                            <i class="fas fa-image"></i>
+                                        </span>
+                                    {% elif field.name == 'duration' %}
+                                        <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-50 text-emerald-500 text-xs mr-1.5">
+                                            <i class="far fa-clock"></i>
+                                        </span>
+                                    {% endif %}
+                                    <span>{{ field.label }}</span>
+                                    {% if field.field.required %}
+                                        <span class="text-rose-400">*</span>
+                                    {% endif %}
                                 </label>
                                 {{ field }}
                                 {% if field.help_text %}
-                                    <p class="text-[10px] text-slate-400 mt-2 italic">{{ field.help_text }}</p>
+                                    <p class="text-[10px] text-slate-400 mt-2 italic flex items-start space-x-1.5">
+                                        <i class="fas fa-info-circle mt-0.5 text-indigo-300 text-[10px]"></i>
+                                        <span>{{ field.help_text }}</span>
+                                    </p>
                                 {% endif %}
                                 {% if field.errors %}
                                     {% for error in field.errors %}

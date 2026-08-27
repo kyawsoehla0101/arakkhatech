@@ -3,6 +3,23 @@
 {% block title %}{{ chapter.title }} - {{ book.title }}{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/html.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/dart.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
 <div class="min-h-screen bg-[#fcfcfd] pt-28 pb-20">
     <div class="container mx-auto px-6">
         <div class="flex flex-col lg:flex-row gap-12">
@@ -54,7 +71,7 @@
                         {{ chapter.title }}
                     </h1>
 
-                    <div class="prose prose-slate prose-indigo max-w-none prose-headings:font-black prose-headings:text-slate-900 prose-p:text-slate-600 prose-p:leading-relaxed prose-strong:text-slate-900 prose-code:text-indigo-600 prose-pre:bg-slate-900 prose-pre:rounded-2xl prose-img:rounded-3xl">
+                    <div id="chapter-content" class="prose prose-slate prose-indigo max-w-none prose-headings:font-black prose-headings:text-slate-900 prose-p:text-slate-600 prose-p:leading-relaxed prose-strong:text-slate-900 prose-code:text-indigo-600 prose-pre:bg-slate-900 prose-pre:rounded-2xl prose-img:rounded-3xl">
                         {{ content_html|safe }}
                     </div>
 
@@ -86,18 +103,114 @@
     </div>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var content = document.getElementById('chapter-content');
+        if (content) {
+            content.innerHTML = content.innerHTML.replace(/==([^=]+)==/g, '<mark class="bg-yellow-200/80 text-yellow-900 px-1 rounded font-semibold">$1</mark>');
+
+            try {
+                if (window.katex) {
+                    var html = content.innerHTML;
+                    html = html
+                        .replace(/\$\$([\s\S]+?)\$\$/g, function(match, expr) {
+                            try { return '<div class="katex-display-wrapper my-8 flex justify-center py-6 px-4 rounded-2xl">' + katex.renderToString(expr.trim(), { throwOnError: false, displayMode: true }) + '</div>'; }
+                            catch(e) { return '<div class="p-4 bg-rose-50 text-rose-600 rounded-xl border border-rose-200 my-5">Math Error: ' + match + '</div>'; }
+                        })
+                        .replace(/\$([^\$\n]+?)\$/g, function(match, expr) {
+                            try { return '<span class="katex-inline">' + katex.renderToString(expr.trim(), { throwOnError: false, displayMode: false }) + '</span>'; }
+                            catch(e) { return '<span class="text-rose-500">Math Error</span>'; }
+                        });
+                    content.innerHTML = html;
+                }
+            } catch(e) {}
+
+            try {
+                content.querySelectorAll('pre code').forEach(function(block) {
+                    hljs.highlightElement(block);
+                });
+            } catch(e) {}
+
+            content.querySelectorAll('pre').forEach(function(pre) {
+                if (!pre.querySelector('.copy-code-btn')) {
+                    var wrapper = document.createElement('div');
+                    wrapper.className = 'relative group';
+                    pre.parentNode.insertBefore(wrapper, pre);
+                    wrapper.appendChild(pre);
+                    var btn = document.createElement('button');
+                    btn.className = 'copy-code-btn absolute top-4 right-4 z-10 px-4 py-2 text-xs font-black rounded-xl bg-white/10 hover:bg-white/30 text-white border border-white/20 backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 shadow-lg';
+                    btn.innerHTML = '<i class="far fa-copy mr-2"></i> Copy Code';
+                    btn.onclick = function() {
+                        var txt = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+                        navigator.clipboard.writeText(txt).then(function() {
+                            btn.innerHTML = '<i class="fas fa-check mr-2"></i> Copied!';
+                            btn.classList.add('bg-emerald-500/50');
+                            setTimeout(function() {
+                                btn.innerHTML = '<i class="far fa-copy mr-2"></i> Copy Code';
+                                btn.classList.remove('bg-emerald-500/50');
+                            }, 1800);
+                        });
+                    };
+                    wrapper.appendChild(btn);
+                }
+            });
+
+            content.querySelectorAll('details').forEach(function(d) {
+                d.className = (d.className ? d.className + ' ' : '') + 'my-7 rounded-2xl border border-indigo-100 overflow-hidden bg-indigo-50/40 shadow-sm';
+                var sum = d.querySelector('summary');
+                if (sum) sum.className = (sum.className ? sum.className + ' ' : '') + 'cursor-pointer px-5 py-4 font-bold text-indigo-800 bg-indigo-100/50 select-none text-base';
+            });
+        }
+    });
+</script>
+
 <style>
     /* Custom Markdown Styles */
-    .prose { line-height: 1.8; font-family: 'Plus Jakarta Sans', 'Pyidaungsu', sans-serif; }
-    .prose h2 { margin-top: 3rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 1rem; margin-bottom: 1.5rem; font-weight: 800; }
-    .prose h3 { margin-top: 2.5rem; margin-bottom: 1.25rem; font-weight: 800; }
-    .prose p { margin-bottom: 1.5rem; color: #475569; }
-    .prose code { background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 0.5rem; font-weight: 600; color: #4f46e5; }
-    .prose pre { background-color: #0f172a !important; border-radius: 1.5rem !important; padding: 1.5rem !important; margin: 2rem 0 !important; }
-    .prose pre code { background: transparent !important; color: #e2e8f0 !important; font-family: 'JetBrains Mono', monospace !important; }
-    .prose ul { list-style-type: disc; margin-left: 1.5rem; }
-    .prose ol { list-style-type: decimal; margin-left: 1.5rem; }
-    .prose .admonition { padding: 1.5rem; border-radius: 1.5rem; margin: 2rem 0; border-left: 6px solid #6366f1; background-color: #f8fafc; }
-    .prose .admonition-title { font-weight: 800; text-transform: uppercase; font-size: 0.75rem; color: #6366f1; margin-bottom: 0.5rem; }
+    #chapter-content { line-height: 1.9; font-family: 'Plus Jakarta Sans', 'Pyidaungsu', sans-serif; font-size: 17px; }
+    #chapter-content h1, #chapter-content .h1-like { font-size: 2.2rem; font-weight: 900; color: #1e1b4b; margin-bottom: 1.5rem; border-bottom: 3px solid #eef2ff; padding-bottom: 0.75rem; }
+    #chapter-content h2 { margin-top: 3rem; font-size: 1.6rem; border-bottom: 2px solid #eef2ff; padding-bottom: 1rem; margin-bottom: 1.5rem; font-weight: 800; color: #312e81; }
+    #chapter-content h3 { margin-top: 2.5rem; font-size: 1.25rem; margin-bottom: 1.25rem; font-weight: 700; color: #3730a3; }
+    #chapter-content p { margin-bottom: 1.5rem; color: #475569; line-height: 1.9; }
+    #chapter-content code:not(pre code) { background: linear-gradient(to right, #fef2f2, #fff1f2); padding: 0.25rem 0.6rem; border-radius: 0.6rem; font-weight: 600; color: #be123c; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.93em; border: 1px solid #fecdd3; }
+    #chapter-content pre { background: linear-gradient(145deg, #282c34, #1e2127) !important; border-radius: 1.25rem !important; padding: 1.5rem 1.5rem 1.5rem 1.5rem !important; margin: 2rem 0 !important; overflow: auto !important; border: 1px solid #374151 !important; box-shadow: 0 15px 40px -12px rgba(0,0,0,0.4) !important; }
+    #chapter-content pre code { background: transparent !important; color: #e5e7eb !important; font-family: 'JetBrains Mono', ui-monospace, monospace !important; font-size: 14.5px !important; line-height: 1.8 !important; padding: 0 !important; }
+    #chapter-content ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1.5rem; }
+    #chapter-content ul li { margin: 0.5rem 0; padding-left: 0.3rem; }
+    #chapter-content ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 1.5rem; }
+    #chapter-content ol li { margin: 0.5rem 0; padding-left: 0.3rem; }
+    #chapter-content blockquote { padding: 1.5rem 1.75rem; border-radius: 1.25rem; margin: 2rem 0; border-left: 6px solid #6366f1; background: linear-gradient(135deg, #eef2ff, #e0f2fe); color: #312e81; font-style: italic; box-shadow: 0 8px 24px -8px rgba(99,102,241,0.25); }
+    #chapter-content blockquote p { color: #312e81 !important; margin-bottom: 0 !important; }
+    #chapter-content hr { border: none !important; border-top: 3px dashed #c7d2fe !important; margin: 2.5rem 0 !important; }
+    #chapter-content table { border-collapse: collapse; margin: 2rem 0; width: 100%; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 5px 18px -6px rgba(0,0,0,0.08); border: 1px solid #eef2ff; }
+    #chapter-content th { background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; font-weight: 800; padding: 1rem 1.25rem; text-align: left; font-size: 14px; letter-spacing: 0.02em; }
+    #chapter-content td { padding: 1rem 1.25rem; border-bottom: 1px solid #eef2ff; color: #475569; }
+    #chapter-content tr:nth-child(even) td { background-color: #fafbff; }
+    #chapter-content img { border-radius: 1.5rem; box-shadow: 0 20px 50px -12px rgba(0,0,0,0.18); max-width: 100%; margin: 1.75rem 0; border: 1px solid #eef2ff; }
+    #chapter-content a { color: #4f46e5; font-weight: 600; text-decoration: none; border-bottom: 2px solid #c7d2fe; padding-bottom: 1px; }
+    #chapter-content a:hover { color: #4338ca; border-color: #4f46e5; }
+    #chapter-content mark { background: linear-gradient(transparent 60%, #fde68a 60%); padding: 0.1rem 0.35rem; border-radius: 4px; color: inherit; font-weight: 600; }
+    #chapter-content input[type="checkbox"] { width: 1.15em; height: 1.15em; border: 2px solid #c7d2fe; border-radius: 4px; appearance: none; -webkit-appearance: none; cursor: pointer; position: relative; margin-right: 0.4em; vertical-align: -2px; }
+    #chapter-content input[type="checkbox"]:checked { background: #4f46e5; border-color: #4f46e5; }
+    #chapter-content input[type="checkbox"]:checked::after { content: '✓'; position: absolute; color: white; font-size: 0.8em; left: 2px; top: -2px; font-weight: 900; }
+    #chapter-content sup { vertical-align: super; font-size: 0.78em; color: #7c3aed; font-weight: 700; }
+    #chapter-content sub { vertical-align: sub; font-size: 0.78em; color: #be123c; font-weight: 700; }
+    #chapter-content u { text-decoration: underline; text-decoration-color: #6366f1; text-underline-offset: 4px; text-decoration-thickness: 2px; text-decoration-style: solid; }
+    #chapter-content .admonition,
+    #chapter-content .note, #chapter-content .warning, #chapter-content .danger, #chapter-content .success, #chapter-content .info, #chapter-content .tip {
+        padding: 1.5rem 1.75rem; border-radius: 1.25rem; margin: 2rem 0; border-left: 6px solid; position: relative; box-shadow: 0 8px 28px -12px rgba(0,0,0,0.15);
+    }
+    #chapter-content .admonition-title { font-weight: 900; margin-bottom: 0.5rem; font-size: 1.05rem; display: block; }
+    #chapter-content .note, #chapter-content .info { background: linear-gradient(135deg, #eff6ff, #dbeafe); border-color: #3b82f6; color: #1e3a8a; }
+    #chapter-content .note::before, #chapter-content .info::before { content: '💡 '; font-size: 1.5rem; margin-right: 0.5rem; font-weight: 800; }
+    #chapter-content .warning, #chapter-content .attention, #chapter-content .caution { background: linear-gradient(135deg, #fffbeb, #fef3c7); border-color: #f59e0b; color: #78350f; }
+    #chapter-content .warning::before, #chapter-content .attention::before, #chapter-content .caution::before { content: '⚠️ '; font-size: 1.5rem; margin-right: 0.5rem; font-weight: 800; }
+    #chapter-content .danger, #chapter-content .error { background: linear-gradient(135deg, #fef2f2, #fee2e2); border-color: #ef4444; color: #7f1d1d; }
+    #chapter-content .danger::before, #chapter-content .error::before { content: '❌ '; font-size: 1.5rem; margin-right: 0.5rem; font-weight: 800; }
+    #chapter-content .success, #chapter-content .hint, #chapter-content .tip { background: linear-gradient(135deg, #ecfdf5, #d1fae5); border-color: #10b981; color: #064e3b; }
+    #chapter-content .success::before, #chapter-content .hint::before, #chapter-content .tip::before { content: '✅ '; font-size: 1.5rem; margin-right: 0.5rem; font-weight: 800; }
+    .katex-display-wrapper { background: linear-gradient(135deg, #f5f3ff, #eef2ff); border: 1px solid #e0e7ff; box-shadow: 0 6px 18px -6px rgba(99,102,241,0.25); overflow-x: auto; }
+    .katex-inline { font-size: 1.08em !important; }
+    #chapter-content div[style*="text-align:center"] { padding: 1.25rem; background: linear-gradient(135deg, #f5f3ff, #eef2ff); border-radius: 1.25rem; margin: 1.5rem 0; border: 1px dashed #c7d2fe; }
+    #chapter-content iframe { border-radius: 1rem; border: 4px solid #fff1f2; box-shadow: 0 10px 25px -5px rgba(244,63,94,0.2); margin: 1.5rem 0; }
 </style>
 {% endblock %}

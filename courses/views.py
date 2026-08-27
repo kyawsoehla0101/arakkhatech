@@ -6,6 +6,7 @@ from .models import Course, Lesson, Enrollment, Notification, CommunityVoice, Ne
 from .forms import CourseForm, LessonForm, StudentCreationForm, ManualEnrollmentForm, CommunityVoiceForm, ProfileForm, UserUpdateForm, SignUpForm
 from .helpers import is_admin, is_instructor, can_manage_course, can_manage_book
 from django.db.models import Q, Count
+import markdown
 
 from django.contrib.auth import update_session_auth_hash, login
 from django.contrib.auth.forms import PasswordChangeForm
@@ -713,17 +714,27 @@ def lesson_detail(request, course_pk, lesson_pk):
     
     lesson = get_object_or_404(Lesson, pk=lesson_pk, course=course)
     lessons = course.lessons.all() # Get all lessons for the sidebar
-    
+
+    # Convert lesson.content markdown to HTML with full extension support
+    try:
+        content_html = markdown.markdown(lesson.content or '', extensions=[
+            'extra', 'codehilite', 'toc', 'nl2br', 'sane_lists',
+            'fenced_code', 'attr_list', 'admonition',
+        ])
+    except Exception:
+        content_html = lesson.content or ''
+
     # Get completed lesson IDs for the current enrollment
     completed_lesson_ids = enrollment.completed_lessons.values_list('id', flat=True)
-    
+
     # Get next and previous lessons
     next_lesson = course.lessons.filter(order__gt=lesson.order).order_by('order').first()
     prev_lesson = course.lessons.filter(order__lt=lesson.order).order_by('-order').first()
-    
+
     return render(request, 'courses/lesson_detail.html', {
         'course': course,
         'lesson': lesson,
+        'content_html': content_html,
         'lessons': lessons,
         'next_lesson': next_lesson,
         'prev_lesson': prev_lesson,

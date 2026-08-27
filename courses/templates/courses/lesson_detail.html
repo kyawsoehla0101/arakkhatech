@@ -3,6 +3,23 @@
 {% block title %}{{ lesson.title }} - {{ course.title }}{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/html.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/dart.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
 <div class="bg-slate-900 min-h-screen pt-8 pb-20">
     <div class="container mx-auto px-6">
         <!-- Breadcrumb -->
@@ -33,7 +50,7 @@
                         {% else %}
                             <div class="w-full h-full flex flex-col items-center justify-center bg-slate-800 text-slate-500">
                                 <i class="fas fa-video-slash text-6xl mb-4 opacity-20"></i>
-                                <p class="font-bold">ဗီဒီယို မဟိသိမ့်ပါ။</p>
+                                <p class="font-bold">ဗီဒီယို မဟိသိမ့်ပါ။</p>
                             </div>
                         {% endif %}
                     </div>
@@ -66,8 +83,8 @@
                         </div>
                     </div>
                     
-                    <div class="prose max-w-none text-slate-600 leading-relaxed text-lg">
-                        {{ lesson.content|safe }}
+                    <div id="lesson-content" class="prose max-w-none text-slate-600 leading-relaxed text-lg">
+                        {{ content_html|safe }}
                     </div>
 
                     <!-- Navigation Buttons -->
@@ -152,6 +169,76 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var content = document.getElementById('lesson-content');
+        if (content) {
+            content.innerHTML = content.innerHTML.replace(/==([^=]+)==/g, '<mark class="bg-yellow-200/80 text-yellow-900 px-1 rounded font-semibold">$1</mark>');
+
+            try {
+                if (typeof katex !== 'undefined') {
+                    var html = content.innerHTML;
+                    html = html.replace(/\$\$([\s\S]+?)\$\$/g, function(match, math) {
+                        try {
+                            var rendered = katex.renderToString(math.trim(), { throwOnError: false, displayMode: true });
+                            return '<div class="katex-display-wrapper">' + rendered + '</div>';
+                        } catch(e) {
+                            return '<div class="katex-error">' + match + '</div>';
+                        }
+                    });
+                    html = html.replace(/\$`([^`]+)`\$/g, function(match, math) {
+                        try {
+                            return katex.renderToString(math.trim(), { throwOnError: false, displayMode: false });
+                        } catch(e) { return match; }
+                    });
+                    html = html.replace(/(^|[^\\])\$([^$\n]+?)\$/g, function(match, prefix, math) {
+                        try {
+                            return prefix + katex.renderToString(math.trim(), { throwOnError: false, displayMode: false });
+                        } catch(e) { return match; }
+                    });
+                    content.innerHTML = html;
+                }
+            } catch(e) {}
+
+            try {
+                content.querySelectorAll('pre code').forEach(function(block) {
+                    hljs.highlightElement(block);
+                });
+            } catch(e) {}
+
+            content.querySelectorAll('pre').forEach(function(pre) {
+                if (!pre.querySelector('.copy-code-btn')) {
+                    var wrapper = document.createElement('div');
+                    wrapper.className = 'relative group';
+                    pre.parentNode.insertBefore(wrapper, pre);
+                    wrapper.appendChild(pre);
+                    var btn = document.createElement('button');
+                    btn.className = 'copy-code-btn absolute top-4 right-4 z-10 px-4 py-2 text-xs font-black rounded-xl bg-white/10 hover:bg-white/30 text-white border border-white/20 backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 shadow-lg';
+                    btn.innerHTML = '<i class="far fa-copy mr-2"></i> Copy Code';
+                    btn.onclick = function() {
+                        var txt = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+                        navigator.clipboard.writeText(txt).then(function() {
+                            btn.innerHTML = '<i class="fas fa-check mr-2"></i> Copied!';
+                            btn.classList.add('bg-emerald-500/50');
+                            setTimeout(function() {
+                                btn.innerHTML = '<i class="far fa-copy mr-2"></i> Copy Code';
+                                btn.classList.remove('bg-emerald-500/50');
+                            }, 1800);
+                        });
+                    };
+                    wrapper.appendChild(btn);
+                }
+            });
+
+            content.querySelectorAll('details').forEach(function(d) {
+                d.className = 'rounded-xl p-5 my-6 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 shadow-md';
+                var s = d.querySelector('summary');
+                if (s) { s.className = 'font-bold cursor-pointer text-indigo-800 text-lg mb-2 select-none'; }
+            });
+        }
+    });
+</script>
 
 <script>
      document.addEventListener('DOMContentLoaded', () => {
@@ -270,5 +357,59 @@
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
         background: rgba(255,255,255,0.2);
     }
+
+    /* Custom Markdown Styles */
+    #lesson-content { line-height: 1.9; font-family: 'Plus Jakarta Sans', 'Pyidaungsu', sans-serif; font-size: 17px; }
+    #lesson-content h1, #lesson-content .h1-like { font-size: 2.2rem; font-weight: 900; color: #1e1b4b; margin-bottom: 1.5rem; border-bottom: 3px solid #eef2ff; padding-bottom: 0.75rem; }
+    #lesson-content h2 { margin-top: 3rem; font-size: 1.6rem; border-bottom: 2px solid #eef2ff; padding-bottom: 1rem; margin-bottom: 1.5rem; font-weight: 800; color: #312e81; }
+    #lesson-content h3 { margin-top: 2.5rem; font-size: 1.25rem; margin-bottom: 1.25rem; font-weight: 700; color: #3730a3; }
+    #lesson-content p { margin-bottom: 1.5rem; color: #475569; line-height: 1.9; }
+    #lesson-content code:not(pre code) { background: linear-gradient(to right, #fef2f2, #fff1f2); padding: 0.25rem 0.6rem; border-radius: 0.6rem; font-weight: 600; color: #be123c; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.93em; border: 1px solid #fecdd3; }
+    #lesson-content pre { background: linear-gradient(145deg, #282c34, #1e2127) !important; border-radius: 1.25rem !important; padding: 1.5rem 1.5rem 1.5rem 1.5rem !important; margin: 2rem 0 !important; overflow: auto !important; border: 1px solid #374151 !important; box-shadow: 0 15px 40px -12px rgba(0,0,0,0.4) !important; }
+    #lesson-content pre code { background: transparent !important; color: #e5e7eb !important; font-family: 'JetBrains Mono', ui-monospace, monospace !important; font-size: 14.5px !important; line-height: 1.8 !important; padding: 0 !important; }
+    #lesson-content ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1.5rem; }
+    #lesson-content ul li { margin: 0.5rem 0; padding-left: 0.3rem; }
+    #lesson-content ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 1.5rem; }
+    #lesson-content ol li { margin: 0.5rem 0; padding-left: 0.3rem; }
+    #lesson-content blockquote { padding: 1.5rem 1.75rem; border-radius: 1.25rem; margin: 2rem 0; border-left: 6px solid #6366f1; background: linear-gradient(135deg, #eef2ff, #e0f2fe); color: #312e81; font-style: italic; box-shadow: 0 8px 24px -8px rgba(99,102,241,0.25); }
+    #lesson-content blockquote p { color: #312e81 !important; margin-bottom: 0 !important; }
+    #lesson-content hr { border: none !important; border-top: 3px dashed #c7d2fe !important; margin: 2.5rem 0 !important; }
+    #lesson-content table { border-collapse: collapse; margin: 2rem 0; width: 100%; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 5px 18px -6px rgba(0,0,0,0.08); border: 1px solid #eef2ff; }
+    #lesson-content th { background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; font-weight: 800; padding: 1rem 1.25rem; text-align: left; font-size: 14px; letter-spacing: 0.02em; }
+    #lesson-content td { padding: 1rem 1.25rem; border-bottom: 1px solid #eef2ff; color: #475569; }
+    #lesson-content tr:nth-child(even) td { background-color: #fafbff; }
+    #lesson-content img { border-radius: 1.5rem; box-shadow: 0 20px 50px -12px rgba(0,0,0,0.18); max-width: 100%; margin: 1.75rem 0; border: 1px solid #eef2ff; }
+    #lesson-content a { color: #4f46e5; font-weight: 600; text-decoration: none; border-bottom: 2px solid #c7d2fe; padding-bottom: 1px; }
+    #lesson-content a:hover { color: #4338ca; border-color: #4f46e5; }
+    #lesson-content mark { background: linear-gradient(transparent 60%, #fde68a 60%); padding: 0.1rem 0.35rem; border-radius: 4px; color: inherit; font-weight: 600; }
+    #lesson-content input[type="checkbox"] { width: 1.15em; height: 1.15em; border: 2px solid #c7d2fe; border-radius: 4px; appearance: none; -webkit-appearance: none; cursor: pointer; position: relative; margin-right: 0.4em; vertical-align: -2px; }
+    #lesson-content input[type="checkbox"]:checked { background: #4f46e5; border-color: #4f46e5; }
+    #lesson-content input[type="checkbox"]:checked::after { content: '✓'; position: absolute; color: white; font-size: 0.8em; left: 2px; top: -2px; font-weight: 900; }
+
+    #lesson-content u { text-decoration: underline; text-decoration-color: #6366f1; text-decoration-thickness: 3px; text-underline-offset: 3px; }
+    #lesson-content sup { color: #7c3aed; font-weight: 700; }
+    #lesson-content sub { color: #dc2626; font-weight: 700; }
+
+    #lesson-content .admonition { padding: 1.5rem 1.75rem; border-radius: 1.25rem; margin: 2rem 0; border-left: 6px solid; box-shadow: 0 8px 28px -10px rgba(0,0,0,0.18); position: relative; overflow: hidden; }
+    #lesson-content .admonition-title { font-weight: 800; margin-bottom: 0.5rem; font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem; }
+    #lesson-content .admonition.note { background: linear-gradient(135deg, #eff6ff, #dbeafe); border-left-color: #3b82f6; color: #1e40af; }
+    #lesson-content .admonition.note .admonition-title::before { content: "💡"; }
+    #lesson-content .admonition.warning { background: linear-gradient(135deg, #fffbeb, #fef3c7); border-left-color: #f59e0b; color: #92400e; }
+    #lesson-content .admonition.warning .admonition-title::before { content: "⚠️"; }
+    #lesson-content .admonition.success { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-left-color: #10b981; color: #166534; }
+    #lesson-content .admonition.success .admonition-title::before { content: "✅"; }
+    #lesson-content .admonition.danger { background: linear-gradient(135deg, #fef2f2, #fee2e2); border-left-color: #ef4444; color: #991b1b; }
+    #lesson-content .admonition.danger .admonition-title::before { content: "🚨"; }
+    #lesson-content .admonition p { margin-bottom: 0; }
+    #lesson-content .admonition p + p { margin-top: 0.75rem; }
+
+    #lesson-content .katex-display-wrapper { padding: 2rem 1.5rem; margin: 2rem 0; background: linear-gradient(135deg, #f5f3ff, #ede9fe); border-radius: 1.5rem; border: 1px solid #c4b5fd; overflow-x: auto; box-shadow: inset 0 2px 10px rgba(139,92,246,0.08); text-align: center; }
+    #lesson-content .katex-error { background: linear-gradient(135deg, #fff1f2, #ffe4e6); border: 1px dashed #fb7185; color: #9f1239; padding: 1rem 1.25rem; border-radius: 1rem; display: inline-block; margin: 1rem 0; font-family: monospace; }
+    #lesson-content .katex { font-size: 1.1em; }
+
+    #lesson-content div[style*="text-align:center"] { padding: 1.25rem; margin: 1.5rem 0; border: 2px dashed #a5b4fc; border-radius: 1rem; background: linear-gradient(90deg, rgba(238,242,255,0.6), rgba(243,232,255,0.6)); }
+
+    #lesson-content iframe { width: 100%; max-width: 100%; aspect-ratio: 16/9; border-radius: 1.25rem; border: 3px solid #f9a8d4; box-shadow: 0 20px 45px -15px rgba(236,72,153,0.35); margin: 2rem 0; overflow: hidden; display: block; }
+    #lesson-content iframe.youtube-player { background: #000; }
 </style>
 {% endblock %}

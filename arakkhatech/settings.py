@@ -441,9 +441,15 @@ else:
     }
 # ============================================================
 # SECURITY SETTINGS
+#  - Production (Render): CSRF_COOKIE_SECURE + SESSION_COOKIE_SECURE
+#    => HTTPS ကျမှ cookie လက်ခံမယ် => /admin login အတွက် မဖြစ်မနေလိုတယ်
+#  - RENDER_EXTERNAL_HOSTNAME ရှိရင်တောင် SECURE settings တွေ ပေးမယ်
+#    (DEBUG accidentally True set ထားရင်တောင် Render မှာ cookie မပျောက်စေဖို့)
 # ============================================================
 
-if not DEBUG:
+RENDER_DEPLOYED = bool(os.environ.get('RENDER_EXTERNAL_HOSTNAME'))
+
+if not DEBUG or RENDER_DEPLOYED:
 
     CSRF_COOKIE_SECURE = True
 

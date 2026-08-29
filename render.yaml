@@ -27,5 +27,5 @@ services:
     autoDeploy: true
 
 databases:
-  - name: arakkhatech-db
+  - name: defaultdb
     plan: starter

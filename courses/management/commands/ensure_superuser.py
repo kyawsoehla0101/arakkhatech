@@ -1,6 +1,6 @@
 import os
 from django.core.management.base import BaseCommand
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from django.db import transaction
 
 
@@ -9,31 +9,20 @@ User = get_user_model()
 
 class Command(BaseCommand):
     help = (
-        'Ensure a Django superuser exists. '
-        'Reads DJANGO_SUPERUSER_USERNAME, DJANGO_SUPERUSER_EMAIL, DJANGO_SUPERUSER_PASSWORD. '
+        'Ensure a Django superuser exists with BOTH is_staff=True AND is_superuser=True '
+        'AND Profile.role="admin". Reads credentials from the environment variables: '
+        'DJANGO_SUPERUSER_USERNAME, DJANGO_SUPERUSER_EMAIL, DJANGO_SUPERUSER_PASSWORD. '
         'Use DJANGO_SUPERUSER_FORCE=1 to reset the password every deploy. '
-        'If no user matches USERNAME exactly, a case-insensitive username match or an EMAIL match '
-        'will be tried before creating a brand new user (avoids duplicate admin accounts when '
-        'the same person has previously signed up via Google / allauth).'
+        'Designed for Render free tier where shell access is not available: this command '
+        'runs automatically on every deploy via render.yaml startCommand.'
     )
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            '--username', dest='username', default=None,
-            help='Superuser username (overrides DJANGO_SUPERUSER_USERNAME)',
-        )
-        parser.add_argument(
-            '--email', dest='email', default=None,
-            help='Superuser email (overrides DJANGO_SUPERUSER_EMAIL)',
-        )
-        parser.add_argument(
-            '--password', dest='password', default=None,
-            help='Superuser password (overrides DJANGO_SUPERUSER_PASSWORD)',
-        )
-        parser.add_argument(
-            '--force', action='store_true', dest='force',
-            help='Force password + role update even if the user already exists.',
-        )
+        parser.add_argument('--username', dest='username', default=None)
+        parser.add_argument('--email', dest='email', default=None)
+        parser.add_argument('--password', dest='password', default=None)
+        parser.add_argument('--force', action='store_true', dest='force',
+                            help='Force password + role update every run.')
 
     # ------------------------------------------------------------------
     # helpers
@@ -42,35 +31,80 @@ class Command(BaseCommand):
         v = str(os.environ.get(key, '')).strip().lower()
         return v in {'1', 'true', 'yes', 'y', 'on'}
 
+    def _banner(self, text: str):
+        self.stdout.write('')
+        self.stdout.write(self.style.MIGRATE_HEADING(
+            f'[ensure_superuser] {text}'
+        ))
+
+    def _db_snapshot(self):
+        total = User.objects.count()
+        staff = User.objects.filter(is_staff=True).count()
+        superusers = User.objects.filter(is_superuser=True).count()
+        try:
+            from courses.models import Profile
+            admin_role = Profile.objects.filter(role='admin').count()
+        except Exception:
+            admin_role = '?'
+        self.stdout.write(
+            f'    DB snapshot: users_total={total}, '
+            f'is_staff={staff}, is_superuser={superusers}, '
+            f'Profile.role=admin={admin_role}'
+        )
+
     def _find_user(self, username: str, email: str):
         """
-        Best-effort user lookup in this priority order:
-          1. exact username match (case sensitive, Django default)
+        Lookup priority (highest first):
+          1. exact username match (Django case-sensitive default)
           2. case-insensitive username match
-          3. exact email match
-        Returns (User, matched_via_str) or (None, None).
+          3. exact email match (env email matches Google signup email)
+        Returns (User, reason_str) or (None, None).
+
+        Extra safety: since Django's default User model only enforces
+        username uniqueness (NOT email uniqueness), when we find a user
+        by email but env username is ALREADY taken by a DIFFERENT user,
+        we bail out to avoid a duplicate-key IntegrityError on rename —
+        caller will create a fresh user instead.
         """
+        # 1) exact username
         try:
-            return User.objects.get(username=username), 'exact username'
+            return User.objects.get(username=username), f'exact username="{username}"'
         except User.DoesNotExist:
             pass
 
+        # 2) case-insensitive username
         try:
-            user = User.objects.get(username__iexact=username)
-            return user, f'case-insensitive username match for "{username}"'
+            u = User.objects.get(username__iexact=username)
+            return u, f'case-insensitive username match (env="{username}", db="{u.username}")'
         except (User.DoesNotExist, User.MultipleObjectsReturned):
             pass
 
+        # 3) email (strongest match when user signed up via Google first)
         if email:
             try:
-                user = User.objects.get(email__iexact=email)
-                return user, f'email match for "{email}"'
-            except (User.DoesNotExist, User.MultipleObjectsReturned):
+                u = User.objects.get(email__iexact=email)
+                # Sanity check: before claiming this user as our target,
+                # make sure the env username isn't held by a DIFFERENT user.
+                conflict = User.objects.exclude(pk=u.pk).filter(username=username).first()
+                if conflict is not None:
+                    self.stdout.write(self.style.WARNING(
+                        f'    -> Conflict: email matched user "{u.username}" but env username '
+                        f'"{username}" is already used by another user (pk={conflict.pk}). '
+                        f'Will create a NEW user instead of merging.'
+                    ))
+                    return None, None
+                return u, f'email match (env email="{email}", db username="{u.username}")'
+            except User.DoesNotExist:
                 pass
+            except User.MultipleObjectsReturned:
+                self.stdout.write(self.style.WARNING(
+                    f'    -> WARNING: Multiple users share email "{email}". '
+                    f'Creating a new superuser with username="{username}" instead of merging.'
+                ))
 
         return None, None
 
-    def _ensure_profile_admin(self, user):
+    def _ensure_profile_admin(self, user) -> str:
         try:
             from courses.models import Profile
             profile, _ = Profile.objects.get_or_create(
@@ -80,17 +114,10 @@ class Command(BaseCommand):
             if profile.role != 'admin':
                 profile.role = 'admin'
                 profile.save(update_fields=['role'])
-                self.stdout.write(self.style.SUCCESS(
-                    f'    -> Profile.role upgraded to "admin" (user={user.username})'
-                ))
-            else:
-                self.stdout.write(self.style.SUCCESS(
-                    f'    -> Profile.role already "admin" (user={user.username})'
-                ))
+                return 'changed from %r -> "admin"' % (profile.role,)
+            return 'already "admin"'
         except Exception as exc:
-            self.stdout.write(self.style.WARNING(
-                f'    -> Could not ensure Profile role: {type(exc).__name__}: {exc}'
-            ))
+            return f'error: {type(exc).__name__}: {exc}'
 
     # ------------------------------------------------------------------
     # main handler
@@ -102,31 +129,28 @@ class Command(BaseCommand):
         password = options.get('password') or os.environ.get('DJANGO_SUPERUSER_PASSWORD')
         force = bool(options.get('force')) or self._env_truthy('DJANGO_SUPERUSER_FORCE')
 
-        self.stdout.write(self.style.MIGRATE_HEADING(
-            '[ensure_superuser] ================================================================'
-        ))
-        self.stdout.write('[ensure_superuser] Render deploy auto-superuser hook starting...')
-        self.stdout.write(f'    DJANGO_SUPERUSER_USERNAME  = {username or "(NOT SET)"}')
-        self.stdout.write(f'    DJANGO_SUPERUSER_EMAIL     = {email or "(NOT SET -> default: username@localhost)"}')
-        self.stdout.write(f'    DJANGO_SUPERUSER_PASSWORD  = {"(SET)" if password else "(NOT SET)"}')
-        self.stdout.write(f'    DJANGO_SUPERUSER_FORCE     = {"1 — password/role WILL be reset" if force else "0 — preserve existing password hash"}')
-        self.stdout.write('')
+        self._banner('=' * 68)
+        self.stdout.write('[ensure_superuser] AUTO SUPERUSER ENSURE (Render deploy hook)')
+        self.stdout.write(f'    ENV USERNAME : {username or "(NOT SET)"}')
+        self.stdout.write(f'    ENV EMAIL    : {email or "(NOT SET -> default username@localhost)"}')
+        self.stdout.write(f'    ENV PASSWORD : {"(SET)" if password else "(NOT SET — SKIP)"}')
+        self.stdout.write(f'    FORCE RESET  : {"ENABLED (DJANGO_SUPERUSER_FORCE=1)" if force else "disabled"}')
+        self._db_snapshot()
 
         if not username or not password:
+            self._banner('MISSING CREDENTIALS — SKIPPED')
             self.stdout.write(self.style.ERROR(
-                '[ensure_superuser] ❌ MISSING CREDENTIALS. Superuser creation skipped.'
+                '   Both DJANGO_SUPERUSER_USERNAME and DJANGO_SUPERUSER_PASSWORD must be set '
+                'in Render > Service > Environment Variables.'
             ))
-            self.stdout.write(self.style.WARNING(
-                '   -> Go to Render > Service > Environment and set these 3 variables, '
-                'then re-deploy with DJANGO_SUPERUSER_FORCE=1:'
-            ))
-            self.stdout.write('      - DJANGO_SUPERUSER_USERNAME = your_admin_username')
-            self.stdout.write('      - DJANGO_SUPERUSER_EMAIL    = your@email.com')
-            self.stdout.write('      - DJANGO_SUPERUSER_PASSWORD = A_very_strong_password_123!')
-            self.stdout.write('      - DJANGO_SUPERUSER_FORCE    = 1   (set on first deploy, or anytime you want to reset)')
-            self.stdout.write(self.style.MIGRATE_HEADING(
-                '[ensure_superuser] ================================================================'
-            ))
+            self.stdout.write(
+                '   Recommended minimal env vars (copy this block into Render Environment):'
+            )
+            self.stdout.write('     DJANGO_SUPERUSER_USERNAME = admin')
+            self.stdout.write('     DJANGO_SUPERUSER_EMAIL    = your@email.com')
+            self.stdout.write('     DJANGO_SUPERUSER_PASSWORD = AVeryStrongPassword_123!')
+            self.stdout.write('     DJANGO_SUPERUSER_FORCE    = 1')
+            self._banner('=' * 68)
             return
 
         if not email:
@@ -135,167 +159,189 @@ class Command(BaseCommand):
         try:
             user, match_reason = self._find_user(username, email)
 
+            # ================================================================
+            # BRAND NEW USER — create with FULL admin powers from day 1
+            # ================================================================
             if user is None:
-                # ----------------------------------------------------------
-                # BRAND NEW USER
-                # ----------------------------------------------------------
-                user = User.objects.create(
+                user = User(
                     username=username,
                     email=email,
-                    is_superuser=True,
-                    is_staff=True,
                     is_active=True,
+                    is_staff=True,         # required to even see /admin/login form
+                    is_superuser=True,     # required to have ALL permissions (not "staff only")
                 )
+                user.save()
                 user.set_password(password)
                 user.save(update_fields=['password'])
                 self.stdout.write(self.style.SUCCESS(
-                    f'[ensure_superuser] ✅ New superuser CREATED: username="{username}", email="{email}"'
+                    f'[ensure_superuser] ✅ New user CREATED with full admin powers: '
+                    f'username="{user.username}"'
                 ))
-                self._ensure_profile_admin(user)
-                self.stdout.write('')
-                self.stdout.write(self.style.MIGRATE_HEADING(
-                    '   >>> NOW LOG IN TO /admin USING THESE EXACT CREDENTIALS <<<'
-                ))
-                self.stdout.write(f'       LOGIN PAGE : /admin/login/')
-                self.stdout.write(f'       Username   : {username}')
-                self.stdout.write(f'       Password   : (the DJANGO_SUPERUSER_PASSWORD value you set in Render env)')
-                self.stdout.write(self.style.WARNING(
-                    '       NOTE: Do NOT use the "Google" button from the login form for admin access — '
-                    'Google creates a regular student account first.'
-                ))
-                self.stdout.write(self.style.MIGRATE_HEADING(
-                    '[ensure_superuser] ================================================================'
-                ))
+                role_status = self._ensure_profile_admin(user)
+                self.stdout.write(f'    Profile.role       : {role_status}')
+                # Reload to guarantee user.profile.role reflects DB state (not cache)
+                user.refresh_from_db()
+                self._final_verification(user, password, created=True)
                 return
 
-            # --------------------------------------------------------------
-            # EXISTING USER FOUND
-            # --------------------------------------------------------------
+            # ================================================================
+            # EXISTING USER FOUND — hard upgrade to FULL admin
+            # ================================================================
             self.stdout.write(
                 f'[ensure_superuser] Found existing user {user.username!r} via {match_reason}.'
             )
 
-            # Username sync: if we matched by email (or case-insensitive username) but username
-            # differs from desired value, update it so the canonical admin identity is stable.
+            # Username sync: rename to env username so credentials stay consistent across deploys
             if user.username != username:
-                old_uname = user.username
+                old = user.username
                 user.username = username
                 user.save(update_fields=['username'])
                 self.stdout.write(self.style.SUCCESS(
-                    f'    -> Username updated from "{old_uname}" -> "{username}"'
+                    f'    -> Username synced: "{old}" -> "{username}"'
                 ))
-
-            # Flags sync: ALWAYS ensure 3 critical admin flags.
-            changed_flags = []
-            if not user.is_superuser:
-                user.is_superuser = True
-                changed_flags.append('is_superuser')
-            if not user.is_staff:
-                user.is_staff = True
-                changed_flags.append('is_staff')
-            if not user.is_active:
-                user.is_active = True
-                changed_flags.append('is_active')
 
             # Email sync
             if email and user.email.lower() != email.lower():
                 user.email = email
-                changed_flags.append('email')
+                user.save(update_fields=['email'])
+                self.stdout.write(self.style.SUCCESS(
+                    f'    -> Email synced to "{email}"'
+                ))
 
             # --------------------------------------------------------------
-            # Password update decision
+            # CRITICAL: HARD-SET BOTH is_staff=True AND is_superuser=True
             # --------------------------------------------------------------
-            needs_password = False
+            # This is what prevents "staff only" empty admin pages.
+            # "is_staff = True" alone allows login to /admin but with zero perms
+            # unless is_superuser = True (or explicit per-object permissions granted).
+            flags_were = (user.is_active, user.is_staff, user.is_superuser)
+            user.is_active = True
+            user.is_staff = True          # <-- required to access /admin
+            user.is_superuser = True      # <-- required to NOT be "staff only"
+            flags_now = (user.is_active, user.is_staff, user.is_superuser)
+            flags_changed = [f for f, old_val, new_val in zip(
+                ('is_active', 'is_staff', 'is_superuser'), flags_were, flags_now
+            ) if old_val != new_val]
+
+            # --------------------------------------------------------------
+            # Password policy
+            # --------------------------------------------------------------
             if force:
-                # Always respect the user's explicit reset request.
-                if not user.check_password(password):
-                    needs_password = True
-                    pw_reason = (
-                        'FORCE=1 set and stored hash does not match env password — updating hash.'
-                    )
-                else:
-                    pw_reason = (
-                        'FORCE=1 set but password already matches env value — no change needed.'
-                    )
+                pw_reason = 'FORCE=1 — always refresh password hash with env password.'
+                needs_pw = not user.check_password(password)
+            elif not user.has_usable_password():
+                pw_reason = 'Current password hash is UNUSABLE — auto-repairing.'
+                needs_pw = True
             else:
-                # No force — only touch the password hash if it's genuinely broken,
-                # never overwrite a valid/usable admin password silently.
-                if not user.has_usable_password():
-                    needs_password = True
-                    pw_reason = 'Existing password hash is UNUSABLE — auto-repairing with env password.'
-                else:
-                    pw_reason = (
-                        'Existing password hash is valid — PRESERVING it '
-                        '(set DJANGO_SUPERUSER_FORCE=1 to force-reset).'
-                    )
+                pw_reason = 'Valid password hash detected (not FORCE mode) — preserving.'
+                needs_pw = False
 
-            self.stdout.write(f'    -> Password policy: {pw_reason}')
+            self.stdout.write(f'    Password policy    : {pw_reason}')
 
-            # Apply any field updates
-            if needs_password:
+            # Save fields
+            save_fields = list(flags_changed)
+            if needs_pw:
                 user.set_password(password)
-                if changed_flags:
-                    # set_password already marks the field; update_fields plus any other changed.
-                    user.save(update_fields=changed_flags + ['password'])
-                else:
-                    user.save()  # save password-only change
+                # When password changes, persist it alongside any flag changes
+                user.save(update_fields=(save_fields + ['password']) if save_fields else None)
                 self.stdout.write(self.style.SUCCESS(
-                    f'    -> Password UPDATED (hash refreshed for user={user.username})'
+                    f'    -> Password hash UPDATED (using env password).'
                 ))
-                if changed_flags:
+                if flags_changed:
                     self.stdout.write(self.style.SUCCESS(
-                        f'    -> User flags updated too: {", ".join(changed_flags)}'
+                        f'    -> Admin flags UPDATED: {", ".join(flags_changed)}'
                     ))
-            elif changed_flags:
-                user.save(update_fields=changed_flags)
+            elif save_fields:
+                user.save(update_fields=save_fields)
                 self.stdout.write(self.style.SUCCESS(
-                    f'    -> User fields updated: {", ".join(changed_flags)}'
+                    f'    -> Admin flags UPDATED: {", ".join(flags_changed)}'
                 ))
             else:
+                # No field changes but we still want to guarantee no stale cached state
+                user.save(update_fields=['last_login'])  # no-op-ish, refreshes cache
                 self.stdout.write(
-                    f'    -> No changes to user fields (user={user.username}).'
+                    f'    -> No user fields needed changes (flags already correct).'
                 )
 
-            # Profile.role always enforced to 'admin' (both normal and force runs).
-            self._ensure_profile_admin(user)
+            # Profile.role = admin — every run
+            role_status = self._ensure_profile_admin(user)
+            self.stdout.write(f'    Profile.role       : {role_status}')
 
-            # Final summary — explicit login instructions.
-            self.stdout.write('')
-            self.stdout.write(self.style.SUCCESS(
-                f'[ensure_superuser] ✅ Superuser READY: user="{user.username}" '
-                f'is_staff={user.is_staff}, is_superuser={user.is_superuser}, is_active={user.is_active}, '
-                f'role={getattr(getattr(user, "profile", None), "role", "N/A")!r}'
-            ))
-            self.stdout.write('')
-            self.stdout.write(self.style.MIGRATE_HEADING(
-                '   >>> LOGIN TO ADMIN WITH THESE EXACT CREDENTIALS <<<'
-            ))
-            self.stdout.write(f'       URL        : /admin/login/')
-            self.stdout.write(f'       Username   : {user.username}')
-            self.stdout.write(f'       Password   : (use the value of DJANGO_SUPERUSER_PASSWORD from Render env)')
-            self.stdout.write(self.style.WARNING(
-                '       IMPORTANT: Use the regular Django username/password fields on the admin '
-                'login form — NOT the Google / social-login button. Google login creates a '
-                'regular (role=student) account and will NOT give you staff access.'
-            ))
-            if not force:
-                self.stdout.write(self.style.WARNING(
-                '       TROUBLESHOOT: If you still see "Please enter the correct username and '
-                'password for a staff account", set DJANGO_SUPERUSER_FORCE=1 in Render > Environment, '
-                'save, and re-deploy. That force-resets the hash.'
-            ))
-            self.stdout.write(self.style.MIGRATE_HEADING(
-                '[ensure_superuser] ================================================================'
-            ))
+            # Reload from DB to ensure we read the latest Profile.role
+            # (in case get_or_create + save() have cached stale values on the relation)
+            user.refresh_from_db()
+
+            # Final summary + inline authenticate() verification
+            self._final_verification(user, password, created=False)
 
         except Exception as exc:
+            self._banner('FAILURE')
             self.stdout.write(self.style.ERROR(
-                f'[ensure_superuser] ❌ FAILED: {type(exc).__name__}: {exc}'
+                f'    {type(exc).__name__}: {exc}'
             ))
             self.stderr.write(
-                '       Troubleshooting tips:'
-                ' (a) Ensure DATABASE_URL env var is pointing to the correct Aiven MySQL.'
-                ' (b) Ensure mysqlclient package installed (it is in requirements.txt).'
-                ' (c) Ensure DB migrations ran: startCommand in render.yaml runs'
-                ' "python manage.py migrate --noinput" BEFORE ensure_superuser.'
+                '    Troubleshooting checklist:'
+                ' (1) Verify DATABASE_URL in Render env points to correct MySQL DB.'
+                ' (2) Verify migrations ran (render.yaml startCommand runs migrate before this command).'
+                ' (3) Verify mysqlclient or appropriate DB driver is installed.'
             )
+            self._banner('=' * 68)
+
+    # ------------------------------------------------------------------
+    # final verification block — also prints EXACT login instructions
+    # ------------------------------------------------------------------
+    def _final_verification(self, user, password, *, created: bool):
+        self._banner('FINAL VERIFICATION')
+
+        try:
+            from courses.models import Profile
+            role = user.profile.role
+        except Exception:
+            role = 'N/A'
+
+        # Inline Django authenticate() using the env credentials.
+        # This is the same call /admin/login/ uses — if it fails here,
+        # the user WILL get "Please enter correct username and password..."
+        auth_ok = None
+        try:
+            authed_user = authenticate(username=user.username, password=password)
+            auth_ok = (authed_user is not None) and (authed_user.pk == user.pk)
+        except Exception as exc:
+            auth_ok = f'error: {type(exc).__name__}: {exc}'
+
+        lines = [
+            ('Username (EXACT to type)',   user.username),
+            ('Email',                      user.email),
+            ('is_active    (must be True)', str(user.is_active)),
+            ('is_staff     (must be True — otherwise /admin blocked)',  str(user.is_staff)),
+            ('is_superuser (must be True — otherwise "staff only" page)', str(user.is_superuser)),
+            ('Profile.role (must be "admin" for custom /management views)', role),
+        ]
+        for label, val in lines:
+            self.stdout.write(f'    {label:<55} : {val!r}')
+
+        self.stdout.write('')
+        if auth_ok is True:
+            self.stdout.write(self.style.SUCCESS(
+                '    authenticate() CHECK ✅ PASS — /admin/login/ will accept these credentials.'
+            ))
+        else:
+            self.stdout.write(self.style.ERROR(
+                f'    authenticate() CHECK ❌ FAIL — you WILL NOT be able to log in: {auth_ok!r}'
+            ))
+            self.stdout.write(self.style.WARNING(
+                '    REMEDY: Set DJANGO_SUPERUSER_FORCE=1 in Render Environment, Save changes,'
+                ' and let it re-deploy. Then try logging in again.'
+            ))
+
+        self.stdout.write('')
+        self.stdout.write(self.style.MIGRATE_HEADING(
+            '    >>> EXACT LOGIN INSTRUCTIONS <<<'
+        ))
+        self.stdout.write(f'        Step 1 : Open /admin/login/ — https://your-render-domain.onrender.com/admin/login/')
+        self.stdout.write(f'        Step 2 : Do NOT click "Google" / social buttons.')
+        self.stdout.write(f'        Step 3 : Username field -> type this EXACTLY: {user.username!r}')
+        self.stdout.write( '        Step 4 : Password field -> use the value of env DJANGO_SUPERUSER_PASSWORD.')
+        self.stdout.write(f'        Step 5 : If it still says "Please enter correct username and password'
+                          f' for a staff account", re-deploy with DJANGO_SUPERUSER_FORCE=1.')
+        self._banner('=' * 68)

@@ -250,16 +250,36 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 
-# ============================================================
-# DATABASE
-# ============================================================
+import os
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
-        conn_max_age=600,
-    )
-}
+# ==========================================
+# DATABASE
+# ==========================================
+
+if os.environ.get("RENDER"):
+    # Production - Render → MySQL
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": os.environ.get("DB_NAME"),
+            "USER": os.environ.get("DB_USER"),
+            "PASSWORD": os.environ.get("DB_PASSWORD"),
+            "HOST": os.environ.get("DB_HOST"),
+            "PORT": os.environ.get("DB_PORT", "3306"),
+            "OPTIONS": {
+                "charset": "utf8mb4",
+            },
+        }
+    }
+
+else:
+    # Local → SQLite
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # ============================================================
@@ -460,13 +480,6 @@ CSRF_USE_SESSIONS = False
 CSRF_COOKIE_NAME = 'csrftoken'
 
 CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
-
-
-# ============================================================
-# DEFAULT PRIMARY KEY
-# ============================================================
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # ============================================================

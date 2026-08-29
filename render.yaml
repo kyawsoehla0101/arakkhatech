@@ -6,7 +6,11 @@ services:
     buildCommand: |
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
-    startCommand: gunicorn arakkhatech.wsgi:application
+    startCommand: |
+      python manage.py migrate --noinput
+      python manage.py ensure_superuser
+      python manage.py collectstatic --noinput
+      gunicorn arakkhatech.wsgi:application
     envVars:
       - key: PYTHON_VERSION
         value: 3.11

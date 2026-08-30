@@ -31,7 +31,7 @@
                             {% if book.course %}
                             <div class="p-6 bg-emerald-50 rounded-3xl border border-emerald-100">
                                 <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-2">Related Course</p>
-                                <a href="{% url 'course_detail' book.course.pk %}" class="text-lg font-black text-slate-900 hover:text-emerald-700 block leading-tight">
+                                <a href="{% url 'course_detail' book.course.slug %}" class="text-lg font-black text-slate-900 hover:text-emerald-700 block leading-tight">
                                     {{ book.course.title }}
                                 </a>
                             </div>

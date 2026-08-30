@@ -647,6 +647,106 @@ def course_list(request):
         'query': query
     })
 
+
+def courses_page(request):
+    """
+    Dedicated standalone Courses landing page (independent of home course_list).
+    URL: /courses/  (template name: courses/course.html as requested).
+    """
+    query = request.GET.get('q', '').strip()
+    category = request.GET.get('category', '').strip()
+    sort = request.GET.get('sort', 'newest')
+
+    base_qs = (
+        Course.objects.select_related('instructor')
+        .prefetch_related('lessons', 'enrolled_students')
+        .annotate(
+            student_count=Count('enrolled_students', distinct=True),
+            lesson_count=Count('lessons', distinct=True),
+        )
+    )
+
+    if query:
+        base_qs = base_qs.filter(
+            Q(title__icontains=query)
+            | Q(description__icontains=query)
+            | Q(instructor__username__icontains=query)
+        ).distinct()
+
+    # Simple soft categorization by keyword in title (keeps the page functional
+    # without having to add a category FK to the Course model right now).
+    category_keywords = {
+        'programming': ['python', 'django', 'javascript', 'react', 'flutter', 'coding', 'code', 'programming', 'နည်းပညာ', 'ကုဒ်', 'ပရိုဂရမ်'],
+        'design': ['ui', 'ux', 'design', 'css', 'tailwind', 'figma', 'ဒီဇိုင်း'],
+        'business': ['business', 'marketing', 'seo', 'startup', 'စီးပွားရေး', 'မာခက်တင်'],
+        'language': ['english', 'japanese', 'iit', 'ielts', 'ဘာသာစကား', 'အင်္ဂလိပ်'],
+    }
+    if category and category in category_keywords:
+        kw_filter = Q()
+        for kw in category_keywords[category]:
+            kw_filter |= Q(title__icontains=kw) | Q(description__icontains=kw)
+        base_qs = base_qs.filter(kw_filter)
+
+    if sort == 'popular':
+        courses = base_qs.order_by('-student_count', '-created_at')
+    elif sort == 'shortest':
+        courses = base_qs.order_by('lesson_count', '-created_at')
+    else:  # newest
+        courses = base_qs.order_by('-created_at')
+
+    courses = list(courses)
+
+    # Aggregate stats for the hero
+    total_courses = len(courses)
+    total_lessons = sum((c.lesson_count or 0) for c in courses)
+    total_students = sum((c.student_count or 0) for c in courses)
+    try:
+        total_instructors = Course.objects.values('instructor').distinct().count()
+    except Exception:
+        total_instructors = 0
+
+    featured = [c for c in courses[:6]]
+
+    categories = [
+        {'key': '',           'label': 'All Courses',      'icon': 'fas fa-layer-group'},
+        {'key': 'programming','label': 'Programming',      'icon': 'fas fa-code'},
+        {'key': 'design',     'label': 'UI / UX / Design', 'icon': 'fas fa-pen-ruler'},
+        {'key': 'business',   'label': 'Business',         'icon': 'fas fa-briefcase'},
+        {'key': 'language',   'label': 'Languages',        'icon': 'fas fa-language'},
+    ]
+
+    sort_options = [
+        {'key': 'newest',   'label': 'အသစ်အဆင့်'},
+        {'key': 'popular',  'label': 'လူကြိုက်အများဆုံး'},
+        {'key': 'shortest', 'label': 'သင်ခန်းစာအနည်းဆုံး'},
+    ]
+
+    hero_stats = [
+        {'number': f'{total_courses}+',  'label': 'Courses Available', 'icon': 'fas fa-book-open',  'accent': 'indigo'},
+        {'number': f'{total_lessons}+',  'label': 'Total Lessons',     'icon': 'fas fa-layer-group', 'accent': 'fuchsia'},
+        {'number': f'{total_students}+', 'label': 'Students Enrolled', 'icon': 'fas fa-users',       'accent': 'emerald'},
+        {'number': f'{total_instructors}+','label': 'Expert Instructors','icon':'fas fa-user-graduate','accent':'amber'},
+    ]
+
+    testimonials = [
+        {'name': 'Kyaw Zayar', 'role': 'Frontend Developer', 'text': 'အေ platform ကနိန်ပနာ လိလာရစွာ တကယ့်ကို ထိရောက်ပါတယ်။ ဗီဒီယိုတွေကလည်း ရှင်းလင်းပါတယ်။'},
+        {'name': 'Hsu Myat',   'role': 'Student',             'text': 'သင်တန်းပို့ချပုံစံက နားလည်လွယ်ပါတယ်။ Real-world project တွေကလည်း အရမ်းကောင်းပါတယ်။'},
+        {'name': 'Aung Ko',    'role': 'Junior Developer',    'text': 'Course လိုင်းစဉ်လိုက်ပြီး သင်ယူလို့ရတာ ကောင်းပါတယ်။ Career အစပိုင်းမှာ အထောက်အကူအများကြီးရခဲ့ပါတယ်။'},
+    ]
+
+    return render(request, 'courses/course.html', {
+        'courses': courses,
+        'featured': featured,
+        'query': query,
+        'category': category,
+        'sort': sort,
+        'categories': categories,
+        'sort_options': sort_options,
+        'hero_stats': hero_stats,
+        'testimonials': testimonials,
+        'total_courses': total_courses,
+    })
+
 from docs.models import Book
 
 @login_required
@@ -687,20 +787,170 @@ def admin_dashboard(request):
         'chart_data': json.dumps(chart_data),
     })
 
-def course_detail(request, pk):
-    course = get_object_or_404(Course, pk=pk)
+def course_detail_pk_redirect(request, pk):
+    """
+    Legacy /course/<int:pk>/ URL — redirects to the clean slug-based URL.
+    Keeps backwards compatibility for any old deep links / bookmarks.
+    """
+    c = get_object_or_404(Course, pk=pk)
+    if not c.slug:
+        c.save(update_fields=['slug'])
+        c.refresh_from_db()
+    return redirect('course_detail', slug=c.slug, permanent=True)
+
+
+def course_detail(request, slug):
+    course = get_object_or_404(
+        Course.objects.select_related('instructor')
+        .prefetch_related('lessons', 'enrolled_students'),
+        slug=slug
+    )
     is_enrolled = False
     enrollment = None
+    progress_pct = 0
+    completed_lesson_ids = []
+
     if request.user.is_authenticated:
-        enrollment = Enrollment.objects.filter(student=request.user, course=course).first()
+        enrollment = (
+            Enrollment.objects.filter(student=request.user, course=course)
+            .prefetch_related('completed_lessons')
+            .first()
+        )
         is_enrolled = enrollment is not None
-    
-    lessons = course.lessons.all()
+        if enrollment:
+            progress_pct = enrollment.progress_percentage or 0
+            completed_lesson_ids = list(
+                enrollment.completed_lessons.values_list('id', flat=True)
+            )
+
+    lessons = list(course.lessons.all())
+    lesson_count = len(lessons)
+    enrolled_student_count = course.enrolled_students.count()
+
+    # Try to grab the instructor's profile (avatar, bio) without errors.
+    instructor_profile = None
+    try:
+        instructor_profile = getattr(course.instructor, 'profile', None)
+    except Exception:
+        instructor_profile = None
+
+    # Course description with markdown support.
+    try:
+        description_html = markdown.markdown(
+            course.description or '',
+            extensions=[
+                'extra', 'codehilite', 'toc', 'nl2br', 'sane_lists',
+                'fenced_code', 'attr_list', 'admonition',
+            ]
+        )
+    except Exception:
+        description_html = course.description or ''
+
+    # Total duration as pretty string (best effort).
+    total_minutes = 0
+    total_seconds = 0
+    for l in lessons:
+        if not l.duration:
+            continue
+        parts = str(l.duration).split(':')
+        try:
+            if len(parts) == 3:
+                h, m, s = parts
+                total_minutes += int(h) * 60 + int(m)
+                total_seconds += int(s)
+            elif len(parts) == 2:
+                m, s = parts
+                total_minutes += int(m)
+                total_seconds += int(s)
+        except Exception:
+            pass
+    total_minutes += total_seconds // 60
+    total_hours = total_minutes // 60
+    remaining_minutes = total_minutes % 60
+    if total_hours > 0:
+        total_duration_str = f"{total_hours}h {remaining_minutes}m"
+    else:
+        total_duration_str = f"{remaining_minutes}m" if remaining_minutes else "—"
+
+    # Related courses (same instructor, excluding the current one).
+    related_courses = list(
+        Course.objects.filter(instructor=course.instructor)
+        .exclude(pk=course.pk)
+        .annotate(student_count=Count('enrolled_students'))
+        .order_by('-created_at')[:3]
+    )
+
+    # High-level FAQ / feature blocks shared across all course detail pages.
+    # Kept static here so the page always has a polished FAQ section.
+    course_features = [
+        {
+            'icon': 'fas fa-video',
+            'title': 'အရည်အသွေးမြင့် ဗီဒီယိုသင်ခန်းစာများ',
+            'desc': 'HD ဂုဏ်သတ္တိရှိသော ဗီဒီယိုများဖြင့် ရှင်းလင်းစွာ သင်ကြားပေးပါသည်။',
+        },
+        {
+            'icon': 'fas fa-infinity',
+            'title': 'ထပ်ခါထပ်ခါ ကြည့်ရှုနိုင်ခွင့်',
+            'desc': 'တစ်ခါအပ်နှံပြီးသည်နှင့် ဘယ်အချိန်မဆို ထပ်ခါထပ်ခါ ကြည့်ရှုနိုင်ပါသည်။',
+        },
+        {
+            'icon': 'fas fa-file-code',
+            'title': 'လက်တွေ့ကျသော Source Code',
+            'desc': 'သင်ခန်းစာတိုင်းနှင့်အတူ source code နှင့် project files များကို ပေးပို့ပေးပါသည်။',
+        },
+        {
+            'icon': 'fas fa-certificate',
+            'title': 'ပြီးဆုံးမှတ်တမ်း (Certificate)',
+            'desc': 'သင်တန်းအားလုံးပြီးဆုံးသူများအား လက်မှတ်နှင့်အတူ ဂုဏ်ပြုပေးပါသည်။',
+        },
+        {
+            'icon': 'fas fa-comments',
+            'title': 'Community & Support',
+            'desc': 'Community group တွင် မေးခွန်းများမေးနိုင်ပြီး instructor ထံမှ အကူအညီရရှိနိုင်ပါသည်။',
+        },
+        {
+            'icon': 'fas fa-mobile-alt',
+            'title': 'Mobile အသုံးပြုနိုင်မှု',
+            'desc': 'ဖုန်း၊ တက်ဘလက်၊ ကွန်ပျူတာ — မည်သည့်စက်ပစ္စည်းနှင့်မဆို ကြည့်ရှုနိုင်ပါသည်။',
+        },
+    ]
+
+    faqs = [
+        {
+            'q': 'သင်တန်းကို ဝင်ခွင့်ရရှိနိုင်ရန် အရင်ဆုံးဘာတွေလုပ်ရမလဲ?',
+            'a': 'အကောင့်တစ်ခုဖွင့်ပြီး Course Detail Page ရှိ "Enroll Now" ကိုနှိပ်ရုံသာ လုံလောက်ပါသည်။ အခုလက်ရှိ demo courses များကို Free ဖြင့် အပ်နှံနိုင်ပါသည်။',
+        },
+        {
+            'q': 'ဗီဒီယိုများကို စစ်ဆေးကြည့်လို့ရပါသလား?',
+            'a': 'သင်တန်းအတွင်း ပထမဆုံးသင်ခန်းစာများကို စမ်းကြည့်နိုင်ပြီး Enroll မလုပ်မီ အကြောင်းအရာအစီအစဉ်ကို စစ်ဆေးနိုင်ပါသည်။',
+        },
+        {
+            'q': 'သင်တန်းပြီးရင် Certificate ရနိုင်ပါသလား?',
+            'a': 'ဟုတ်ပါသည်။ သင်ခန်းစာအားလုံးပြီးဆုံးပါက Arakkha Tech မှ ချမှတ်သော Certificate တစ်ခုကို အလိုအလျောက် ထုတ်ပေးပါသည်။',
+        },
+        {
+            'q': 'ဗီဒီယိုကို download လုပ်လို့ရပါသလား?',
+            'a': 'လက်ရှိ streaming သာလုပ်နိုင်ပြီး download ခွင့်မပေးထားသေးပါ။ ဒါပေမယ့် ဘယ်အချိန်မဆို ထပ်ခါထပ်ခါ ကြည့်ရှုနိုင်ပါသည်။',
+        },
+    ]
+
     return render(request, 'courses/course_detail.html', {
         'course': course,
         'lessons': lessons,
+        'lesson_count': lesson_count,
         'is_enrolled': is_enrolled,
-        'enrollment': enrollment
+        'enrollment': enrollment,
+        'progress_pct': progress_pct,
+        'completed_lesson_ids': completed_lesson_ids,
+        'enrolled_student_count': enrolled_student_count,
+        'instructor_profile': instructor_profile,
+        'description_html': description_html,
+        'total_duration_str': total_duration_str,
+        'related_courses': related_courses,
+        'course_features': course_features,
+        'faqs': faqs,
+        # Querystring-based tab: <url>?tab=curriculum
+        'active_tab': request.GET.get('tab', 'overview'),
     })
 
 @login_required
@@ -710,7 +960,7 @@ def lesson_detail(request, course_pk, lesson_pk):
     enrollment = Enrollment.objects.filter(student=request.user, course=course).first()
     if not enrollment:
         messages.error(request, "သင်ခန်းစာများကို ကြည့်ရှုရန် အရင်ဆုံး သင်တန်းအပ်နှံပေးပါ")
-        return redirect('course_detail', pk=course_pk)
+        return redirect('course_detail', slug=course.slug)
     
     lesson = get_object_or_404(Lesson, pk=lesson_pk, course=course)
     lessons = course.lessons.all() # Get all lessons for the sidebar
@@ -793,11 +1043,11 @@ def student_dashboard(request):
 def enroll(request, pk):
     # Only admin can use this view to enroll students (or if we want to keep it simple, 
     # just disable self-enrollment by checking if user is admin)
+    course = get_object_or_404(Course, pk=pk)
     if not request.user.is_superuser:
         messages.error(request, "သင်တန်းအပ်နှံရန် Admin ကို ဆက်သွယ်ပေးပါ။")
-        return redirect('course_detail', pk=pk)
+        return redirect('course_detail', slug=course.slug)
         
-    course = get_object_or_404(Course, pk=pk)
     # For admin, we might want to enroll a specific student, but this view is simple.
     # Let's keep it as is but restricted, or better yet, the user wants admin-only enrollment.
     enrollment, created = Enrollment.objects.get_or_create(student=request.user, course=course)
@@ -812,4 +1062,4 @@ def enroll(request, pk):
         messages.success(request, f"{course.title} သင်တန်းကို အောင်မြင်စွာ အပ်နှံပြီးပါပြီ")
     else:
         messages.info(request, "သင်သည် ဤသင်တန်းကို အပ်နှံပြီးသားဖြစ်သည်")
-    return redirect('course_detail', pk=pk)
+    return redirect('course_detail', slug=course.slug)

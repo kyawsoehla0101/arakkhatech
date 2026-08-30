@@ -63,7 +63,7 @@
                         <a href="{% url 'book_overview' book.slug %}" class="hover:text-slate-600">{{ book.title }}</a>
                         {% if book.course %}
                         <span class="mx-3">/</span>
-                        <a href="{% url 'course_detail' book.course.pk %}" class="text-indigo-600 hover:text-indigo-800">Course</a>
+                        <a href="{% url 'course_detail' book.course.slug %}" class="text-indigo-600 hover:text-indigo-800">Course</a>
                         {% endif %}
                     </nav>
 

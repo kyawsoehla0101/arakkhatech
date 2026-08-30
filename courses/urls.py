@@ -43,13 +43,18 @@ urlpatterns = [
     # 404 Preview for testing
     path('404-preview/', views.preview_404, name='preview_404'),
 
-    # Community Voice URLs
     path('community-voice/submit/', views.submit_community_voice, name='submit_community_voice'),
     path('manage/voices/', views.manage_voices, name='manage_voices'),
     path('manage/voice/<int:pk>/approve/', views.approve_voice, name='approve_voice'),
     path('manage/voice/<int:pk>/delete/', views.delete_voice, name='delete_voice'),
 
-    path('course/<int:pk>/', views.course_detail, name='course_detail'),
+    # Dedicated standalone Courses landing page (/courses/)
+    path('courses/', views.courses_page, name='courses_page'),
+
+    # Primary course detail URL uses slug
+    path('course/<slug:slug>/', views.course_detail, name='course_detail'),
+    # Legacy /course/<int:pk>/ URL — redirects to slug URL for backwards compatibility
+    path('course/<int:pk>/', views.course_detail_pk_redirect, name='course_detail_pk'),
     path('dashboard/', views.student_dashboard, name='student_dashboard'),
     path('course/<int:course_pk>/lesson/<int:lesson_pk>/', views.lesson_detail, name='lesson_detail'),
     path('lesson/<int:lesson_pk>/toggle-completion/', views.toggle_lesson_completion, name='toggle_lesson_completion'),

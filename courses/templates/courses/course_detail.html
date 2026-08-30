@@ -1,236 +1,674 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ course.title }} - Course Details{% endblock %}
+{% block title %}{{ course.title }} | Arakkha Tech{% endblock %}
 
 {% block content %}
-<!-- Course Header Section -->
-<section class="relative py-20 bg-slate-900 overflow-hidden">
-    <div class="absolute inset-0 custom-gradient opacity-10"></div>
-    <div class="container mx-auto px-6 relative z-10">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div data-aos="fade-right">
-                <nav class="flex mb-8 text-sm font-bold text-indigo-400 uppercase tracking-widest">
-                     <a href="{% url 'course_list' %}" class="hover:text-white transition-colors">Courses</a>
-                     <span class="mx-3 text-slate-600">/</span>
-                     <span class="text-slate-400">{{ course.title }}</span>
-                  </nav>
-                <h1 class="text-4xl md:text-6xl font-black text-white mb-8 leading-tight">
+<!-- ========================== HERO ========================== -->
+<section class="relative overflow-hidden bg-slate-900 pb-32 pt-24 text-white">
+    <div class="pointer-events-none absolute inset-0 custom-gradient opacity-20"></div>
+    <div class="pointer-events-none absolute -top-32 -right-32 h-96 w-96 rounded-full bg-indigo-600/30 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-24 -left-32 h-96 w-96 rounded-full bg-fuchsia-600/20 blur-3xl"></div>
+
+    <div class="relative container mx-auto px-6">
+        <!-- Breadcrumb -->
+        <nav class="mb-8 flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-indigo-300">
+            <a href="{% url 'course_list' %}" class="hover:text-white transition-colors">Courses</a>
+            <i class="fas fa-chevron-right text-slate-600"></i>
+            <span class="text-slate-400">{{ course.title }}</span>
+        </nav>
+
+        <div class="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16 items-center">
+            <div class="lg:col-span-7" data-aos="fade-right">
+                <div class="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur px-4 py-1.5 text-xs font-bold text-indigo-200 border border-white/10 mb-6">
+                    <i class="fas fa-graduation-cap"></i>
+                    Professional Track · Free Enrollment
+                </div>
+
+                <h1 class="text-4xl md:text-5xl xl:text-6xl font-black leading-tight mb-6">
                     {{ course.title }}
                 </h1>
-                <p class="text-slate-400 text-lg mb-10 leading-relaxed max-w-xl">
-                    {{ course.description|truncatechars:200 }}
+
+                <p class="text-lg md:text-xl text-slate-300 leading-relaxed mb-10 max-w-2xl line-clamp-4">
+                    {{ course.description|striptags|truncatechars:220 }}
                 </p>
-                <div class="flex flex-wrap gap-8 items-center text-white/80">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-indigo-400">
-                            <i class="fas fa-user-tie"></i>
+
+                <!-- Meta grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
+                    <div class="rounded-2xl bg-white/5 backdrop-blur border border-white/10 p-5">
+                        <div class="flex items-center gap-3 text-indigo-300 mb-1">
+                            <i class="fas fa-layer-group"></i>
+                            <span class="text-[10px] uppercase tracking-widest font-bold">Lessons</span>
                         </div>
-                        <div>
-                            <p class="text-[10px] uppercase font-black text-slate-500">Instructor</p>
-                            <p class="font-bold">{{ course.instructor.username }}</p>
-                        </div>
+                        <p class="text-2xl font-black">{{ lesson_count }}</p>
                     </div>
-                    <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-indigo-400">
-                            <i class="fas fa-video"></i>
+                    <div class="rounded-2xl bg-white/5 backdrop-blur border border-white/10 p-5">
+                        <div class="flex items-center gap-3 text-fuchsia-300 mb-1">
+                            <i class="fas fa-users"></i>
+                            <span class="text-[10px] uppercase tracking-widest font-bold">Students</span>
                         </div>
-                        <div>
-                            <p class="text-[10px] uppercase font-black text-slate-500">Curriculum</p>
-                            <p class="font-bold">{{ lessons.count }} Lessons</p>
-                        </div>
+                        <p class="text-2xl font-black">{{ enrolled_student_count|default:"0" }}</p>
                     </div>
-                    <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-indigo-400">
-                            <i class="fas fa-star text-yellow-400"></i>
+                    <div class="rounded-2xl bg-white/5 backdrop-blur border border-white/10 p-5">
+                        <div class="flex items-center gap-3 text-emerald-300 mb-1">
+                            <i class="fas fa-clock"></i>
+                            <span class="text-[10px] uppercase tracking-widest font-bold">Duration</span>
                         </div>
-                        <div>
-                            <p class="text-[10px] uppercase font-black text-slate-500">Rating</p>
-                            <p class="font-bold">4.9 (120+ reviews)</p>
+                        <p class="text-2xl font-black">{{ total_duration_str }}</p>
+                    </div>
+                    <div class="rounded-2xl bg-white/5 backdrop-blur border border-white/10 p-5">
+                        <div class="flex items-center gap-3 text-yellow-300 mb-1">
+                            <i class="fas fa-star"></i>
+                            <span class="text-[10px] uppercase tracking-widest font-bold">Rating</span>
                         </div>
+                        <p class="text-2xl font-black">4.9<span class="text-slate-500 text-sm font-bold">/5</span></p>
                     </div>
                 </div>
-            </div>
-            
-            <div class="relative" data-aos="fade-left">
-                <div class="rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white/5">
-                    {% if course.thumbnail %}
-                        <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="w-full">
+
+                <!-- Instructor row -->
+                <div class="flex items-center gap-5 mb-8">
+                    <div class="relative">
+                        {% if instructor_profile and instructor_profile.avatar %}
+                            <img src="{{ instructor_profile.avatar.url }}" alt="{{ course.instructor.username }}" class="w-14 h-14 rounded-2xl object-cover border-2 border-white/30 shadow-lg">
+                        {% else %}
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 flex items-center justify-center text-xl font-black shadow-lg">
+                                {{ course.instructor.username|slice:":1"|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-1">Instructor</p>
+                        <p class="font-bold text-lg leading-none mb-1">{{ course.instructor.get_full_name|default:course.instructor.username }}</p>
+                        {% if instructor_profile and instructor_profile.role %}
+                            <p class="text-xs text-indigo-300 font-semibold capitalize">{{ instructor_profile.role }} @ Arakkha Tech</p>
+                        {% else %}
+                            <p class="text-xs text-indigo-300 font-semibold">Senior Instructor @ Arakkha Tech</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- CTA buttons -->
+                <div class="flex flex-wrap items-center gap-4">
+                    {% if is_enrolled %}
+                        <a href="{% if lessons %}{% url 'lesson_detail' course.pk lessons.0.pk %}{% else %}#{% endif %}"
+                           class="inline-flex items-center gap-3 rounded-2xl custom-gradient px-8 py-4 text-base font-black shadow-2xl shadow-indigo-900/50 hover:scale-[1.03] transition-transform">
+                            <i class="fas fa-play-circle"></i>
+                            {% if progress_pct > 0 %}Continue Learning · {{ progress_pct }}%{% else %}Start Learning Now{% endif %}
+                        </a>
+                        <a href="#curriculum" class="inline-flex items-center gap-3 rounded-2xl bg-white/10 backdrop-blur px-8 py-4 text-base font-black text-white border border-white/10 hover:bg-white/20 transition-colors">
+                            <i class="fas fa-list"></i> View Curriculum
+                        </a>
                     {% else %}
-                        <div class="w-full aspect-video bg-indigo-900/50 flex items-center justify-center text-indigo-400">
-                            <i class="fas fa-laptop-code text-8xl opacity-20"></i>
-                        </div>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'enroll' course.pk %}"
+                               class="inline-flex items-center gap-3 rounded-2xl custom-gradient px-8 py-4 text-base font-black shadow-2xl shadow-indigo-900/50 hover:scale-[1.03] transition-transform">
+                                <i class="fas fa-rocket"></i> Enroll Now · Free
+                            </a>
+                        {% else %}
+                            <a href="{% url 'account_login' %}?next={% url 'course_detail' course.slug %}"
+                               class="inline-flex items-center gap-3 rounded-2xl custom-gradient px-8 py-4 text-base font-black shadow-2xl shadow-indigo-900/50 hover:scale-[1.03] transition-transform">
+                                <i class="fas fa-sign-in-alt"></i> Login & Enroll · Free
+                            </a>
+                        {% endif %}
+                        <a href="#course-features" class="inline-flex items-center gap-3 rounded-2xl bg-white/10 backdrop-blur px-8 py-4 text-base font-black text-white border border-white/10 hover:bg-white/20 transition-colors">
+                            <i class="fas fa-sparkles"></i> What you'll learn
+                        </a>
                     {% endif %}
                 </div>
             </div>
-        </div>
-    </div>
-</section>
 
-<!-- Course Content Section -->
-<section class="py-24 bg-white">
-    <div class="container mx-auto px-6">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-16">
-            <!-- Left: Description & Curriculum -->
-            <div class="lg:col-span-2">
-                <div class="mb-16" data-aos="fade-up">
-                    <h2 class="text-3xl font-black text-slate-800 mb-8 flex items-center">
-                        <span class="w-2 h-10 bg-indigo-600 rounded-full mr-4"></span> Course Description
-                    </h2>
-                    <div class="prose max-w-none text-slate-600 leading-relaxed text-lg">
-                        {{ course.description|safe }}
-                    </div>
-                </div>
-
-                <div class="mb-16" data-aos="fade-up">
-                    <h2 class="text-3xl font-black text-slate-800 mb-8 flex items-center">
-                        <span class="w-2 h-10 bg-indigo-600 rounded-full mr-4"></span> Course Curriculum
-                    </h2>
-                    <div class="space-y-4">
-                        {% for lesson in lessons %}
-                        <div class="group bg-slate-50 rounded-[2rem] p-6 hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-slate-100">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-6">
-                                    <span class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-indigo-600 font-black group-hover:custom-gradient group-hover:text-white transition-all">
-                                        {{ forloop.counter|stringformat:"02d" }}
-                                    </span>
-                                    <div>
-                                        <h4 class="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">{{ lesson.title }}</h4>
-                                        {% if lesson.duration %}
-                                        <p class="text-xs text-slate-400 mt-1 font-medium"><i class="far fa-clock mr-2"></i>{{ lesson.duration }}</p>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                {% if is_enrolled %}
-                                    <a href="{% url 'lesson_detail' course.pk lesson.pk %}" class="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-indigo-100">Watch Now</a>
-                                {% else %}
-                                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-300">
-                                        <i class="fas fa-lock"></i>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% empty %}
-                        <p class="text-slate-400 italic">No lessons available yet.</p>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Instructor Bio -->
-                <div class="bg-indigo-50 rounded-[3rem] p-12 flex flex-col md:flex-row items-center gap-10" data-aos="fade-up">
-                    <div class="w-32 h-32 rounded-[2rem] bg-indigo-600 flex items-center justify-center text-white text-5xl font-black shadow-xl shadow-indigo-200">
-                        {{ course.instructor.username|slice:":1"|upper }}
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-black text-slate-800 mb-4">Meet your Instructor</h3>
-                        <p class="text-slate-600 leading-relaxed mb-6 font-medium">
-                            {{ course.instructor.username }} is a senior software engineer with over 10 years of experience in the industry. He has taught thousands of students globally.
-                        </p>
-                        <div class="flex space-x-4">
-                            <a href="#" class="text-indigo-600 hover:text-indigo-800 transition-colors"><i class="fab fa-twitter text-xl"></i></a>
-                            <a href="#" class="text-indigo-600 hover:text-indigo-800 transition-colors"><i class="fab fa-linkedin text-xl"></i></a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Course Documentation Section -->
-                {% if course.doc_categories.exists %}
-                <div class="mt-16" data-aos="fade-up">
-                    <h2 class="text-3xl font-black text-slate-800 mb-8 flex items-center">
-                        <span class="w-2 h-10 bg-emerald-500 rounded-full mr-4"></span> Course Documentation
-                    </h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {% for category in course.doc_categories.all %}
-                        <div class="glass p-8 rounded-[2.5rem] border-white/50 hover:shadow-xl transition-all group">
-                            <div class="flex items-center space-x-4 mb-4">
-                                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl group-hover:bg-emerald-600 group-hover:text-white transition-all">
-                                    <i class="fas fa-book"></i>
-                                </div>
-                                <h3 class="text-xl font-black text-slate-800">{{ category.title }}</h3>
-                            </div>
-                            <p class="text-slate-500 text-sm mb-6 line-clamp-2">{{ category.description }}</p>
-                            <div class="space-y-2">
-                                {% for page in category.pages.all|slice:":2" %}
-                                <a href="{{ page.get_absolute_url }}" class="flex items-center text-sm font-bold text-slate-600 hover:text-emerald-600 transition-colors">
-                                    <i class="fas fa-file-alt mr-2 opacity-50"></i> {{ page.title }}
-                                </a>
-                                {% endfor %}
-                            </div>
-                            <a href="{% url 'book_detail' category.slug %}" class="inline-flex items-center mt-6 text-sm font-black text-emerald-600 hover:translate-x-1 transition-transform">
-                                Read More <i class="fas fa-arrow-right ml-2"></i>
-                            </a>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-
-            <!-- Right: Enrollment Card -->
-            <div class="lg:col-span-1">
-                <div class="sticky top-32" data-aos="fade-left">
-                    <div class="bg-white rounded-[3rem] shadow-2xl border border-slate-100 p-10 overflow-hidden relative">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-[5rem] -z-10"></div>
-                        
-                        <div class="mb-10 text-center">
-                            <span class="text-slate-400 font-bold uppercase tracking-widest text-xs mb-4 block">Limited Time Offer</span>
-                            <div class="flex items-center justify-center space-x-3 mb-4">
-                                <span class="text-5xl font-black text-slate-800">Free</span>
-                                <span class="text-slate-300 line-through text-xl">$149.00</span>
-                            </div>
-                            <p class="text-emerald-500 font-bold text-sm"><i class="fas fa-bolt mr-2"></i> 100% OFF for this week</p>
-                        </div>
-
-                        <div class="space-y-6 mb-10">
-                            <div class="flex items-center text-slate-600 font-medium">
-                                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mr-4 flex-shrink-0"><i class="fas fa-infinity"></i></div>
-                                Lifetime access to all videos
-                            </div>
-                            <div class="flex items-center text-slate-600 font-medium">
-                                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mr-4 flex-shrink-0"><i class="fas fa-file-alt"></i></div>
-                                Premium resources & assets
-                            </div>
-                            <div class="flex items-center text-slate-600 font-medium">
-                                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mr-4 flex-shrink-0"><i class="fas fa-certificate"></i></div>
-                                Certificate of Completion
-                            </div>
-                        </div>
-
-                        {% if not is_enrolled %}
-                            {% if user.is_superuser %}
-                                <a href="{% url 'enroll' course.pk %}" class="block w-full custom-gradient text-white text-center font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform shadow-xl shadow-indigo-200">
-                                    Enroll Student (Admin)
-                                </a>
+            <!-- Hero media / sticky preview card -->
+            <div class="lg:col-span-5" data-aos="fade-left">
+                <div class="relative">
+                    <div class="absolute -inset-2 rounded-[2.5rem] bg-gradient-to-br from-indigo-500/30 via-fuchsia-500/20 to-emerald-400/20 blur-2xl opacity-80"></div>
+                    <div class="relative rounded-[2rem] overflow-hidden bg-slate-800 border border-white/10 shadow-2xl">
+                        <div class="aspect-video bg-gradient-to-br from-slate-800 via-indigo-950 to-slate-900 flex items-center justify-center relative overflow-hidden">
+                            {% if course.thumbnail %}
+                                <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="w-full h-full object-cover">
                             {% else %}
-                                <div class="bg-amber-50 text-amber-700 p-6 rounded-2xl text-center font-bold mb-6 border border-amber-100">
-                                    <i class="fas fa-info-circle mr-3"></i> တက်ရောက်လိုပါက Admin ကို ဆက်သွယ်ပီးပါ။
-                                </div>
-                                <a href="https://m.me/yourpage" target="_blank" class="block w-full bg-slate-900 text-white text-center font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform shadow-xl">
-                                    Contact Admin
+                                <i class="fas fa-laptop-code text-white/10 text-[9rem]"></i>
+                            {% endif %}
+
+                            {% if lessons.0 and lessons.0.youtube_id %}
+                                <a href="https://www.youtube.com/watch?v={{ lessons.0.youtube_id }}"
+                                   target="_blank" rel="noopener"
+                                   class="absolute inset-0 flex items-center justify-center group">
+                                    <div class="w-20 h-20 rounded-full custom-gradient flex items-center justify-center shadow-2xl shadow-indigo-900/60 group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-play text-white text-2xl ml-1"></i>
+                                    </div>
+                                    <span class="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-black/50 backdrop-blur text-xs font-bold px-4 py-2 text-white border border-white/10">
+                                        <i class="fas fa-play-circle mr-2"></i> Preview First Lesson
+                                    </span>
                                 </a>
                             {% endif %}
-                        {% else %}
-                            <div class="bg-emerald-50 text-emerald-700 p-6 rounded-2xl text-center font-bold mb-6">
-                                <div class="flex items-center justify-center mb-4">
-                                    <i class="fas fa-check-circle mr-3 text-xl"></i> Already Enrolled
-                                </div>
-                                <div class="w-full bg-emerald-100 rounded-full h-2 mb-2">
-                                    <div class="bg-emerald-500 h-full rounded-full transition-all duration-1000" style="width: {{ enrollment.progress_percentage }}%"></div>
-                                </div>
-                                <div class="flex justify-between text-[10px] uppercase tracking-widest">
-                                    <span>Progress</span>
-                                    <span>{{ enrollment.progress_percentage }}%</span>
-                                </div>
+                        </div>
+                        <div class="p-6 bg-slate-900/50 border-t border-white/10">
+                            <div class="flex items-center justify-between mb-4">
+                                <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Current Offer</p>
+                                <span class="text-xs font-bold text-emerald-400"><i class="fas fa-bolt mr-1"></i> Limited</span>
                             </div>
-                            <a href="{% url 'lesson_detail' course.pk lessons.first.pk %}" class="block w-full custom-gradient text-white text-center font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform shadow-xl shadow-indigo-200">
-                                {% if enrollment.progress_percentage > 0 %}Continue Learning{% else %}Start Learning Now{% endif %}
-                            </a>
-                        {% endif %}
+                            <div class="flex items-end gap-3 mb-5">
+                                <span class="text-5xl font-black text-white">Free</span>
+                                <span class="text-slate-500 line-through font-bold mb-1">$199</span>
+                                <span class="rounded-full bg-emerald-500/15 text-emerald-400 px-3 py-1 text-[10px] font-black mb-1 border border-emerald-500/30">100% OFF</span>
+                            </div>
+                            <ul class="space-y-3 text-sm text-slate-300 mb-6">
+                                <li class="flex items-center gap-3"><i class="fas fa-check-circle text-emerald-400"></i> Lifetime access to all lessons</li>
+                                <li class="flex items-center gap-3"><i class="fas fa-check-circle text-emerald-400"></i> Downloadable resources & code</li>
+                                <li class="flex items-center gap-3"><i class="fas fa-check-circle text-emerald-400"></i> Certificate of Completion</li>
+                                <li class="flex items-center gap-3"><i class="fas fa-check-circle text-emerald-400"></i> Community & instructor support</li>
+                            </ul>
 
-                        <p class="text-center text-slate-400 text-xs mt-8">30-Day Money Back Guarantee</p>
+                            {% if is_enrolled %}
+                                <div class="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-5 mb-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center gap-2 text-emerald-400 font-black text-sm">
+                                            <i class="fas fa-check-double"></i> You are enrolled
+                                        </div>
+                                        <span class="text-xs font-black text-emerald-400">{{ progress_pct }}%</span>
+                                    </div>
+                                    <div class="h-2 w-full rounded-full bg-emerald-500/15 overflow-hidden">
+                                        <div class="h-full rounded-full bg-gradient-to-r from-emerald-400 to-indigo-500 transition-all duration-700" style="width:{{ progress_pct }}%"></div>
+                                    </div>
+                                </div>
+                                <a href="{% if lessons %}{% url 'lesson_detail' course.pk lessons.0.pk %}{% else %}#{% endif %}"
+                                   class="block w-full text-center rounded-2xl custom-gradient py-4 font-black shadow-xl shadow-indigo-900/40 hover:scale-[1.01] transition-transform">
+                                    {% if progress_pct > 0 %}Continue Learning{% else %}Start First Lesson{% endif %}
+                                </a>
+                            {% else %}
+                                {% if user.is_authenticated %}
+                                    <a href="{% url 'enroll' course.pk %}"
+                                       class="block w-full text-center rounded-2xl custom-gradient py-4 font-black shadow-xl shadow-indigo-900/40 hover:scale-[1.01] transition-transform">
+                                        <i class="fas fa-rocket mr-2"></i> Enroll Now · Free
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'account_login' %}?next={% url 'course_detail' course.slug %}"
+                                       class="block w-full text-center rounded-2xl custom-gradient py-4 font-black shadow-xl shadow-indigo-900/40 hover:scale-[1.01] transition-transform">
+                                        <i class="fas fa-sign-in-alt mr-2"></i> Login & Enroll · Free
+                                    </a>
+                                {% endif %}
+                                <p class="text-center text-xs text-slate-500 mt-4"><i class="fas fa-shield-alt mr-1"></i> 30-Day Satisfaction Guarantee</p>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<!-- ====================== LOGOS / SOCIAL PROOF ====================== -->
+<section class="bg-white py-10 border-b border-slate-100">
+    <div class="container mx-auto px-6">
+        <div class="flex flex-wrap items-center justify-center gap-x-16 gap-y-6 opacity-70">
+            <div class="flex items-center gap-3 text-slate-500 font-black text-sm uppercase tracking-widest">
+                <i class="fab fa-python text-2xl text-slate-700"></i> Python · Django
+            </div>
+            <div class="flex items-center gap-3 text-slate-500 font-black text-sm uppercase tracking-widest">
+                <i class="fab fa-js text-2xl text-yellow-500"></i> JavaScript
+            </div>
+            <div class="flex items-center gap-3 text-slate-500 font-black text-sm uppercase tracking-widest">
+                <i class="fab fa-react text-2xl text-sky-500"></i> React · Flutter
+            </div>
+            <div class="flex items-center gap-3 text-slate-500 font-black text-sm uppercase tracking-widest">
+                <i class="fas fa-mobile-alt text-2xl text-emerald-500"></i> iOS · Android
+            </div>
+            <div class="flex items-center gap-3 text-slate-500 font-black text-sm uppercase tracking-widest">
+                <i class="fas fa-database text-2xl text-indigo-500"></i> MySQL · PostgreSQL
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====================== TABS (Overview / Curriculum / Instructor / FAQ) ====================== -->
+<section class="bg-slate-50 py-20">
+    <div class="container mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <!-- ========= LEFT (tabs) ========= -->
+            <div class="lg:col-span-8">
+                <!-- Tab nav -->
+                <div class="sticky top-24 z-20 bg-slate-50/90 backdrop-blur -mx-6 px-6 pt-2 pb-6 border-b border-slate-200/80 mb-10 rounded-t-3xl">
+                    <div class="flex flex-wrap gap-2">
+                        {% url 'course_detail' course.slug as base_url %}
+                        <a href="{{ base_url }}?tab=overview" class="tab-btn {% if active_tab == 'overview' or active_tab == '' %}active{% endif %}">
+                            <i class="fas fa-book-open mr-2"></i> Overview
+                        </a>
+                        <a href="#curriculum" class="tab-btn {% if active_tab == 'curriculum' %}active{% endif %}">
+                            <i class="fas fa-list-check mr-2"></i> Curriculum ({{ lesson_count }})
+                        </a>
+                        <a href="#instructor" class="tab-btn {% if active_tab == 'instructor' %}active{% endif %}">
+                            <i class="fas fa-chalkboard-user mr-2"></i> Instructor
+                        </a>
+                        <a href="#faq" class="tab-btn {% if active_tab == 'faq' %}active{% endif %}">
+                            <i class="fas fa-circle-question mr-2"></i> FAQ
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ========== OVERVIEW ========== -->
+                <div id="overview" class="mb-20" data-aos="fade-up">
+                    <h2 class="text-3xl md:text-4xl font-black text-slate-900 mb-8 flex items-center">
+                        <span class="w-2 h-12 bg-indigo-600 rounded-full mr-4"></span>
+                        About this course
+                    </h2>
+                    <div class="rounded-[2rem] bg-white border border-slate-200 shadow-sm p-8 md:p-10 prose prose-slate max-w-none prose-headings:font-black prose-a:text-indigo-600 prose-code:text-indigo-600 prose-pre:rounded-2xl">
+                        {{ description_html|safe }}
+                    </div>
+                </div>
+
+                <!-- ========== COURSE FEATURES ========== -->
+                <div id="course-features" class="mb-20" data-aos="fade-up">
+                    <h2 class="text-3xl md:text-4xl font-black text-slate-900 mb-10 flex items-center">
+                        <span class="w-2 h-12 bg-emerald-500 rounded-full mr-4"></span>
+                        ဘာတွေသင်ကြားပေးမလဲ
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {% for ft in course_features %}
+                            <div class="rounded-[1.75rem] bg-white border border-slate-200 p-7 hover:shadow-xl hover:shadow-indigo-100 hover:-translate-y-0.5 transition-all group">
+                                <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-5 group-hover:custom-gradient group-hover:text-white transition-all">
+                                    <i class="{{ ft.icon }}"></i>
+                                </div>
+                                <h3 class="text-lg font-black text-slate-900 mb-2">{{ ft.title }}</h3>
+                                <p class="text-slate-500 text-sm leading-relaxed">{{ ft.desc }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- ========== CURRICULUM (expandable lessons) ========== -->
+                <div id="curriculum" class="mb-20 scroll-mt-28" data-aos="fade-up">
+                    <div class="flex items-end justify-between mb-8 flex-wrap gap-4">
+                        <h2 class="text-3xl md:text-4xl font-black text-slate-900 flex items-center">
+                            <span class="w-2 h-12 bg-fuchsia-500 rounded-full mr-4"></span>
+                            Course Curriculum
+                        </h2>
+                        <div class="flex items-center gap-4 text-sm text-slate-500">
+                            <span class="font-bold"><i class="fas fa-book-open mr-2"></i> {{ lesson_count }} Lessons</span>
+                            <span class="font-bold"><i class="fas fa-clock mr-2"></i> {{ total_duration_str }}</span>
+                        </div>
+                    </div>
+
+                    <div class="rounded-[2rem] bg-white border border-slate-200 overflow-hidden shadow-sm">
+                        <div class="px-6 md:px-8 py-5 bg-slate-900 text-white flex items-center justify-between flex-wrap gap-3">
+                            <div class="flex items-center gap-4">
+                                <i class="fas fa-folder-open text-indigo-300"></i>
+                                <div>
+                                    <h3 class="font-black">Full Syllabus</h3>
+                                    <p class="text-xs text-slate-400">{{ course.title }}</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-black text-emerald-400"><i class="fas fa-unlock mr-1"></i> Free · Enroll to unlock</span>
+                        </div>
+
+                        <div class="divide-y divide-slate-100">
+                            {% for lesson in lessons %}
+                                {% with lid=lesson.id|slugify %}
+                                <details class="group">
+                                    <summary class="flex items-center justify-between cursor-pointer list-none px-6 md:px-8 py-5 hover:bg-slate-50 transition-colors gap-4">
+                                        <div class="flex items-center gap-5 min-w-0">
+                                            <span class="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black flex-shrink-0 group-hover:custom-gradient group-hover:text-white transition-colors">
+                                                {{ forloop.counter|stringformat:"02d" }}
+                                            </span>
+                                            <div class="min-w-0">
+                                                <h4 class="font-black text-slate-900 truncate">{{ lesson.title }}</h4>
+                                                <div class="flex items-center gap-3 mt-1.5 text-xs text-slate-500">
+                                                    {% if lesson.duration %}
+                                                        <span class="inline-flex items-center gap-1"><i class="far fa-clock"></i> {{ lesson.duration }}</span>
+                                                    {% endif %}
+                                                    {% if lesson.youtube_id or lesson.video_file %}
+                                                        <span class="inline-flex items-center gap-1 text-sky-600"><i class="fas fa-video"></i> Video</span>
+                                                    {% else %}
+                                                        <span class="inline-flex items-center gap-1 text-slate-600"><i class="fas fa-file-alt"></i> Reading</span>
+                                                    {% endif %}
+                                                    {% if is_enrolled and lid in completed_lesson_ids %}
+                                                        <span class="inline-flex items-center gap-1 text-emerald-600"><i class="fas fa-check-circle"></i> Completed</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-3 flex-shrink-0">
+                                            {% if is_enrolled %}
+                                                <a href="{% url 'lesson_detail' course.pk lesson.pk %}" class="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 text-sm font-black shadow-sm">
+                                                    {% if lid in completed_lesson_ids %}Review{% else %}Open{% endif %}
+                                                </a>
+                                            {% elif forloop.counter <= 2 %}
+                                                <span class="rounded-xl bg-emerald-50 text-emerald-700 px-4 py-2 text-xs font-black"><i class="fas fa-eye mr-1"></i> Preview</span>
+                                            {% else %}
+                                                <span class="text-slate-300"><i class="fas fa-lock text-lg"></i></span>
+                                            {% endif %}
+                                            <i class="fas fa-chevron-down text-slate-300 group-open:rotate-180 transition-transform"></i>
+                                        </div>
+                                    </summary>
+                                    <div class="px-6 md:px-8 pb-6 pt-2 bg-slate-50/60 border-t border-slate-100">
+                                        <div class="rounded-2xl border border-slate-200 bg-white p-5 md:p-6">
+                                            {% if lesson.youtube_id %}
+                                                <div class="aspect-video rounded-2xl overflow-hidden mb-5 shadow-sm">
+                                                    <iframe class="w-full h-full" loading="lazy"
+                                                            src="https://www.youtube.com/embed/{{ lesson.youtube_id }}?rel=0"
+                                                            title="{{ lesson.title }}"
+                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                            allowfullscreen></iframe>
+                                                </div>
+                                            {% elif lesson.video_file %}
+                                                <div class="rounded-2xl overflow-hidden mb-5">
+                                                    <video class="w-full" controls preload="metadata" {% if lesson.video_poster %}poster="{{ lesson.video_poster.url }}"{% endif %} src="{{ lesson.video_file.url }}"></video>
+                                                </div>
+                                            {% endif %}
+                                            <div class="text-sm text-slate-600 leading-relaxed line-clamp-6 whitespace-pre-wrap">{{ lesson.content|striptags }}</div>
+                                            {% if not is_enrolled %}
+                                                <div class="mt-5 rounded-2xl bg-amber-50 border border-amber-200 p-5 text-amber-800 flex items-center justify-between gap-3 flex-wrap">
+                                                    <p class="text-sm font-bold"><i class="fas fa-info-circle mr-2"></i> အပြည့်အဝကြည့်ရန် သင်တန်းအပ်နှံပေးပါ။</p>
+                                                    {% if user.is_authenticated %}
+                                                        <a href="{% url 'enroll' course.pk %}" class="rounded-xl bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 text-sm font-black">Enroll Now · Free</a>
+                                                    {% else %}
+                                                        <a href="{% url 'account_login' %}?next={% url 'course_detail' course.slug %}" class="rounded-xl bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 text-sm font-black">Login to Enroll</a>
+                                                    {% endif %}
+                                                </div>
+                                            {% else %}
+                                                <a href="{% url 'lesson_detail' course.pk lesson.pk %}"
+                                                   class="mt-5 inline-flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 text-sm font-black">
+                                                    Go to Lesson <i class="fas fa-arrow-right"></i>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </details>
+                                {% endwith %}
+                            {% empty %}
+                                <div class="px-8 py-14 text-center text-slate-400">
+                                    <i class="fas fa-box-open text-4xl mb-3 opacity-50"></i>
+                                    <p class="font-bold">သင်ခန်းစာများ မရှိသေးပါ။</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== INSTRUCTOR ========== -->
+                <div id="instructor" class="mb-20 scroll-mt-28" data-aos="fade-up">
+                    <h2 class="text-3xl md:text-4xl font-black text-slate-900 mb-10 flex items-center">
+                        <span class="w-2 h-12 bg-sky-500 rounded-full mr-4"></span>
+                        Instructor
+                    </h2>
+                    <div class="rounded-[2rem] bg-white border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="grid md:grid-cols-5 gap-8 p-8 md:p-10 items-center">
+                            <div class="md:col-span-2">
+                                <div class="relative">
+                                    <div class="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-br from-indigo-500/20 to-fuchsia-500/20 blur-2xl"></div>
+                                    {% if instructor_profile and instructor_profile.avatar %}
+                                        <img src="{{ instructor_profile.avatar.url }}" alt="{{ course.instructor.username }}" class="relative w-44 h-44 rounded-[2rem] object-cover border-4 border-white shadow-xl mx-auto">
+                                    {% else %}
+                                        <div class="relative w-44 h-44 rounded-[2rem] bg-gradient-to-br from-indigo-500 to-fuchsia-600 flex items-center justify-center text-white text-7xl font-black border-4 border-white shadow-xl mx-auto">
+                                            {{ course.instructor.username|slice:":1"|upper }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="md:col-span-3">
+                                <p class="text-xs font-black uppercase tracking-widest text-indigo-600 mb-2">Senior Instructor</p>
+                                <h3 class="text-3xl font-black text-slate-900 mb-3">
+                                    {{ course.instructor.get_full_name|default:course.instructor.username }}
+                                </h3>
+                                <div class="flex flex-wrap items-center gap-x-6 gap-y-3 mb-5 text-sm text-slate-500">
+                                    <span class="inline-flex items-center gap-2"><i class="fas fa-star text-yellow-500"></i> 4.9 Instructor Rating</span>
+                                    <span class="inline-flex items-center gap-2"><i class="fas fa-users text-sky-500"></i> {{ enrolled_student_count|default:"0" }}+ Students</span>
+                                    <span class="inline-flex items-center gap-2"><i class="fas fa-play-circle text-emerald-500"></i> {{ lesson_count }} Lessons</span>
+                                </div>
+                                <p class="text-slate-600 leading-relaxed mb-6">
+                                    {% if instructor_profile and instructor_profile.bio %}
+                                        {{ instructor_profile.bio }}
+                                    {% else %}
+                                        {{ course.instructor.get_full_name|default:course.instructor.username }} သည် နှစ်ပေါင်းများစွာ Industry တွင် အလုပ်လုပ်ခဲ့ပြီး ထောင်နှင့်ချီသော ကျောင်းသားများအား သင်ကြားပေးခဲ့သည့် အတွေ့အကြုံရှိ Instructor ဖြစ်ပါတယ်။
+                                        Real-world Project အခြေပြု သင်ကြားပေးခြင်းဖြင့် ကျောင်းသားများအား Career အစပိုင်းမှာပင် ကျွမ်းကျင်စွာ ဆောင်ရွက်နိုင်အောင် လမ်းညွှန်ပေးပါတယ်။
+                                    {% endif %}
+                                </p>
+                                <div class="flex flex-wrap items-center gap-3">
+                                    <a href="#" class="inline-flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 text-xs font-black">
+                                        <i class="fab fa-linkedin"></i> LinkedIn
+                                    </a>
+                                    <a href="#" class="inline-flex items-center gap-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 text-xs font-black">
+                                        <i class="fab fa-github"></i> GitHub
+                                    </a>
+                                    <a href="#" class="inline-flex items-center gap-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 text-xs font-black">
+                                        <i class="fab fa-twitter"></i> Twitter
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== FAQ ========== -->
+                <div id="faq" class="mb-10 scroll-mt-28" data-aos="fade-up">
+                    <h2 class="text-3xl md:text-4xl font-black text-slate-900 mb-10 flex items-center">
+                        <span class="w-2 h-12 bg-amber-500 rounded-full mr-4"></span>
+                        မေးလေ့ရှိသော မေးခွန်းများ
+                    </h2>
+                    <div class="space-y-4">
+                        {% for item in faqs %}
+                            <details class="group rounded-[1.75rem] bg-white border border-slate-200 shadow-sm open:shadow-lg overflow-hidden">
+                                <summary class="list-none cursor-pointer flex items-center justify-between gap-6 px-6 md:px-8 py-6 hover:bg-slate-50">
+                                    <h4 class="font-black text-slate-900 leading-snug">{{ item.q }}</h4>
+                                    <span class="w-10 h-10 flex-shrink-0 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-open:custom-gradient group-open:text-white transition-all">
+                                        <i class="fas fa-plus group-open:hidden"></i>
+                                        <i class="fas fa-minus hidden group-open:inline"></i>
+                                    </span>
+                                </summary>
+                                <div class="px-6 md:px-8 pb-7 text-slate-600 leading-relaxed border-t border-slate-100 pt-5">
+                                    {{ item.a }}
+                                </div>
+                            </details>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========= RIGHT (sticky mini card on desktop) ========= -->
+            <aside class="lg:col-span-4">
+                <div class="sticky top-32 space-y-6">
+                    <!-- Progress / CTA mini -->
+                    <div class="rounded-[2rem] bg-white border border-slate-200 shadow-sm p-7">
+                        <h4 class="font-black text-slate-900 mb-5 flex items-center gap-2">
+                            <i class="fas fa-gauge-high text-indigo-600"></i> Your Progress
+                        </h4>
+                        {% if is_enrolled %}
+                            <div class="mb-4 flex items-center justify-between text-sm">
+                                <span class="font-bold text-slate-600">Course completion</span>
+                                <span class="font-black text-indigo-600">{{ progress_pct }}%</span>
+                            </div>
+                            <div class="h-3 w-full rounded-full bg-slate-100 overflow-hidden mb-6">
+                                <div class="h-full rounded-full bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-emerald-500 transition-all duration-1000" style="width:{{ progress_pct }}%"></div>
+                            </div>
+                            <div class="space-y-2 text-sm text-slate-600 mb-6">
+                                <div class="flex items-center justify-between">
+                                    <span class="inline-flex items-center gap-2"><i class="fas fa-circle-check text-emerald-500"></i> Completed</span>
+                                    <span class="font-black">{{ completed_lesson_ids|length }}</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="inline-flex items-center gap-2"><i class="fas fa-circle text-slate-300"></i> Remaining</span>
+                                    <span class="font-black">{{ lesson_count|add:"0" }}{% comment %}subtract completed{% endcomment %}</span>
+                                </div>
+                            </div>
+                            <a href="{% if lessons %}{% url 'lesson_detail' course.pk lessons.0.pk %}{% else %}#{% endif %}"
+                               class="block w-full text-center rounded-2xl custom-gradient py-4 font-black text-white shadow-lg shadow-indigo-200 hover:scale-[1.01] transition-transform">
+                                {% if progress_pct >= 100 %}Review Lessons{% elif progress_pct > 0 %}Continue{% else %}Start First Lesson{% endif %}
+                            </a>
+                        {% else %}
+                            <p class="text-sm text-slate-500 mb-5">သင်တန်းအပ်နှံပြီးသားမဟုတ်ပါ။ အခုပဲ Free အပ်နှံပြီး သင်ယူစတင်နိုင်ပါတယ်။</p>
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'enroll' course.pk %}"
+                                   class="block w-full text-center rounded-2xl custom-gradient py-4 font-black text-white shadow-lg shadow-indigo-200 hover:scale-[1.01] transition-transform mb-3">
+                                    Enroll in this Course · Free
+                                </a>
+                            {% else %}
+                                <a href="{% url 'account_login' %}?next={% url 'course_detail' course.slug %}"
+                                   class="block w-full text-center rounded-2xl custom-gradient py-4 font-black text-white shadow-lg shadow-indigo-200 hover:scale-[1.01] transition-transform mb-3">
+                                    Login & Enroll · Free
+                                </a>
+                                <a href="{% url 'account_signup' %}?next={% url 'course_detail' course.slug %}"
+                                   class="block w-full text-center rounded-2xl bg-slate-100 hover:bg-slate-200 py-4 font-black text-slate-700">
+                                    Create New Account
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Quick info -->
+                    <div class="rounded-[2rem] bg-white border border-slate-200 shadow-sm p-7">
+                        <h4 class="font-black text-slate-900 mb-5"><i class="fas fa-info-circle text-sky-500 mr-2"></i> Course Info</h4>
+                        <ul class="space-y-4 text-sm">
+                            <li class="flex items-center justify-between">
+                                <span class="text-slate-500 font-semibold">Duration</span>
+                                <span class="font-black text-slate-800">{{ total_duration_str }}</span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span class="text-slate-500 font-semibold">Lessons</span>
+                                <span class="font-black text-slate-800">{{ lesson_count }}</span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span class="text-slate-500 font-semibold">Level</span>
+                                <span class="font-black text-slate-800">Beginner → Pro</span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span class="text-slate-500 font-semibold">Language</span>
+                                <span class="font-black text-slate-800">မြန်မာဘာသာ</span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span class="text-slate-500 font-semibold">Certificate</span>
+                                <span class="font-black text-emerald-600"><i class="fas fa-check mr-1"></i> Included</span>
+                            </li>
+                            <li class="flex items-center justify-between">
+                                <span class="text-slate-500 font-semibold">Last Updated</span>
+                                <span class="font-black text-slate-800">{{ course.updated_at|date:"M Y" }}</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Share -->
+                    <div class="rounded-[2rem] bg-gradient-to-br from-indigo-600 via-fuchsia-600 to-indigo-700 p-7 text-white shadow-xl shadow-indigo-200">
+                        <h4 class="font-black mb-3"><i class="fas fa-share-nodes mr-2"></i> Share this course</h4>
+                        <p class="text-sm text-indigo-100 mb-5">သူငယ်ချင်းများနှင့် မျှဝေပြီး အတူတူသင်ယူကြပါ။</p>
+                        <div class="flex flex-wrap gap-2">
+                            <a href="#" class="rounded-xl bg-white/10 hover:bg-white/20 px-4 py-2.5 text-xs font-black backdrop-blur border border-white/10"><i class="fab fa-facebook-f mr-1"></i> Facebook</a>
+                            <a href="#" class="rounded-xl bg-white/10 hover:bg-white/20 px-4 py-2.5 text-xs font-black backdrop-blur border border-white/10"><i class="fab fa-telegram mr-1"></i> Telegram</a>
+                            <a href="#" class="rounded-xl bg-white/10 hover:bg-white/20 px-4 py-2.5 text-xs font-black backdrop-blur border border-white/10"><i class="fab fa-whatsapp mr-1"></i> WhatsApp</a>
+                            <a href="#" class="rounded-xl bg-white/10 hover:bg-white/20 px-4 py-2.5 text-xs font-black backdrop-blur border border-white/10"><i class="fas fa-link mr-1"></i> Copy</a>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+
+<!-- ====================== RELATED COURSES ====================== -->
+{% if related_courses %}
+<section class="bg-white py-20 border-t border-slate-100">
+    <div class="container mx-auto px-6">
+        <div class="flex items-end justify-between mb-10 flex-wrap gap-4">
+            <div>
+                <p class="text-xs font-black uppercase tracking-widest text-indigo-600 mb-2">More to explore</p>
+                <h2 class="text-3xl md:text-4xl font-black text-slate-900">ဆက်လက်သင်ယူနိုင်သော သင်တန်းများ</h2>
+            </div>
+            <a href="{% url 'course_list' %}" class="inline-flex items-center gap-2 text-sm font-black text-indigo-600 hover:translate-x-0.5 transition-transform">
+                View all courses <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for rc in related_courses %}
+                <a href="{% url 'course_detail' rc.slug %}" class="group rounded-[2rem] bg-white border border-slate-200 overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-indigo-100 hover:-translate-y-1 transition-all">
+                    <div class="aspect-video bg-slate-100 overflow-hidden relative">
+                        {% if rc.thumbnail %}
+                            <img src="{{ rc.thumbnail.url }}" alt="{{ rc.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        {% else %}
+                            <div class="w-full h-full bg-gradient-to-br from-indigo-500 to-fuchsia-600 flex items-center justify-center text-white">
+                                <i class="fas fa-book text-5xl opacity-20"></i>
+                            </div>
+                        {% endif %}
+                        <span class="absolute top-4 left-4 rounded-full bg-white/95 backdrop-blur text-[10px] font-black text-slate-800 px-3 py-1 border border-white shadow">
+                            {{ rc.lessons.count }} Lessons
+                        </span>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">
+                            <span><i class="fas fa-user-tie mr-1"></i> {{ rc.instructor.username }}</span>
+                            <span>·</span>
+                            <span class="text-emerald-600">Free</span>
+                        </div>
+                        <h3 class="text-lg font-black text-slate-900 mb-3 line-clamp-2 group-hover:text-indigo-600 transition-colors">{{ rc.title }}</h3>
+                        <p class="text-sm text-slate-500 line-clamp-2 mb-4">{{ rc.description|striptags|truncatechars:120 }}</p>
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-100 text-xs text-slate-500 font-bold">
+                            <span><i class="fas fa-users mr-1"></i> {{ rc.student_count|default:"0" }} enrolled</span>
+                            <span class="text-yellow-500"><i class="fas fa-star"></i> 4.9</span>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ====================== FINAL CTA BANNER ====================== -->
+<section class="relative overflow-hidden py-20 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white">
+    <div class="pointer-events-none absolute -top-10 right-0 h-72 w-72 rounded-full bg-indigo-500/20 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-10 left-0 h-72 w-72 rounded-full bg-fuchsia-500/20 blur-3xl"></div>
+    <div class="relative container mx-auto px-6 text-center">
+        <p class="text-xs font-black uppercase tracking-widest text-indigo-300 mb-5">Ready to start?</p>
+        <h2 class="text-3xl md:text-5xl font-black max-w-3xl mx-auto leading-tight mb-7">
+            {{ course.title }} — အခုပဲ စတင်သင်ယူကြပါစို့
+        </h2>
+        <p class="text-lg text-slate-300 max-w-2xl mx-auto mb-10">
+            ၁၀၀% Free · Lifetime Access · Certificate အပါ။ အရင်ဆုံး Account ဝင်ပြီး Enroll လုပ်ရုံသာ လုံလောက်ပါတယ်။
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-4">
+            {% if is_enrolled %}
+                <a href="{% if lessons %}{% url 'lesson_detail' course.pk lessons.0.pk %}{% else %}#{% endif %}"
+                   class="inline-flex items-center gap-3 rounded-2xl custom-gradient px-8 py-4 font-black shadow-2xl shadow-indigo-900/50 hover:scale-[1.03] transition-transform">
+                    {% if progress_pct > 0 %}Continue Learning{% else %}Start Learning Now{% endif %} <i class="fas fa-arrow-right"></i>
+                </a>
+            {% else %}
+                {% if user.is_authenticated %}
+                    <a href="{% url 'enroll' course.pk %}"
+                       class="inline-flex items-center gap-3 rounded-2xl custom-gradient px-8 py-4 font-black shadow-2xl shadow-indigo-900/50 hover:scale-[1.03] transition-transform">
+                        Enroll Now · Free <i class="fas fa-rocket"></i>
+                    </a>
+                {% else %}
+                    <a href="{% url 'account_login' %}?next={% url 'course_detail' course.slug %}"
+                       class="inline-flex items-center gap-3 rounded-2xl custom-gradient px-8 py-4 font-black shadow-2xl shadow-indigo-900/50 hover:scale-[1.03] transition-transform">
+                        Login & Enroll <i class="fas fa-sign-in-alt"></i>
+                    </a>
+                {% endif %}
+            {% endif %}
+            <a href="{% url 'course_list' %}" class="inline-flex items-center gap-3 rounded-2xl bg-white/10 backdrop-blur px-8 py-4 font-black text-white border border-white/10 hover:bg-white/20 transition-colors">
+                Explore More Courses
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tab-btn {
+        display:inline-flex;
+        align-items:center;
+        padding:0.75rem 1.1rem;
+        border-radius:0.9rem;
+        font-weight:800;
+        font-size:0.85rem;
+        color:#475569;
+        background:white;
+        border:1px solid #e2e8f0;
+        transition:all 0.15s ease;
+    }
+    .tab-btn:hover { color:#4f46e5; border-color:#c7d2fe; }
+    .tab-btn.active {
+        background: linear-gradient(135deg,#6366f1,#a855f7);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 10px 25px -10px rgba(99,102,241,0.55);
+    }
+    details > summary::-webkit-details-marker { display:none; }
+    details[open] > summary { background-color: rgb(248 250 252); }
+</style>
 {% endblock %}

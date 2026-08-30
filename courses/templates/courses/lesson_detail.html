@@ -26,7 +26,7 @@
         <nav class="flex mb-8 text-sm font-bold text-slate-500 uppercase tracking-widest" data-aos="fade-down">
             <a href="{% url 'course_list' %}" class="hover:text-white transition-colors">Courses</a>
             <span class="mx-3">/</span>
-            <a href="{% url 'course_detail' course.pk %}" class="hover:text-white transition-colors">{{ course.title|truncatechars:30 }}</a>
+            <a href="{% url 'course_detail' course.slug %}" class="hover:text-white transition-colors">{{ course.title|truncatechars:30 }}</a>
             <span class="mx-3">/</span>
             <span class="text-indigo-400">{{ lesson.title }}</span>
         </nav>

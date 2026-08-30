@@ -1,8 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.text import slugify
+
 
 class Course(models.Model):
     title = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True, db_index=True)
     description = models.TextField()
     thumbnail = models.ImageField(upload_to='courses/thumbnails/', blank=True, null=True)
     instructor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='courses_taught')
@@ -11,6 +14,26 @@ class Course(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        # Auto-populate slug from title (with Burmese/Unicode support fallback via pk)
+        if not self.slug:
+            base = slugify(self.title, allow_unicode=True) or f"course"
+            candidate = base
+            # Uniqueness loop: if slug collides, append "-2", "-3", etc.
+            i = 2
+            qs = Course.objects.all()
+            if self.pk is not None:
+                qs = qs.exclude(pk=self.pk)
+            while qs.filter(slug=candidate).exists():
+                # If candidate gets too long with suffix, include pk
+                if len(base) > 180:
+                    base = base[:180]
+                pk_hint = self.pk or ''
+                candidate = f"{base}-{i}" if not pk_hint else f"{base}-{pk_hint}-{i}"
+                i += 1
+            self.slug = candidate
+        super().save(*args, **kwargs)
 
 class Lesson(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lessons')

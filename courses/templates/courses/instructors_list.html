@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Instructors | Arakkha Tech{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white pt-28 pb-28">
+    <div class="pointer-events-none absolute inset-0 custom-gradient opacity-20"></div>
+    <div class="pointer-events-none absolute top-0 left-1/3 h-96 w-96 rounded-full bg-indigo-500/20 blur-3xl"></div>
+    <div class="pointer-events-none absolute bottom-0 right-1/3 h-96 w-96 rounded-full bg-fuchsia-500/20 blur-3xl"></div>
+
+    <div class="relative container mx-auto px-6 text-center">
+        <span class="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur border border-white/10 text-xs font-black uppercase tracking-widest text-indigo-200 px-5 py-2 mb-6">
+            <i class="fas fa-chalkboard-user text-emerald-400"></i> Meet Our Teachers
+        </span>
+        <h1 class="text-4xl md:text-6xl xl:text-7xl font-black leading-tight max-w-5xl mx-auto mb-8">
+            <span class="bg-gradient-to-r from-indigo-300 via-emerald-300 to-amber-300 bg-clip-text text-transparent">
+                Industry Expert Instructors
+            </span>
+            <br>
+            နှင့်အတူ သင်ယူပါ
+        </h1>
+        <p class="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed mb-12">
+            Tech Industry မှာ နှစ်ပေါင်းများစွာ အလုပ်လုပ်ကြတဲ့ Senior Engineer များ၊ Project Manager များနှင့်
+            Senior Designer များမှ လက်တွေ့အခြေပြု သင်ကြားပေးမည်။
+        </p>
+
+        <!-- 4 hero stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-5 max-w-5xl mx-auto">
+            <div class="rounded-[1.75rem] bg-white/5 backdrop-blur border border-white/10 p-6 hover:bg-white/10 transition-all">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-500/15 text-indigo-300 flex items-center justify-center text-xl mx-auto mb-4">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <p class="text-3xl md:text-4xl font-black mb-1">{{ total_instructors }}+</p>
+                <p class="text-xs uppercase tracking-widest text-slate-400 font-bold">Expert Teachers</p>
+            </div>
+            <div class="rounded-[1.75rem] bg-white/5 backdrop-blur border border-white/10 p-6 hover:bg-white/10 transition-all">
+                <div class="w-12 h-12 rounded-2xl bg-fuchsia-500/15 text-fuchsia-300 flex items-center justify-center text-xl mx-auto mb-4">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <p class="text-3xl md:text-4xl font-black mb-1">{{ total_courses }}+</p>
+                <p class="text-xs uppercase tracking-widest text-slate-400 font-bold">Courses</p>
+            </div>
+            <div class="rounded-[1.75rem] bg-white/5 backdrop-blur border border-white/10 p-6 hover:bg-white/10 transition-all">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500/15 text-emerald-300 flex items-center justify-center text-xl mx-auto mb-4">
+                    <i class="fas fa-users"></i>
+                </div>
+                <p class="text-3xl md:text-4xl font-black mb-1">{{ total_students }}+</p>
+                <p class="text-xs uppercase tracking-widest text-slate-400 font-bold">Students Reached</p>
+            </div>
+            <div class="rounded-[1.75rem] bg-white/5 backdrop-blur border border-white/10 p-6 hover:bg-white/10 transition-all">
+                <div class="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-300 flex items-center justify-center text-xl mx-auto mb-4">
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="text-3xl md:text-4xl font-black mb-1">4.9/5</p>
+                <p class="text-xs uppercase tracking-widest text-slate-400 font-bold">Average Rating</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURED INSTRUCTORS -->
+{% if featured %}
+<section class="bg-white py-16 border-b border-slate-100">
+    <div class="container mx-auto px-6">
+        <div class="flex items-end justify-between mb-10 flex-wrap gap-4">
+            <div>
+                <p class="text-xs font-black uppercase tracking-[0.25em] text-amber-600 mb-3">
+                    <i class="fas fa-star mr-2"></i>Featured
+                </p>
+                <h2 class="text-3xl md:text-5xl font-black text-slate-900 leading-tight">
+                    သင်တန်းဆရာများ
+                </h2>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for p in featured %}
+                {% include 'courses/snippets/instructor_card.html' with profile=p featured=True %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ALL INSTRUCTORS -->
+<section class="bg-slate-50 py-20">
+    <div class="container mx-auto px-6">
+        <div class="flex items-end justify-between mb-12 flex-wrap gap-4">
+            <div>
+                <p class="text-xs font-black uppercase tracking-[0.25em] text-indigo-600 mb-3">All Teachers</p>
+                <h2 class="text-3xl md:text-5xl font-black text-slate-900 leading-tight">
+                    ကရို့၏ သင်တန်းဆရာများ
+                </h2>
+            </div>
+            <p class="text-sm text-slate-500 font-bold">
+                <i class="fas fa-users mr-2 text-indigo-500"></i> {{ instructors|length }} instructors
+            </p>
+        </div>
+
+        {% if instructors %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for p in instructors %}
+                {% if not p.is_featured %}
+                    {% include 'courses/snippets/instructor_card.html' with profile=p featured=False %}
+                {% endif %}
+            {% endfor %}
+            {% for p in instructors %}
+                {% if p.is_featured %}{% comment %}skip featured - already shown above{% endcomment %}{% endif %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="rounded-[2rem] bg-white border border-dashed border-slate-300 p-16 text-center">
+            <div class="w-20 h-20 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-3xl mx-auto mb-5">
+                <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900 mb-3">သင်ပညာရှင်များ မရှိသေးပါ</h3>
+            <p class="text-slate-500 mb-8 max-w-xl mx-auto">
+                Admin Panel မှ User အသစ်ကို Instructor Role ဖြင့် ဖန်တီးပြီး Public Profile Fields ဖြည့်သွင်းပါ။
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="relative overflow-hidden py-24 bg-gradient-to-br from-emerald-600 via-teal-600 to-indigo-700 text-white">
+    <div class="pointer-events-none absolute -top-10 right-0 h-80 w-80 rounded-full bg-white/10 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-10 left-0 h-80 w-80 rounded-full bg-black/10 blur-3xl"></div>
+    <div class="relative container mx-auto px-6 text-center">
+        <p class="text-xs font-black uppercase tracking-[0.25em] text-emerald-200 mb-5">Become a Teacher</p>
+        <h2 class="text-3xl md:text-5xl font-black max-w-3xl mx-auto leading-tight mb-6">
+            သင့်ကိုယ်ပိုင် သင်တန်းများ ဖွင့်လိုပါသလား?
+        </h2>
+        <p class="text-lg text-emerald-50/90 max-w-2xl mx-auto mb-10 leading-relaxed">
+            Arakkha Tech မှာ သင်ပညာရှင်အဖြစ် ဝင်ရောက်ပြီး သင့်ဗဟုသုတကို တိုင်းပြည်သားလူငယ်များအား ဝေမျှပါ။
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-4">
+            <a href="{% url 'contact' %}" class="inline-flex items-center gap-3 rounded-2xl bg-white text-emerald-700 px-8 py-4 font-black shadow-2xl hover:scale-[1.03] transition-transform">
+                <i class="fas fa-handshake-angle"></i> Become an Instructor
+            </a>
+            <a href="{% url 'courses_page' %}" class="inline-flex items-center gap-3 rounded-2xl bg-white/10 backdrop-blur border border-white/20 px-8 py-4 font-black text-white hover:bg-white/20 transition-colors">
+                <i class="fas fa-book-open"></i> Browse Courses
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

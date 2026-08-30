@@ -177,6 +177,7 @@ TEMPLATES = [
 
                 'courses.context_processors.notifications',
                 'courses.context_processors.user_roles',
+                'courses.context_processors.navbar_active',
             ],
         },
     },

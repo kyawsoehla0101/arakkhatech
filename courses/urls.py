@@ -32,6 +32,7 @@ urlpatterns = [
     path('manage/users/add/', views.add_user, name='add_user'),
     path('manage/users/<int:user_pk>/edit/', views.edit_user, name='edit_user'),
     path('manage/users/<int:user_pk>/delete/', views.delete_user, name='delete_user'),
+    path('manage/users/<int:user_pk>/toggle-active/', views.toggle_user_active, name='toggle_user_active'),
     
     path('admin-search/', views.admin_search, name='admin_search'),
     path('notifications/', views.all_notifications, name='all_notifications'),
@@ -59,6 +60,10 @@ urlpatterns = [
     path('course/<int:course_pk>/lesson/<int:lesson_pk>/', views.lesson_detail, name='lesson_detail'),
     path('lesson/<int:lesson_pk>/toggle-completion/', views.toggle_lesson_completion, name='toggle_lesson_completion'),
     path('course/<int:pk>/enroll/', views.enroll, name='enroll'),
+
+    # Instructor Public Pages
+    path('instructors/', views.instructors_list, name='instructors_list'),
+    path('instructor/<slug:slug>/', views.instructor_detail, name='instructor_detail'),
 
     # Static Pages
     path('about/', views.about_us, name='about'),

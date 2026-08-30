@@ -117,9 +117,55 @@ class Profile(models.Model):
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     bio = models.TextField(max_length=500, blank=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student')
-    
+
+    # ── Instructor-specific public profile fields ──
+    # Short headline like "Senior Full-Stack Engineer"
+    headline = models.CharField(max_length=120, blank=True, null=True)
+    # Comma-separated: Python, Django, React, Flutter, Burmese, etc.
+    expertise = models.CharField(max_length=255, blank=True, null=True)
+    years_of_experience = models.PositiveIntegerField(blank=True, null=True, default=0)
+    linkedin_url = models.URLField(max_length=255, blank=True, null=True)
+    github_url = models.URLField(max_length=255, blank=True, null=True)
+    twitter_url = models.URLField(max_length=255, blank=True, null=True)
+    website_url = models.URLField(max_length=255, blank=True, null=True)
+    # Featured = show at top of public instructors listing
+    is_featured = models.BooleanField(default=False, db_index=True)
+    # Public URL slug for instructor detail page
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True, db_index=True)
+
     def __str__(self):
         return f"{self.user.username}'s Profile"
+
+    def save(self, *args, **kwargs):
+        # Auto-populate slug for instructors from username with uniqueness
+        if self.role == 'instructor' and not self.slug:
+            base = self._build_base_slug()
+            candidate = base
+            i = 2
+            qs = Profile.objects.all()
+            if self.pk is not None:
+                qs = qs.exclude(pk=self.pk)
+            while qs.filter(slug=candidate).exists():
+                if len(base) > 180:
+                    base = base[:180]
+                candidate = f"{base}-{i}"
+                i += 1
+            self.slug = candidate
+        super().save(*args, **kwargs)
+
+    def _build_base_slug(self):
+        from django.utils.text import slugify
+        base = slugify(self.user.username, allow_unicode=True)
+        if base:
+            return base
+        base = slugify(self.user.get_full_name(), allow_unicode=True)
+        return base or 'instructor'
+
+    @property
+    def expertise_list(self):
+        if not self.expertise:
+            return []
+        return [e.strip() for e in self.expertise.split(',') if e.strip()]
 
 # Signals to automatically create profile
 from django.db.models.signals import post_save

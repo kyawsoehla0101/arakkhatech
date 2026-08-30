@@ -67,11 +67,24 @@ class UserUpdateForm(forms.ModelForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['avatar', 'bio', 'role']
+        fields = [
+            'avatar', 'bio', 'role',
+            'headline', 'expertise', 'years_of_experience',
+            'linkedin_url', 'github_url', 'twitter_url', 'website_url',
+            'is_featured',
+        ]
         widgets = {
             'avatar': forms.FileInput(attrs={'class': 'block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100'}),
-            'bio': forms.Textarea(attrs={'class': 'block w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-[2rem] focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-medium leading-relaxed', 'rows': 3, 'placeholder': 'သင့်အကြောင်း အနည်းငယ် ရေးသားပါ...'}),
+            'bio': forms.Textarea(attrs={'class': 'block w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-[2rem] focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-medium leading-relaxed', 'rows': 4, 'placeholder': 'သင့်အကြောင်း အနည်းငယ် ရေးသားပါ...'}),
+            'headline': forms.TextInput(attrs={'class': 'block w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-slate-700 placeholder-slate-400', 'placeholder': 'e.g. Senior Full-Stack Engineer'}),
+            'expertise': forms.TextInput(attrs={'class': 'block w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-slate-700 placeholder-slate-400', 'placeholder': 'Python, Django, React, Flutter'}),
+            'years_of_experience': forms.NumberInput(attrs={'class': 'block w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-slate-700 placeholder-slate-400', 'min': '0'}),
             'role': forms.Select(attrs={'class': 'block w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-slate-700'}),
+            'linkedin_url': forms.URLInput(attrs={'class': 'block w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-slate-700 placeholder-slate-400', 'placeholder': 'https://linkedin.com/in/...'}),
+            'github_url': forms.URLInput(attrs={'class': 'block w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-slate-700 placeholder-slate-400', 'placeholder': 'https://github.com/...'}),
+            'twitter_url': forms.URLInput(attrs={'class': 'block w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-slate-700 placeholder-slate-400', 'placeholder': 'https://twitter.com/...'}),
+            'website_url': forms.URLInput(attrs={'class': 'block w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-slate-700 placeholder-slate-400', 'placeholder': 'https://example.com'}),
+            'is_featured': forms.CheckboxInput(attrs={'class': 'h-5 w-5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -85,6 +98,15 @@ class ProfileForm(forms.ModelForm):
         if editing_user is not None and not _is_admin(editing_user):
             self.fields['role'].disabled = True
             self.fields['role'].widget.attrs['readonly'] = True
+            # Instructors can manage only their own public profile fields
+            safe_fields = {
+                'avatar', 'bio', 'headline', 'expertise', 'years_of_experience',
+                'linkedin_url', 'github_url', 'twitter_url', 'website_url',
+            }
+            for fname in list(self.fields.keys()):
+                if fname not in safe_fields:
+                    self.fields[fname].disabled = True
+                    self.fields[fname].widget.attrs['readonly'] = True
         self._editing_user = editing_user
 
     def clean_role(self):

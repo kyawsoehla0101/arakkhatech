@@ -28,14 +28,75 @@
             </div>
         </div>
 
-        <!-- Search & Filter Bar -->
+        <!-- Search & Filter Bar — ROLE FILTER TABS + SEARCH -->
         <div class="mb-8" data-aos="fade-up">
-            <div class="bg-white p-2 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col md:flex-row items-center gap-4">
+            <!-- Role Tabs (Filter buckets) -->
+            <div class="flex flex-wrap items-center gap-3 mb-6">
+                {% url 'manage_users' as base_url %}
+                <a href="{{ base_url }}" class="role-tab {% if active_role == 'all' %}active{% endif %}">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-users"></i> All Users
+                    </span>
+                    <span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-black {% if active_role == 'all' %}bg-white text-rose-600{% else %}bg-slate-100 text-slate-500{% endif %}">
+                        {{ counts.all }}
+                    </span>
+                </a>
+                <a href="{{ base_url }}?role=admin{% if query %}&q={{ query|urlencode }}{% endif %}" class="role-tab {% if active_role == 'admin' %}active{% endif %}">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-crown"></i> Admins
+                    </span>
+                    <span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-black {% if active_role == 'admin' %}bg-white text-rose-600{% else %}bg-slate-100 text-slate-500{% endif %}">
+                        {{ counts.admin }}
+                    </span>
+                </a>
+                <a href="{{ base_url }}?role=instructor{% if query %}&q={{ query|urlencode }}{% endif %}" class="role-tab {% if active_role == 'instructor' %}active{% endif %}">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-chalkboard-teacher"></i> Instructors
+                    </span>
+                    <span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-black {% if active_role == 'instructor' %}bg-white text-rose-600{% else %}bg-slate-100 text-slate-500{% endif %}">
+                        {{ counts.instructor }}
+                    </span>
+                </a>
+                <a href="{{ base_url }}?role=student{% if query %}&q={{ query|urlencode }}{% endif %}" class="role-tab {% if active_role == 'student' %}active{% endif %}">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-user-graduate"></i> Students
+                    </span>
+                    <span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-black {% if active_role == 'student' %}bg-white text-rose-600{% else %}bg-slate-100 text-slate-500{% endif %}">
+                        {{ counts.student }}
+                    </span>
+                </a>
+                <a href="{{ base_url }}?role=staff{% if query %}&q={{ query|urlencode }}{% endif %}" class="role-tab {% if active_role == 'staff' %}active{% endif %}">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-user-shield"></i> Staff (I + A)
+                    </span>
+                    <span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-black {% if active_role == 'staff' %}bg-white text-rose-600{% else %}bg-slate-100 text-slate-500{% endif %}">
+                        {{ counts.instructor|add:counts.admin }}
+                    </span>
+                </a>
+            </div>
+
+            <!-- Search -->
+            <form method="get" class="bg-white p-2 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col md:flex-row items-center gap-4">
+                {% if active_role and active_role != 'all' %}
+                    <input type="hidden" name="role" value="{{ active_role }}">
+                {% endif %}
                 <div class="flex-grow flex items-center px-4 space-x-3 w-full">
                     <i class="fas fa-search text-slate-300"></i>
-                    <input type="text" placeholder="Search users by name or email..." class="bg-transparent border-none text-sm font-bold text-slate-600 py-3 outline-none w-full">
+                    <input type="text" name="q" value="{{ query }}" placeholder="Search users by name, username or email..."
+                           class="bg-transparent border-none text-sm font-bold text-slate-600 py-3 outline-none w-full"
+                           onkeydown="if(event.key==='Enter')this.form.submit()">
                 </div>
-            </div>
+                <div class="flex gap-3 items-center pr-3 w-full md:w-auto">
+                    {% if query or active_role and active_role != 'all' %}
+                    <a href="{{ base_url }}" class="text-xs font-black text-slate-400 hover:text-slate-700">
+                        <i class="fas fa-times-circle mr-1"></i> Clear
+                    </a>
+                    {% endif %}
+                    <button type="submit" class="custom-gradient text-white px-6 py-3 rounded-2xl font-black shadow-xl shadow-indigo-100 hover:scale-105 transition-all whitespace-nowrap">
+                        <i class="fas fa-search mr-2"></i> Search
+                    </button>
+                </div>
+            </form>
         </div>
 
         <!-- Users Table -->
@@ -46,6 +107,7 @@
                         <tr class="text-slate-400 text-[10px] font-black uppercase tracking-widest bg-slate-50/50">
                             <th class="px-10 py-6">User Info</th>
                             <th class="px-10 py-6 text-center">Role</th>
+                            <th class="px-10 py-6 text-center">Status</th>
                             <th class="px-10 py-6 text-center">Enrollments</th>
                             <th class="px-10 py-6 text-center">Joined Date</th>
                             <th class="px-10 py-6 text-right">Actions</th>
@@ -60,7 +122,14 @@
                                         {{ user.username|slice:":1"|upper }}
                                     </div>
                                     <div>
-                                        <p class="font-black text-slate-800 group-hover:text-indigo-600 transition-colors leading-tight mb-1">{{ user.username }}</p>
+                                        <p class="font-black text-slate-800 group-hover:text-indigo-600 transition-colors leading-tight mb-1">
+                                            {{ user.username }}
+                                            {% if user.first_name or user.last_name %}
+                                                <span class="ml-2 text-xs font-bold text-slate-400">
+                                                    {{ user.first_name }} {{ user.last_name }}
+                                                </span>
+                                            {% endif %}
+                                        </p>
                                         <p class="text-xs text-slate-400 font-bold">{{ user.email|default:"No email provided" }}</p>
                                     </div>
                                 </div>
@@ -68,13 +137,34 @@
                             <td class="px-10 py-6 text-center">
                                 {% with user.profile.role as role %}
                                     {% if role == 'admin' %}
-                                        <span class="bg-rose-100 text-rose-600 text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest border border-rose-200">Admin</span>
+                                        <span class="bg-rose-100 text-rose-600 text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest border border-rose-200">
+                                            <i class="fas fa-crown mr-1"></i> Admin
+                                        </span>
                                     {% elif role == 'instructor' %}
-                                        <span class="bg-indigo-100 text-indigo-600 text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest border border-indigo-200">Instructor</span>
+                                        <span class="bg-indigo-100 text-indigo-600 text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest border border-indigo-200">
+                                            <i class="fas fa-chalkboard-teacher mr-1"></i> Instructor
+                                        </span>
                                     {% else %}
-                                        <span class="bg-emerald-100 text-emerald-600 text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest border border-emerald-200">Student</span>
+                                        <span class="bg-emerald-100 text-emerald-600 text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest border border-emerald-200">
+                                            <i class="fas fa-user-graduate mr-1"></i> Student
+                                        </span>
                                     {% endif %}
                                 {% endwith %}
+                            </td>
+                            <td class="px-10 py-6 text-center">
+                                <form method="post" action="{% url 'toggle_user_active' user.pk %}"
+                                      data-username="{{ user.username }}"
+                                      data-current-status="{% if user.is_active %}active{% else %}disabled{% endif %}"
+                                      onsubmit="return confirmToggleUserActive(this);">
+                                    {% csrf_token %}
+                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest {% if user.is_active %}bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100{% else %}bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100{% endif %}">
+                                        {% if user.is_active %}
+                                            <i class="fas fa-circle-check"></i> Active
+                                        {% else %}
+                                            <i class="fas fa-ban"></i> Disabled
+                                        {% endif %}
+                                    </button>
+                                </form>
                             </td>
                             <td class="px-10 py-6 text-center">
                                 <span class="text-sm font-black text-slate-600 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
@@ -99,11 +189,16 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="5" class="px-10 py-32 text-center">
+                            <td colspan="6" class="px-10 py-32 text-center">
                                 <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8 text-slate-200 text-3xl">
                                     <i class="fas fa-users-slash"></i>
                                 </div>
-                                <p class="text-slate-400 font-black text-xl">No users found.</p>
+                                <p class="text-slate-400 font-black text-xl mb-2">No users found.</p>
+                                {% if query or active_role and active_role != 'all' %}
+                                    <a href="{% url 'manage_users' %}" class="text-xs font-black uppercase tracking-widest text-indigo-600 hover:underline">
+                                        <i class="fas fa-rotate-left mr-1"></i> Clear filters
+                                    </a>
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}
@@ -115,4 +210,45 @@
         {% include 'courses/admin_footer_snippet.html' %}
     </main>
 </div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .role-tab {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.75rem 1.25rem;
+        border-radius: 9999px;
+        font-weight: 800;
+        font-size: 0.85rem;
+        color: #334155;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+    }
+    .role-tab:hover {
+        background: #eef2ff;
+        color: #4338ca;
+        border-color: #c7d2fe;
+        transform: translateY(-1px);
+    }
+    .role-tab.active {
+        background: linear-gradient(135deg,#6366f1,#a855f7);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 14px 30px -12px rgba(99,102,241,0.6);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function confirmToggleUserActive(form) {
+        const username = form.getAttribute('data-username') || 'ဤ user';
+        const status = form.getAttribute('data-current-status') || 'active';
+        const verb = (status === 'active') ? 'Disable လုပ်ပါသလား?' : 'Activate လုပ်ပါသလား?';
+        return window.confirm(username + ' အကောင့်ကို ' + verb);
+    }
+</script>
 {% endblock %}

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Course, Lesson, Enrollment, CommunityVoice, Profile
+from .models import Course, Lesson, Enrollment, CommunityVoice, Profile, ContactMessage
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .helpers import is_admin as _is_admin, is_instructor as _is_instructor
@@ -346,3 +346,95 @@ class ManualEnrollmentForm(forms.Form):
         if commit:
             enrollment.save()
         return enrollment
+
+
+class ContactForm(forms.ModelForm):
+    """
+    Public contact form rendered on /contact/.
+    Includes an invisible honeypot field and rate-limiting guard (max_length, required fields)
+    plus a short subject dropdown to help admins triage messages.
+    """
+
+    class Meta:
+        model = ContactMessage
+        fields = ['name', 'email', 'phone', 'subject', 'message']
+
+    honeypot = forms.CharField(
+        required=False,
+        label='Leave this empty',
+        help_text='ထိုနေရာကို ချန်ထားပါ (Spam စစ်ဆေးရန်အတွက်ဖြစ်ပါသည်)',
+        widget=forms.TextInput(attrs={
+            'tabindex': '-1',
+            'autocomplete': 'off',
+            'class': 'hidden',
+            'style': 'position:absolute;left:-9999px;top:auto;height:0;width:0;overflow:hidden;',
+        })
+    )
+
+    widgets = {
+        'name': forms.TextInput(attrs={
+            'class': 'w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all',
+            'placeholder': 'သင့်အမည် ရေးပါ...',
+        }),
+        'email': forms.EmailInput(attrs={
+            'class': 'w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all',
+            'placeholder': 'Email လိပ်စာ ရေးပါ...',
+        }),
+        'phone': forms.TextInput(attrs={
+            'class': 'w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all',
+            'placeholder': 'ဖုန်းနံပါတ် (Optional)',
+        }),
+        'subject': forms.Select(attrs={
+            'class': 'w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all cursor-pointer',
+        }),
+        'message': forms.Textarea(attrs={
+            'class': 'w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all leading-relaxed',
+            'placeholder': 'မက်ဆေ့ဂျ် အသေးစိတ် ရေးပါ...',
+            'rows': 6,
+        }),
+    }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Fallback: ensure widgets actually get attrs (in case Meta.widgets silently skipped)
+        overrides = {
+            'name':    {'placeholder': 'သင့်အမည် ရေးပါ...'},
+            'email':   {'placeholder': 'Email လိပ်စာ ရေးပါ...'},
+            'phone':   {'placeholder': 'ဖုန်းနံပါတ် (Optional)'},
+            'message': {'placeholder': 'မက်ဆေ့ဂျ် အသေးစိတ် ရေးပါ...', 'rows': 6},
+        }
+        base_cls = 'w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all'
+        for fname, field in self.fields.items():
+            if fname == 'honeypot':
+                continue
+            existing = field.widget.attrs
+            if 'class' not in existing or not existing.get('class'):
+                if fname == 'subject':
+                    existing['class'] = base_cls + ' cursor-pointer'
+                elif fname == 'message':
+                    existing['class'] = base_cls + ' leading-relaxed'
+                else:
+                    existing['class'] = base_cls
+            if fname in overrides:
+                for k, v in overrides[fname].items():
+                    existing.setdefault(k, v)
+
+    def clean_honeypot(self):
+        if self.cleaned_data.get('honeypot'):
+            raise forms.ValidationError("Spam စစ်ဆေးမှု အတည်မပြုခဲ့ပါ။")
+        return ''
+
+    def clean_phone(self):
+        phone = (self.cleaned_data.get('phone') or '').strip()
+        if len(phone) > 30:
+            raise forms.ValidationError("ဖုန်းနံပါတ် အလွန်ရှည်လွန်းပါတယ်။")
+        return phone
+
+    def clean_message(self):
+        message = (self.cleaned_data.get('message') or '').strip()
+        if len(message) < 10:
+            raise forms.ValidationError("မက်ဆေ့ဂျ်ကို အနည်းဆုံး 10 စာလုံး ရေးပေးပါ။")
+        if len(message) > 5000:
+            raise forms.ValidationError("မက်ဆေ့ဂျ် 5000 စာလုံးထက် မပိုရပါ။")
+        return message
+

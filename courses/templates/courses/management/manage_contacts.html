@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block title %}Contact Messages — Admin{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[#fcfcfd] flex flex-col lg:flex-row">
+    {% include 'courses/admin_sidebar_snippet.html' %}
+
+    <main class="flex-grow p-6 lg:p-12">
+        {% include 'courses/admin_topbar_snippet.html' with title="Contact Messages" subtitle=counts.all|add:" messages total • "|add:counts.unread|add:" unread." %}
+
+        <!-- Stats + Filter bar -->
+        <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-6 md:p-8 mb-10" data-aos="fade-down">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <a href="?status=all" class="relative p-6 rounded-2xl border transition-all {% if status == 'all' %}border-indigo-200 bg-indigo-50/60 shadow-sm{% else %}border-slate-100 hover:border-slate-200 hover:bg-slate-50{% endif %}">
+                    <p class="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">All Messages</p>
+                    <p class="text-3xl font-black text-slate-900">{{ counts.all }}</p>
+                </a>
+                <a href="?status=unread" class="relative p-6 rounded-2xl border transition-all {% if status == 'unread' %}border-rose-200 bg-rose-50/60 shadow-sm{% else %}border-slate-100 hover:border-slate-200 hover:bg-slate-50{% endif %}">
+                    <p class="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Unread</p>
+                    <p class="text-3xl font-black text-rose-500">{{ counts.unread }}</p>
+                </a>
+                <a href="?status=answered" class="relative p-6 rounded-2xl border transition-all {% if status == 'answered' %}border-emerald-200 bg-emerald-50/60 shadow-sm{% else %}border-slate-100 hover:border-slate-200 hover:bg-slate-50{% endif %}">
+                    <p class="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Answered</p>
+                    <p class="text-3xl font-black text-emerald-500">{{ counts.answered }}</p>
+                </a>
+                <a href="?status=unanswered" class="relative p-6 rounded-2xl border transition-all {% if status == 'unanswered' %}border-amber-200 bg-amber-50/60 shadow-sm{% else %}border-slate-100 hover:border-slate-200 hover:bg-slate-50{% endif %}">
+                    <p class="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Pending Reply</p>
+                    <p class="text-3xl font-black text-amber-500">{{ counts.unanswered }}</p>
+                </a>
+            </div>
+
+            <form method="get" class="flex flex-col lg:flex-row lg:items-end gap-4">
+                <div class="flex-1 space-y-2">
+                    <label class="text-xs font-black uppercase tracking-widest text-slate-400">Search</label>
+                    <div class="flex gap-2">
+                        <input type="text" name="q" value="{{ query }}"
+                               class="flex-1 bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500"
+                               placeholder="Name / Email / Phone / Message စာလုံးရိုက်ရှာပါ...">
+                        <a href="{% url 'manage_contacts' %}" class="px-5 py-4 rounded-2xl text-slate-400 hover:bg-slate-50 font-black text-sm transition-all">
+                            Clear
+                        </a>
+                        <button type="submit" class="px-7 py-4 rounded-2xl custom-gradient text-white font-black shadow-lg shadow-indigo-100 hover:scale-[1.02] transition-transform">
+                            <i class="fas fa-search mr-1"></i> Search
+                        </button>
+                    </div>
+                </div>
+                <div class="w-full lg:w-72 space-y-2">
+                    <label class="text-xs font-black uppercase tracking-widest text-slate-400">Subject Filter</label>
+                    <select name="subject" class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                        <option value="">All Subjects</option>
+                        {% for key, label in subjects %}
+                            <option value="{{ key }}" {% if subject_filter == key %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+
+        <!-- Messages table -->
+        <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden" data-aos="fade-up">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-slate-50 border-b border-slate-100">
+                        <tr>
+                            <th class="text-left px-6 lg:px-8 py-5 text-[11px] font-black uppercase tracking-widest text-slate-400">Sender</th>
+                            <th class="text-left px-6 lg:px-8 py-5 text-[11px] font-black uppercase tracking-widest text-slate-400">Subject</th>
+                            <th class="text-left px-6 lg:px-8 py-5 text-[11px] font-black uppercase tracking-widest text-slate-400 hidden lg:table-cell">Message Preview</th>
+                            <th class="text-left px-6 lg:px-8 py-5 text-[11px] font-black uppercase tracking-widest text-slate-400 hidden md:table-cell">Status</th>
+                            <th class="text-left px-6 lg:px-8 py-5 text-[11px] font-black uppercase tracking-widest text-slate-400 hidden md:table-cell">Time</th>
+                            <th class="text-right px-6 lg:px-8 py-5 text-[11px] font-black uppercase tracking-widest text-slate-400">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        {% for c in contacts %}
+                            <tr class="group hover:bg-slate-50/70 transition-colors {% if not c.is_read %}bg-indigo-50/10{% endif %}">
+                                <td class="px-6 lg:px-8 py-5 align-top">
+                                    <div class="flex items-start gap-4">
+                                        <div class="w-11 h-11 rounded-2xl {% if c.is_read %}bg-slate-100 text-slate-500{% else %}bg-indigo-100 text-indigo-600{% endif %} flex items-center justify-center font-black shadow-sm flex-shrink-0">
+                                            {{ c.name|slice:":1"|upper }}
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="font-black text-slate-800 truncate">
+                                                {{ c.name }}
+                                                {% if not c.is_read %}
+                                                    <span class="ml-2 inline-flex items-center rounded-full bg-indigo-500 text-[9px] font-black text-white px-2 py-0.5 tracking-wider">NEW</span>
+                                                {% endif %}
+                                            </p>
+                                            <a href="mailto:{{ c.email }}" class="text-[11px] text-indigo-500 font-bold hover:underline block truncate">{{ c.email }}</a>
+                                            {% if c.phone %}
+                                                <span class="text-[11px] text-slate-400 font-bold">{{ c.phone }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 lg:px-8 py-5 align-top">
+                                    <span class="inline-flex items-center rounded-xl px-3 py-1.5 text-[11px] font-black
+                                        {% if c.subject == 'course' %}bg-sky-50 text-sky-700
+                                        {% elif c.subject == 'support' %}bg-rose-50 text-rose-700
+                                        {% elif c.subject == 'partnership' %}bg-fuchsia-50 text-fuchsia-700
+                                        {% elif c.subject == 'feedback' %}bg-emerald-50 text-emerald-700
+                                        {% elif c.subject == 'other' %}bg-slate-50 text-slate-600
+                                        {% else %}bg-indigo-50 text-indigo-700{% endif %}">
+                                        {{ c.subject_label }}
+                                    </span>
+                                </td>
+                                <td class="px-6 lg:px-8 py-5 align-top hidden lg:table-cell">
+                                    <p class="text-sm text-slate-600 font-medium leading-relaxed line-clamp-2">{{ c.message }}</p>
+                                </td>
+                                <td class="px-6 lg:px-8 py-5 align-top hidden md:table-cell">
+                                    <div class="flex flex-col gap-2">
+                                        <span class="inline-flex items-center rounded-xl px-3 py-1 text-[10px] font-black {% if c.is_read %}bg-emerald-50 text-emerald-700{% else %}bg-indigo-50 text-indigo-700{% endif %}">
+                                            <i class="fas fa-{% if c.is_read %}eye{% else %}eye-slash{% endif %} mr-1"></i>
+                                            {{ c.is_read|yesno:"Read,Unread" }}
+                                        </span>
+                                        <span class="inline-flex items-center rounded-xl px-3 py-1 text-[10px] font-black {% if c.is_answered %}bg-emerald-50 text-emerald-700{% else %}bg-amber-50 text-amber-700{% endif %}">
+                                            <i class="fas fa-{% if c.is_answered %}check-double{% else %}clock{% endif %} mr-1"></i>
+                                            {{ c.is_answered|yesno:"Answered,Pending" }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 lg:px-8 py-5 align-top hidden md:table-cell">
+                                    <p class="text-[11px] font-bold text-slate-400">{{ c.created_at|date:"M d, Y H:i" }}</p>
+                                    <p class="text-[10px] font-bold text-slate-300">{{ c.created_at|timesince }} ago</p>
+                                </td>
+                                <td class="px-6 lg:px-8 py-5 align-top text-right">
+                                    <div class="flex justify-end gap-2 flex-wrap">
+                                        <a href="{% url 'contact_detail' c.pk %}"
+                                           class="inline-flex items-center px-3.5 py-2 rounded-xl text-[11px] font-black bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors">
+                                            <i class="fas fa-eye mr-1.5"></i> View
+                                        </a>
+                                        <form method="post" action="{% if c.is_read %}{% url 'contact_mark_unread' c.pk %}{% else %}{% url 'contact_mark_read' c.pk %}{% endif %}" class="inline-block">
+                                            {% csrf_token %}
+                                            <button class="px-3.5 py-2 rounded-xl text-[11px] font-black bg-slate-50 text-slate-600 hover:bg-slate-100 transition-colors">
+                                                <i class="fas fa-{% if c.is_read %}envelope{% else %}envelope-open{% endif %} mr-1.5"></i>
+                                                {% if c.is_read %}Mark Unread{% else %}Mark Read{% endif %}
+                                            </button>
+                                        </form>
+                                        <form method="post" action="{% url 'contact_toggle_answered' c.pk %}" class="inline-block">
+                                            {% csrf_token %}
+                                            <button class="px-3.5 py-2 rounded-xl text-[11px] font-black {% if c.is_answered %}bg-amber-50 text-amber-700 hover:bg-amber-100{% else %}bg-emerald-50 text-emerald-700 hover:bg-emerald-100{% endif %} transition-colors">
+                                                <i class="fas fa-{% if c.is_answered %}rotate-left{% else %}check{% endif %} mr-1.5"></i>
+                                                {% if c.is_answered %}Reopen{% else %}Mark Answered{% endif %}
+                                            </button>
+                                        </form>
+                                        {% if is_admin_user %}
+                                            <form method="post" action="{% url 'contact_delete' c.pk %}" class="inline-block"
+                                                  onsubmit="return confirm('မက်ဆေ့ဂျ် #{{ c.pk }} ကို ဖျက်မှာသေချာပါသလား?');">
+                                                {% csrf_token %}
+                                                <button class="px-3.5 py-2 rounded-xl text-[11px] font-black bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors">
+                                                    <i class="fas fa-trash mr-1.5"></i> Delete
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="px-6 lg:px-8 py-20 text-center">
+                                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-50 mb-6">
+                                        <i class="fas fa-inbox text-slate-200 text-3xl"></i>
+                                    </div>
+                                    <p class="font-black text-slate-600 text-lg mb-2">No contact messages.</p>
+                                    <p class="text-sm text-slate-400 font-medium mb-6">သင့်ရဲ့ filter / search နှင့် ကိုက်ညီတဲ့ မက်ဆေ့ဂျ် မရှိသေးပါ။</p>
+                                    <a href="{% url 'manage_contacts' %}" class="inline-flex items-center px-5 py-3 rounded-2xl custom-gradient text-white font-black shadow-lg shadow-indigo-100 hover:scale-[1.02] transition-transform">
+                                        <i class="fas fa-rotate-right mr-2"></i> Clear filters
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% include 'courses/admin_footer_snippet.html' %}
+    </main>
+</div>
+{% endblock %}

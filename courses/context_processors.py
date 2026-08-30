@@ -1,4 +1,4 @@
-from .models import Notification
+from .models import Notification, ContactMessage
 from .helpers import is_admin as _is_admin, is_instructor as _is_instructor
 
 def notifications(request):
@@ -29,15 +29,26 @@ def notifications(request):
 
 def user_roles(request):
     if request.user.is_authenticated:
+        is_admin = _is_admin(request.user)
+        is_instructor = _is_instructor(request.user)
+        # Admin/instructors get a badge of unread contact messages (visible in topbar + dropdown)
+        unread_contacts = 0
+        if is_admin or is_instructor:
+            try:
+                unread_contacts = ContactMessage.objects.filter(is_read=False).count()
+            except Exception:
+                unread_contacts = 0
         return {
-            'is_admin_user': _is_admin(request.user),
-            'is_instructor_user': _is_instructor(request.user),
-            'user_role_label': (request.user.profile.role if hasattr(request.user, 'profile') else 'student')
+            'is_admin_user': is_admin,
+            'is_instructor_user': is_instructor,
+            'user_role_label': (request.user.profile.role if hasattr(request.user, 'profile') else 'student'),
+            'unread_contact_messages_count': unread_contacts,
         }
     return {
         'is_admin_user': False,
         'is_instructor_user': False,
-        'user_role_label': 'guest'
+        'user_role_label': 'guest',
+        'unread_contact_messages_count': 0,
     }
 
 def navbar_active(request):

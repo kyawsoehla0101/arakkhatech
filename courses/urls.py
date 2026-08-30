@@ -33,6 +33,14 @@ urlpatterns = [
     path('manage/users/<int:user_pk>/edit/', views.edit_user, name='edit_user'),
     path('manage/users/<int:user_pk>/delete/', views.delete_user, name='delete_user'),
     path('manage/users/<int:user_pk>/toggle-active/', views.toggle_user_active, name='toggle_user_active'),
+
+    # Contact Messages (Admin / Instructor only)
+    path('manage/contacts/', views.manage_contacts, name='manage_contacts'),
+    path('manage/contact/<int:pk>/', views.contact_detail, name='contact_detail'),
+    path('manage/contact/<int:pk>/mark-read/', views.contact_mark_read, name='contact_mark_read'),
+    path('manage/contact/<int:pk>/mark-unread/', views.contact_mark_unread, name='contact_mark_unread'),
+    path('manage/contact/<int:pk>/toggle-answered/', views.contact_toggle_answered, name='contact_toggle_answered'),
+    path('manage/contact/<int:pk>/delete/', views.contact_delete, name='contact_delete'),
     
     path('admin-search/', views.admin_search, name='admin_search'),
     path('notifications/', views.all_notifications, name='all_notifications'),

@@ -29,6 +29,17 @@
                 <i class="fas fa-user-graduate {% if 'enroll' in request.resolver_match.url_name %}text-emerald-400{% else %}group-hover:text-emerald-400{% endif %}"></i>
                 <span>Enrollments</span>
             </a>
+            <a href="{% url 'manage_contacts' %}" class="flex items-center justify-between space-x-4 p-4 rounded-2xl group {% if request.resolver_match.url_name in 'manage_contacts|contact_detail|contact_mark_read|contact_mark_unread|contact_toggle_answered|contact_delete' %}bg-white/10 text-white font-bold border border-white/5 shadow-lg{% else %}text-slate-400 hover:bg-white/5 hover:text-white transition-all{% endif %}">
+                <div class="flex items-center space-x-4 w-full">
+                    <i class="fas fa-envelope-open-text {% if request.resolver_match.url_name in 'manage_contacts|contact_detail|contact_mark_read|contact_mark_unread|contact_toggle_answered|contact_delete' %}text-amber-400{% else %}group-hover:text-amber-400{% endif %}"></i>
+                    <span>Contact Messages</span>
+                </div>
+                {% if unread_contact_messages_count > 0 %}
+                    <span class="ml-1 min-w-[28px] h-7 flex items-center justify-center bg-rose-500 text-white text-[11px] font-black rounded-full px-2 shadow-lg shadow-rose-500/30">
+                        {{ unread_contact_messages_count }}
+                    </span>
+                {% endif %}
+            </a>
             <div class="pt-4 border-t border-white/5">
                 <a href="{% url 'manage_books' %}" class="flex items-center space-x-4 p-4 rounded-2xl {% if 'docs/manage' in request.path %}bg-white/10 text-white font-bold border border-white/5 shadow-lg{% else %}text-slate-400 hover:bg-white/5 hover:text-white transition-all group{% endif %}">
                     <i class="fas fa-book-open {% if 'docs/manage' in request.path %}text-emerald-400{% else %}group-hover:text-emerald-400{% endif %}"></i>

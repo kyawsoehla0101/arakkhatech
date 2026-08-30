@@ -2,8 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .models import Course, Lesson, Enrollment, Notification, CommunityVoice, NewsletterSubscriber, Profile
-from .forms import CourseForm, LessonForm, StudentCreationForm, ManualEnrollmentForm, CommunityVoiceForm, ProfileForm, UserUpdateForm, SignUpForm
+from .models import Course, Lesson, Enrollment, Notification, CommunityVoice, NewsletterSubscriber, Profile, ContactMessage
+from .forms import CourseForm, LessonForm, StudentCreationForm, ManualEnrollmentForm, CommunityVoiceForm, ProfileForm, UserUpdateForm, SignUpForm, ContactForm
 from .helpers import is_admin, is_instructor, can_manage_course, can_manage_book
 from django.db.models import Q, Count
 import markdown
@@ -51,11 +51,73 @@ def about_us(request):
     return render(request, 'courses/about_us.html')
 
 def contact_us(request):
+    """Public contact form — saves submissions, notifies admins, blocks spam with honeypot."""
     if request.method == 'POST':
-        # Here you could handle contact form submission if needed
-        messages.success(request, "သင်၏ မက်ဆေ့ဂျ်ကို လက်ခံရရှိပါပြီ။ မကြာမီ ပြန်လည်ဆက်သွယ်ပေးပါမည်။")
-        return redirect('contact')
-    return render(request, 'courses/contact.html')
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            # Honeypot already validated inside clean_honeypot() above; commit & notify
+            msg = form.save(commit=False)
+            # Light anti-duplicate: same email + message in the last 15 minutes => skip notify.
+            recent_dup = ContactMessage.objects.filter(
+                email__iexact=msg.email,
+                message=msg.message,
+            ).order_by('-created_at').first()
+            is_dup = bool(
+                recent_dup and
+                recent_dup.pk and
+                (recent_dup.created_at and (recent_dup.created_at.timestamp() + 15*60) >
+                 (msg.created_at.timestamp() if msg.created_at else __import__('time').time()))
+            )
+            msg.save()
+
+            # Notify every admin + instructor staff of the new message (if not a duplicate flood).
+            if not is_dup:
+                try:
+                    admin_ids = list(Profile.objects.filter(
+                        role__in=('admin', 'instructor')
+                    ).values_list('user_id', flat=True))
+                    if not admin_ids:
+                        admin_ids = list(User.objects.filter(
+                            is_superuser=True, is_active=True
+                        ).values_list('id', flat=True))
+                    notif_objs = []
+                    title = f"📩 {msg.subject_label} — {msg.name}"
+                    snippet = (msg.message[:80] + '…') if len(msg.message) > 80 else msg.message
+                    body = f"{msg.name} <{msg.email}> မှ မက်ဆေ့ဂျ်အသစ်: {snippet}"
+                    for uid in admin_ids:
+                        notif_objs.append(Notification(
+                            user_id=uid,
+                            title=title,
+                            message=body,
+                            is_read=False,
+                            is_admin_notification=True,
+                        ))
+                    if notif_objs:
+                        Notification.objects.bulk_create(notif_objs, batch_size=200, ignore_conflicts=True)
+                except Exception:
+                    # Never let the user see a 500 for notification failures;
+                    # the message itself already persisted safely.
+                    pass
+
+            messages.success(
+                request,
+                "သင်၏ မက်ဆေ့ဂျ်ကို လက်ခံရဟိပါရေ။ မကြာခင် ပြန်လည်ဆက်သွယ်ပီးပါမေ။"
+            )
+            return redirect('contact')
+        else:
+            messages.error(
+                request,
+                "မက်ဆေ့ဂျ်ပီးပို့မှု မအောင်မြင်ပါ။ အောက်ပါ error များကို စစ်ဆီးပီးပါ။"
+            )
+    else:
+        form = ContactForm()
+
+    # Show a mini success preview block after first submission (for UX)
+    show_success = False
+    return render(request, 'courses/contact.html', {
+        'form': form,
+        'show_success': show_success,
+    })
 
 def privacy_policy(request):
     return render(request, 'courses/privacy_policy.html')
@@ -827,9 +889,9 @@ def courses_page(request):
     ]
 
     sort_options = [
-        {'key': 'newest',   'label': 'အသစ်အဆင့်'},
-        {'key': 'popular',  'label': 'လူကြိုက်အများဆုံး'},
-        {'key': 'shortest', 'label': 'သင်ခန်းစာအနည်းဆုံး'},
+        {'key': 'newest',   'label': 'Newest'},
+        {'key': 'popular',  'label': 'Popular'},
+        {'key': 'shortest', 'label': 'Shortest'},
     ]
 
     hero_stats = [
@@ -963,6 +1025,164 @@ def admin_dashboard(request):
         'chart_labels': json.dumps(chart_labels),
         'chart_data': json.dumps(chart_data),
     })
+
+
+# ──────────────────────────────────────────────────────────────
+#  Contact Messages — Admin + Instructor management
+# ──────────────────────────────────────────────────────────────
+def _contact_staff_or_403(request):
+    """Instructors + Admins can view/manage contact messages."""
+    if not request.user.is_authenticated:
+        return False
+    try:
+        return is_admin(request.user) or is_instructor(request.user)
+    except Exception:
+        return False
+
+
+@login_required
+def manage_contacts(request):
+    if not _contact_staff_or_403(request):
+        messages.error(request, "ဈေးဝယ်ခွင့်မရှိပါ။ Contact messages ကို Admin/Instructor သာ ကြည့်ရှုနိုင်ပါတယ်။")
+        return redirect('course_list')
+
+    # Tabs: All / Unread / Answered / Unanswered + search across name/email/message
+    status = request.GET.get('status', 'all').strip().lower()
+    q = request.GET.get('q', '').strip()
+    subject = request.GET.get('subject', '').strip()
+
+    qs = ContactMessage.objects.all()
+    if status == 'unread':
+        qs = qs.filter(is_read=False)
+    elif status == 'read':
+        qs = qs.filter(is_read=True)
+    elif status == 'answered':
+        qs = qs.filter(is_answered=True)
+    elif status == 'unanswered':
+        qs = qs.filter(is_answered=False)
+
+    if subject and subject in dict(ContactMessage.SUBJECT_CHOICES).keys():
+        qs = qs.filter(subject=subject)
+
+    if q:
+        qs = qs.filter(
+            Q(name__icontains=q) |
+            Q(email__icontains=q) |
+            Q(phone__icontains=q) |
+            Q(message__icontains=q)
+        ).distinct()
+
+    qs = qs.order_by('-created_at')
+
+    counts = {
+        'all':        ContactMessage.objects.count(),
+        'unread':     ContactMessage.objects.filter(is_read=False).count(),
+        'answered':   ContactMessage.objects.filter(is_answered=True).count(),
+        'unanswered': ContactMessage.objects.filter(is_answered=False).count(),
+    }
+
+    return render(request, 'courses/management/manage_contacts.html', {
+        'contacts': qs,
+        'status':   status,
+        'query':    q,
+        'subject_filter': subject,
+        'counts':   counts,
+        'subjects': ContactMessage.SUBJECT_CHOICES,
+    })
+
+
+@login_required
+def contact_detail(request, pk):
+    if not _contact_staff_or_403(request):
+        messages.error(request, "ဈေးဝယ်ခွင့်မရှိပါ။")
+        return redirect('course_list')
+    msg = get_object_or_404(ContactMessage, pk=pk)
+
+    # Handle any internal note / answered toggle submitted from the detail page.
+    if request.method == 'POST':
+        action = request.POST.get('action', '').strip()
+        if action == 'save_note':
+            note = (request.POST.get('internal_note') or '').strip()[:1000]
+            msg.internal_note = note
+            msg.save(update_fields=['internal_note', 'updated_at'])
+            messages.success(request, "Internal note ကို သိမ်းဆည်းပြီးပြီ။")
+        elif action == 'mark_read':
+            msg.is_read = True
+            msg.save(update_fields=['is_read', 'updated_at'])
+            messages.success(request, "ဖတ်ပြီးပြီ လို့ အမှတ်အသားပေးလိုက်ပါတယ်။")
+        elif action == 'mark_unread':
+            msg.is_read = False
+            msg.save(update_fields=['is_read', 'updated_at'])
+            messages.success(request, "မဖတ်ရသေးသေးဘူး လို့ ပြန်ပြောင်းလိုက်ပါတယ်။")
+        elif action == 'toggle_answered':
+            msg.is_answered = not msg.is_answered
+            msg.is_read = True
+            msg.save(update_fields=['is_answered', 'is_read', 'updated_at'])
+            messages.success(
+                request,
+                "အဖြေပေးပြီးပြီ" if msg.is_answered else "အဖြေမပေးသေးဘူး လို့ ပြောင်းလိုက်ပါတယ်။"
+            )
+        return redirect('contact_detail', pk=msg.pk)
+
+    # Auto-mark as read when an admin/instructor opens the detail page.
+    if not msg.is_read:
+        msg.is_read = True
+        msg.save(update_fields=['is_read', 'updated_at'])
+
+    return render(request, 'courses/management/contact_detail.html', {
+        'msg': msg,
+    })
+
+
+@login_required
+def contact_mark_read(request, pk):
+    if not _contact_staff_or_403(request):
+        messages.error(request, "ဈေးဝယ်ခွင့်မရှိပါ။")
+        return redirect('course_list')
+    msg = get_object_or_404(ContactMessage, pk=pk)
+    msg.is_read = True
+    msg.save(update_fields=['is_read', 'updated_at'])
+    messages.success(request, "#{} ကို ဖတ်ပြီးပြီ လို့ အမှတ်အသားပေးလိုက်ပါတယ်။".format(pk))
+    return redirect(request.META.get('HTTP_REFERER') or 'manage_contacts')
+
+
+@login_required
+def contact_mark_unread(request, pk):
+    if not _contact_staff_or_403(request):
+        messages.error(request, "ဈေးဝယ်ခွင့်မရှိပါ။")
+        return redirect('course_list')
+    msg = get_object_or_404(ContactMessage, pk=pk)
+    msg.is_read = False
+    msg.save(update_fields=['is_read', 'updated_at'])
+    messages.success(request, "#{} ကို မဖတ်ရသေးသေးဘူး လို့ ပြန်ပြောင်းလိုက်ပါတယ်။".format(pk))
+    return redirect(request.META.get('HTTP_REFERER') or 'manage_contacts')
+
+
+@login_required
+def contact_toggle_answered(request, pk):
+    if not _contact_staff_or_403(request):
+        messages.error(request, "ဈေးဝယ်ခွင့်မရှိပါ။")
+        return redirect('course_list')
+    msg = get_object_or_404(ContactMessage, pk=pk)
+    msg.is_answered = not msg.is_answered
+    if msg.is_answered and not msg.is_read:
+        msg.is_read = True
+    msg.save(update_fields=['is_answered', 'is_read', 'updated_at'])
+    messages.success(
+        request,
+        "အဖြေပေးပြီးပြီ လို့ သိမ်းလိုက်ပါတယ်။" if msg.is_answered else "အဖြေမပေးသေးဘူး လို့ ပြောင်းလိုက်ပါတယ်။"
+    )
+    return redirect(request.META.get('HTTP_REFERER') or 'manage_contacts')
+
+
+@login_required
+@user_passes_test(is_admin)
+def contact_delete(request, pk):
+    msg = get_object_or_404(ContactMessage, pk=pk)
+    msg.delete()
+    messages.success(request, f"#{pk} မက်ဆေ့ဂျ်ကို ဖျက်ပြီးပြီ။")
+    return redirect('manage_contacts')
+
 
 def course_detail_pk_redirect(request, pk):
     """

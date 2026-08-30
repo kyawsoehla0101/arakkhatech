@@ -107,6 +107,47 @@ class CommunityVoice(models.Model):
     def __str__(self):
         return f"Voice by {self.user.username}"
 
+
+class ContactMessage(models.Model):
+    """
+    Stores inbound messages submitted through the public /contact/ form.
+    Admins can review these, mark them read, and mark answered after replying.
+    """
+    SUBJECT_CHOICES = [
+        ('general',    'အထွေထွေ မေးခွန်း'),
+        ('course',     'သင်တန်းဆိုင်ရာ မေးခွန်း'),
+        ('support',    'Technical Support'),
+        ('partnership','ပူးပေါင်းဆောင်ရွက်ရန်'),
+        ('feedback',   'တုံ့ပြန်ချက်များ'),
+        ('other',      'အခြား'),
+    ]
+
+    name      = models.CharField(max_length=120)
+    email     = models.EmailField(max_length=255)
+    phone     = models.CharField(max_length=30, blank=True, default='')
+    subject   = models.CharField(max_length=30, choices=SUBJECT_CHOICES, default='general')
+    message   = models.TextField(max_length=5000)
+
+    is_read     = models.BooleanField(default=False, db_index=True)
+    is_answered = models.BooleanField(default=False, db_index=True)
+    internal_note = models.TextField(max_length=1000, blank=True, default='')
+
+    created_at  = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at  = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Contact Message'
+        verbose_name_plural = 'Contact Messages'
+
+    def __str__(self):
+        return f"[{self.get_subject_display()}] {self.name} <{self.email}>"
+
+    @property
+    def subject_label(self):
+        return dict(self.SUBJECT_CHOICES).get(self.subject, 'အထွေထွေ မေးခွန်း')
+
+
 class Profile(models.Model):
     ROLE_CHOICES = [
         ('student', 'Student'),

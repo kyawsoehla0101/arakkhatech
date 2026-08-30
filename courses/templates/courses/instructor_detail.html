@@ -153,14 +153,14 @@
                     <p>{{ profile.bio|linebreaksbr }}</p>
                 {% else %}
                     <p>
-                        ဤသင်ပညာရှင်သည် နည်းပညာစက်မှုလုပ်ငန်းတွင် နှစ်ပေါင်းများစွာ အတွေ့အကြုံရှိပြီး
-                        လက်တွေ့အခြေပြု ပညာပေးမှုများကို အဓိကထား ဆောင်ရွက်ပေးလျက်ရှိသည်။
+                        အေသင်တန်းနည်းပြသည် နည်းပညာလုပ်ငန်းတွင် နှစ်ပေါင်းများစွာ အတွေ့အကြုံဟိပြီး
+                        လက်တွိအခြေပြု ပညာပီးမှုများကို အဓိကထား ဆောင်ရွက်ပီးလျက်ဟိသည်။
                         သင်တန်းထဲတွင် လက်တွေ့ Project အများအပြားပါဝင်ပြီး Career အစပိုင်းမှာ
-                        အထောက်အကူအများကြီး ဖြစ်စေမည်ဖြစ်ပါသည်။
+                        အထောက်အကူအများကြီး ဖြစ်စီမည်ဖြစ်ပါသည်။
                     </p>
                     <p>
-                        နောက်ထပ်ထူးခြားသည်မှာ သက်တောင့်သက်သာ မြန်မာဘာသာဖြင့် သင်ကြားပေးသောကြောင့်
-                        နားလည်လွယ်ကူပြီး မေးခွန်းများမှာလည်း တိုက်ရိုက် လေလုံလောက်စွာ ဖြေကြားပေးနိုင်ပါသည်။
+                        နောက်ထပ်ထူးခြားသည်မှာ သက်တောင့်သက်သာ ရက္ခိုင်ဘာသာဖြင့် သင်ကြားပီးသောကြောင့်
+                        နားလည်လွယ်ကူပြီး မေးခွန်းတိကိုလည်း တိုက်ရိုက် ဖြေကြားပေးနိုင်ပါသည်။
                     </p>
                 {% endif %}
             </div>
@@ -197,7 +197,7 @@
                 </ul>
             </div>
             <a href="{% url 'instructors_list' %}" class="block text-center rounded-2xl bg-slate-900 text-white font-black px-7 py-4 hover:bg-slate-800 transition-colors">
-                <i class="fas fa-arrow-left mr-2"></i> All Teachers ကို ပြန်ကြည့်ရန်
+                <i class="fas fa-arrow-left mr-2"></i> သင်တန်းဆရာအားလုံးကို ကြည့်ရန်
             </a>
         </aside>
     </div>
@@ -267,9 +267,9 @@
             <div class="w-20 h-20 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-3xl mx-auto mb-5">
                 <i class="fas fa-book-open"></i>
             </div>
-            <h3 class="text-2xl font-black text-slate-900 mb-3">သင်တန်းများ မရှိသေးပါ</h3>
+            <h3 class="text-2xl font-black text-slate-900 mb-3">သင်တန်းများ မဟိသိမ့်ပါ</h3>
             <p class="text-slate-500 max-w-xl mx-auto">
-                ဤသင်ပညာရှင်၏ သင်တန်းများကို မကြာမီ ထည့်သွင်းသွားမည်ဖြစ်ပါသည်။
+                အေသင်တန်းဆရာ၏ သင်တန်းများကို မကြာခင် ထည့်သွင်းလားဖို့ဖြစ်ပါရေ။
             </p>
         </div>
         {% endif %}
@@ -284,10 +284,10 @@
             <div class="pointer-events-none absolute -bottom-10 left-0 h-72 w-72 rounded-full bg-black/10 blur-3xl"></div>
             <div class="relative text-center max-w-3xl mx-auto">
                 <h2 class="text-3xl md:text-5xl font-black leading-tight mb-5">
-                    အခုပဲ ဒီ Instructor နဲ့အတူ သင်ယူစတင်ပါ
+                    အဂုကပင် အေ သင်တန်းဆရာနန့်အတူ သင်ယူမှုကို စတင်လိုက်ပါ။
                 </h2>
                 <p class="text-lg text-indigo-100/90 mb-10 leading-relaxed">
-                    Lifetime access · 100% မြန်မာဘာသာ · Certificate အပါ · Instructor support အပါ။
+                    Lifetime access · 100% ရက္ခိုင်ဘာသာစကား · Certificate အပါ · Instructor support အပါ။
                 </p>
                 <a href="{% if courses.first %}{% url 'course_detail' courses.first.slug %}{% else %}{% url 'courses_page' %}{% endif %}"
                    class="inline-flex items-center gap-3 rounded-2xl bg-white text-indigo-700 px-8 py-4 font-black shadow-2xl hover:scale-[1.03] transition-transform">

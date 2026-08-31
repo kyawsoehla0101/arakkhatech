@@ -474,10 +474,15 @@
                 <div>
                     <h4 class="text-lg font-bold mb-6">သင်တန်းများ</h4>
                     <ul class="space-y-4 text-slate-400">
-                        <li><a href="#" class="hover:text-white transition-colors">Web Development</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Python Programming</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Mobile App Dev</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Data Science</a></li>
+                        {% for c in footer_latest_courses %}
+                            {% if c.slug %}
+                                <li><a href="{% url 'course_detail' slug=c.slug %}" class="hover:text-white transition-colors">{{ c.title }}</a></li>
+                            {% else %}
+                                <li><a href="{% url 'course_detail_pk' pk=c.pk %}" class="hover:text-white transition-colors">{{ c.title }}</a></li>
+                            {% endif %}
+                        {% empty %}
+                            <li><a href="{% url 'course_list' %}" class="hover:text-white transition-colors">သင်တန်းများ ကြည့်ရန်</a></li>
+                        {% endfor %}
                     </ul>
                 </div>
 

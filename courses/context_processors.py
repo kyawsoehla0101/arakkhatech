@@ -1,25 +1,26 @@
-from .models import Notification, ContactMessage
+from .models import Notification, ContactMessage, Course
 from .helpers import is_admin as _is_admin, is_instructor as _is_instructor
 
 def notifications(request):
-    if request.user.is_authenticated:
-        # Student/Public Notifications
-        unread_count = Notification.objects.filter(user=request.user, is_read=False, is_admin_notification=False).count()
-        latest = Notification.objects.filter(user=request.user, is_admin_notification=False).order_by('-created_at')[:5]
-        
-        # Admin Notifications
-        unread_admin_count = 0
-        latest_admin = []
-        if _is_admin(request.user):
-            unread_admin_count = Notification.objects.filter(user=request.user, is_read=False, is_admin_notification=True).count()
-            latest_admin = Notification.objects.filter(user=request.user, is_admin_notification=True).order_by('-created_at')[:5]
-            
-        return {
-            'unread_notifications_count': unread_count,
-            'latest_notifications': latest,
-            'unread_admin_notifications_count': unread_admin_count,
-            'latest_admin_notifications': latest_admin
-        }
+    try:
+        if request.user.is_authenticated:
+            unread_count = Notification.objects.filter(user=request.user, is_read=False, is_admin_notification=False).count()
+            latest = Notification.objects.filter(user=request.user, is_admin_notification=False).order_by('-created_at')[:5]
+
+            unread_admin_count = 0
+            latest_admin = []
+            if _is_admin(request.user):
+                unread_admin_count = Notification.objects.filter(user=request.user, is_read=False, is_admin_notification=True).count()
+                latest_admin = Notification.objects.filter(user=request.user, is_admin_notification=True).order_by('-created_at')[:5]
+
+            return {
+                'unread_notifications_count': unread_count,
+                'latest_notifications': latest,
+                'unread_admin_notifications_count': unread_admin_count,
+                'latest_admin_notifications': latest_admin
+            }
+    except Exception:
+        pass
     return {
         'unread_notifications_count': 0,
         'latest_notifications': [],
@@ -28,22 +29,24 @@ def notifications(request):
     }
 
 def user_roles(request):
-    if request.user.is_authenticated:
-        is_admin = _is_admin(request.user)
-        is_instructor = _is_instructor(request.user)
-        # Admin/instructors get a badge of unread contact messages (visible in topbar + dropdown)
-        unread_contacts = 0
-        if is_admin or is_instructor:
-            try:
-                unread_contacts = ContactMessage.objects.filter(is_read=False).count()
-            except Exception:
-                unread_contacts = 0
-        return {
-            'is_admin_user': is_admin,
-            'is_instructor_user': is_instructor,
-            'user_role_label': (request.user.profile.role if hasattr(request.user, 'profile') else 'student'),
-            'unread_contact_messages_count': unread_contacts,
-        }
+    try:
+        if request.user.is_authenticated:
+            is_admin = _is_admin(request.user)
+            is_instructor = _is_instructor(request.user)
+            unread_contacts = 0
+            if is_admin or is_instructor:
+                try:
+                    unread_contacts = ContactMessage.objects.filter(is_read=False).count()
+                except Exception:
+                    unread_contacts = 0
+            return {
+                'is_admin_user': is_admin,
+                'is_instructor_user': is_instructor,
+                'user_role_label': (request.user.profile.role if hasattr(request.user, 'profile') else 'student'),
+                'unread_contact_messages_count': unread_contacts,
+            }
+    except Exception:
+        pass
     return {
         'is_admin_user': False,
         'is_instructor_user': False,
@@ -52,84 +55,85 @@ def user_roles(request):
     }
 
 def navbar_active(request):
-    """
-    Computes the primary active navigation section for the main navbar.
-
-    Returns a dict with 3 string flags:
-        active_nav  ∈ {'courses' | 'instructors' | 'docs' | 'dashboard' | 'admin' | 'profile' | 'home' }
-                      used to highlight the top-level desktop / mobile nav link + instructor/docs sub-highlight.
-        active_sub  ∈ {'courses' | 'books' | 'enrollments' | 'users' }
-                      used to highlight instructor/manage dropdown/sublinks AND mobile nav equivalents.
-        active_drop ∈ {'dashboard' | 'mycourses' | 'manage_courses' | 'manage_books' |
-                       'manage_enrollments' | 'profile' | 'password' | 'notifications' }
-                      used to highlight links inside the unified profile dropdown.
-    """
-    nav = 'home'
-    sub = ''
-    drop = ''
-
     try:
-        url_name = request.resolver_match.url_name
-    except Exception:
-        url_name = ''
+        nav = 'home'
+        sub = ''
+        drop = ''
 
-    path = request.path or ''
+        try:
+            url_name = request.resolver_match.url_name
+        except Exception:
+            url_name = ''
 
-    if url_name in {'courses_page', 'course_list', 'course_detail', 'course_detail_pk_redirect'}:
-        nav = 'courses'
-    elif url_name in {'instructors_list', 'instructor_detail'}:
-        nav = 'instructors'
-    elif url_name in {'docs_list', 'book_detail', 'chapter_detail', 'lesson_detail'}:
-        nav = 'docs'
-    elif url_name in {'student_dashboard', 'my_courses', 'enrollment_detail', 'course_progress'}:
-        nav = 'dashboard'
-        drop = 'dashboard' if url_name == 'student_dashboard' else 'mycourses'
-    elif url_name in {
-        'admin_dashboard', 'manage_courses', 'manage_lessons', 'manage_books',
-        'manage_chapters', 'manage_enrollments', 'enroll_student',
-        'manage_users', 'add_user', 'edit_user', 'delete_user', 'toggle_user_active',
-        'manage_notifications', 'send_announcement', 'community_voices',
-    }:
-        nav = 'admin'
-        if url_name in {'manage_courses', 'manage_lessons'}:
-            sub = 'courses'
-            drop = 'manage_courses'
-        elif url_name in {'manage_books', 'manage_chapters'}:
-            sub = 'books'
-            drop = 'manage_books'
-        elif url_name in {'manage_enrollments', 'enroll_student'}:
-            sub = 'enrollments'
-            drop = 'manage_enrollments'
-        elif url_name in {'manage_users', 'add_user', 'edit_user', 'delete_user', 'toggle_user_active'}:
-            sub = 'users'
-    elif url_name in {'edit_profile'}:
-        nav = 'profile'
-        drop = 'profile'
-    elif url_name in {'change_password'}:
-        nav = 'profile'
-        drop = 'password'
-    elif url_name in {'all_notifications'}:
-        nav = 'profile'
-        drop = 'notifications'
+        path = request.path or ''
 
-    # Fallback based on path prefix (protects against any URLs without a url_name)
-    if nav == 'home':
-        if path.startswith('/course'):
+        if url_name in {'courses_page', 'course_list', 'course_detail', 'course_detail_pk_redirect'}:
             nav = 'courses'
-        elif path.startswith('/instructor'):
+        elif url_name in {'instructors_list', 'instructor_detail'}:
             nav = 'instructors'
-        elif path.startswith('/docs') or path.startswith('/book') or path.startswith('/chapter'):
+        elif url_name in {'docs_list', 'book_detail', 'chapter_detail', 'lesson_detail'}:
             nav = 'docs'
-        elif path.startswith('/dashboard') or path.startswith('/my-'):
+        elif url_name in {'student_dashboard', 'my_courses', 'enrollment_detail', 'course_progress'}:
             nav = 'dashboard'
-            drop = drop or 'dashboard'
-        elif path.startswith('/manage') or path.startswith('/admin'):
+            drop = 'dashboard' if url_name == 'student_dashboard' else 'mycourses'
+        elif url_name in {
+            'admin_dashboard', 'manage_courses', 'manage_lessons', 'manage_books',
+            'manage_chapters', 'manage_enrollments', 'enroll_student',
+            'manage_users', 'add_user', 'edit_user', 'delete_user', 'toggle_user_active',
+            'manage_notifications', 'send_announcement', 'community_voices',
+        }:
             nav = 'admin'
-        elif path.startswith('/accounts') and path != '/accounts/logout/':
+            if url_name in {'manage_courses', 'manage_lessons'}:
+                sub = 'courses'
+                drop = 'manage_courses'
+            elif url_name in {'manage_books', 'manage_chapters'}:
+                sub = 'books'
+                drop = 'manage_books'
+            elif url_name in {'manage_enrollments', 'enroll_student'}:
+                sub = 'enrollments'
+                drop = 'manage_enrollments'
+            elif url_name in {'manage_users', 'add_user', 'edit_user', 'delete_user', 'toggle_user_active'}:
+                sub = 'users'
+        elif url_name in {'edit_profile'}:
             nav = 'profile'
+            drop = 'profile'
+        elif url_name in {'change_password'}:
+            nav = 'profile'
+            drop = 'password'
+        elif url_name in {'all_notifications'}:
+            nav = 'profile'
+            drop = 'notifications'
 
-    return {
-        'active_nav': nav,
-        'active_sub': sub,
-        'active_drop': drop,
-    }
+        if nav == 'home':
+            if path.startswith('/course'):
+                nav = 'courses'
+            elif path.startswith('/instructor'):
+                nav = 'instructors'
+            elif path.startswith('/docs') or path.startswith('/book') or path.startswith('/chapter'):
+                nav = 'docs'
+            elif path.startswith('/dashboard') or path.startswith('/my-'):
+                nav = 'dashboard'
+                drop = drop or 'dashboard'
+            elif path.startswith('/manage') or path.startswith('/admin'):
+                nav = 'admin'
+            elif path.startswith('/accounts') and path != '/accounts/logout/':
+                nav = 'profile'
+
+        return {
+            'active_nav': nav,
+            'active_sub': sub,
+            'active_drop': drop,
+        }
+    except Exception:
+        return {
+            'active_nav': 'home',
+            'active_sub': '',
+            'active_drop': '',
+        }
+
+def footer_latest_courses(request):
+    try:
+        courses = list(Course.objects.order_by('-created_at')[:4])
+        return {'footer_latest_courses': courses}
+    except Exception:
+        return {'footer_latest_courses': []}

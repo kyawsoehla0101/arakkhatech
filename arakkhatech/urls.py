@@ -42,3 +42,4 @@ if settings.DEBUG and not settings.SUPABASE_S3_ENDPOINT:
 # ============================================================
 
 handler404 = 'courses.views.preview_404'
+handler500 = 'courses.views.preview_500'

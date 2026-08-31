@@ -65,6 +65,7 @@ else:
         'http://127.0.0.1:8000',
         'http://localhost:8000',
         'http://0.0.0.0:8000',
+        
     ]
 
 
@@ -178,6 +179,7 @@ TEMPLATES = [
                 'courses.context_processors.notifications',
                 'courses.context_processors.user_roles',
                 'courses.context_processors.navbar_active',
+                'courses.context_processors.footer_latest_courses',
             ],
         },
     },
@@ -417,7 +419,7 @@ if SUPABASE_S3_ENDPOINT:
 
         'staticfiles': {
             'BACKEND':
-                'whitenoise.storage.CompressedManifestStaticFilesStorage',
+                'arakkhatech.storage.TolerantCompressedManifestStaticFilesStorage',
         },
     }
 
@@ -437,7 +439,7 @@ else:
         },
         'staticfiles': {
             'BACKEND':
-                'whitenoise.storage.CompressedManifestStaticFilesStorage',
+                'arakkhatech.storage.TolerantCompressedManifestStaticFilesStorage',
         },
     }
 # ============================================================

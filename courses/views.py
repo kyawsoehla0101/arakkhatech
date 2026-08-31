@@ -36,7 +36,7 @@ def send_new_course_notification(course):
         logger.info("send_new_course_notification: no active+confirmed subscribers found")
         return 0
 
-    subject = f"သင်တန်းအသစ်ထွက်ပါပြီ! 🎉 {course.title}"
+    subject = f"သင်တန်းအသစ်ထွက်ပါဗျာယ်! 🎉 {course.title}"
     from_email = settings.DEFAULT_FROM_EMAIL or 'arakkhatech@gmail.com'
 
     if settings.ALLOWED_HOSTS:
@@ -93,7 +93,7 @@ def send_new_course_notification(course):
                         plain_content = strip_tags(html_content)
                     else:
                         plain_content = (
-                            f"သင်တန်းအသစ်ထွက်ပါပြီ!\n\n"
+                            f"သင်တန်းအသစ်ထွက်ပါဗျာယ်!\n\n"
                             f"Title: {course.title}\n"
                             f"{(course.description or '')[:200]}...\n\n"
                             f"အသေးစိတ်ကြည့်ရန်: {course_url}\n\n"

@@ -35,7 +35,7 @@ SECRET_KEY = config(
 
 DEBUG = config(
     'DEBUG',
-    default=True,
+    default=False,
     cast=bool
 )
 

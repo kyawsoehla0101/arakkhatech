@@ -501,6 +501,23 @@ LOGIN_URL = 'login'
 
 
 # ============================================================
+# EMAIL SETTINGS (SMTP)
+# ============================================================
+# Gmail အတွက် App Password သုံးပြီးပို့နိုင်ပါတယ်။
+# .env ဖိုင်ထဲမှာ EMAIL_HOST_USER နဲ့ EMAIL_HOST_PASSWORD ကို ထည့်သွင်းပေးပါ။
+# Gmail ရဲ့ App Password ရယူနည်း: Google Account > Security > 2-Step Verification > App Passwords
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='').strip()
+_raw_pw = config('EMAIL_HOST_PASSWORD', default='')
+EMAIL_HOST_PASSWORD = ''.join(_raw_pw.split()) if _raw_pw else ''
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Arakkha Tech <arakkhatech@gmail.com>')
+EMAIL_SUBJECT_PREFIX = config('EMAIL_SUBJECT_PREFIX', default='[Arakkha Tech] ')
+
+# ============================================================
 # DJANGO REST FRAMEWORK
 # ============================================================
 
@@ -570,6 +587,11 @@ LOGGING = {
                 'DJANGO_LOG_LEVEL',
                 'INFO',
             ),
+            'propagate': False,
+        },
+        'courses': {
+            'handlers': ['console'],
+            'level': 'INFO',
             'propagate': False,
         },
     },

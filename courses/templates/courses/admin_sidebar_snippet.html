@@ -40,6 +40,10 @@
                     </span>
                 {% endif %}
             </a>
+            <a href="{% url 'manage_newsletter' %}" class="flex items-center space-x-4 p-4 rounded-2xl {% if request.resolver_match.url_name in 'manage_newsletter|newsletter_toggle_active|newsletter_delete' %}bg-white/10 text-white font-bold border border-white/5 shadow-lg{% else %}text-slate-400 hover:bg-white/5 hover:text-white transition-all group{% endif %}">
+                <i class="fas fa-newspaper {% if request.resolver_match.url_name in 'manage_newsletter|newsletter_toggle_active|newsletter_delete' %}text-fuchsia-400{% else %}group-hover:text-fuchsia-400{% endif %}"></i>
+                <span>Newsletter</span>
+            </a>
             <div class="pt-4 border-t border-white/5">
                 <a href="{% url 'manage_books' %}" class="flex items-center space-x-4 p-4 rounded-2xl {% if 'docs/manage' in request.path %}bg-white/10 text-white font-bold border border-white/5 shadow-lg{% else %}text-slate-400 hover:bg-white/5 hover:text-white transition-all group{% endif %}">
                     <i class="fas fa-book-open {% if 'docs/manage' in request.path %}text-emerald-400{% else %}group-hover:text-emerald-400{% endif %}"></i>

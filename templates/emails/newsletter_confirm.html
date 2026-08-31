@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsletter အတည်ပြုရန် — Arakkha Tech</title>
+</head>
+<body style="margin: 0; padding: 0; background: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 600px;">
+                    <tr>
+                        <td align="center" style="padding-bottom: 30px;">
+                            <div style="display: inline-flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px 24px; border-radius: 100px;">
+                                <div style="width: 40px; height: 40px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #6366f1; font-weight: 900;">A</div>
+                                <span style="color: white; font-weight: 900; font-size: 20px; letter-spacing: -0.5px;">Arakkha<span style="opacity: 0.8;">Tech</span></span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="padding: 0 20px; margin-top: -20px; position: relative; z-index: 1;">
+        <tr>
+            <td align="center">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 600px; background: white; border-radius: 32px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); overflow: hidden;">
+                    <tr>
+                        <td>
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                <tr>
+                                    <td style="background: linear-gradient(135deg, #eef2ff 0%, #fdf4ff 100%); padding: 48px 36px;">
+                                        <div style="width: 72px; height: 72px; background: white; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: 24px; box-shadow: 0 8px 24px rgba(99,102,241,0.15);">
+                                            ✉️
+                                        </div>
+                                        <div style="display: inline-block; background: white; padding: 10px 20px; border-radius: 100px; font-size: 11px; font-weight: 900; color: #6366f1; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(99,102,241,0.1);">
+                                            Confirm Your Email
+                                        </div>
+                                        <h1 style="margin: 0; font-size: 32px; line-height: 1.2; font-weight: 900; color: #0f172a; letter-spacing: -1px; margin-bottom: 16px;">
+                                            မင်္ဂလာပါ! 👋<br>
+                                            <span style="background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">အီးမေးလ် အတည်ပြုပါ</span>
+                                        </h1>
+                                        <p style="margin: 0; color: #64748b; font-size: 16px; line-height: 1.7; font-weight: 500;">
+                                            Arakkha Tech Newsletter ကို စာရင်းသွင်းမှုအတွက် ကျေးဇူးတင်ပါတယ်။<br>
+                                            သင်တန်းအသစ်တွေ၊ အထူး Discounts နှင့် နည်းပညာဆိုင်ရာ Content တွေကို အရင်ဆုံးရရှိနိုင်ဖို့ အောက်က ခလုတ်ကို နှိပ်ပြီး အတည်ပြုပေးပါ။
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                <tr>
+                                    <td style="padding: 0 36px 36px;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td align="center" style="padding-bottom: 24px;">
+                                                    <a href="{{ confirm_url }}" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; text-decoration: none; padding: 22px 56px; border-radius: 20px; font-size: 17px; font-weight: 900; letter-spacing: -0.3px; box-shadow: 0 12px 30px rgba(99,102,241,0.35);">
+                                                        ✅ အီးမေးလ် အတည်ပြုမည်
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-top: 24px; border-top: 1px solid #e2e8f0;">
+                                                    <div style="background: #f8fafc; border-radius: 20px; padding: 20px 24px; margin-bottom: 16px;">
+                                                        <p style="margin: 0; color: #64748b; font-size: 13px; font-weight: 600; margin-bottom: 8px;">
+                                                            🔗 Link ကို နှိပ်လို့မရလျှင် အောက်ပါ Link ကို Copy ပြီး Browser ထဲ Paste လုပ်ပါ:
+                                                        </p>
+                                                        <p style="margin: 0; color: #6366f1; font-size: 12px; font-weight: 700; word-break: break-all;">
+                                                            {{ confirm_url }}
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                <tr>
+                                    <td style="background: #0f172a; padding: 36px; color: white;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td>
+                                                    <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px;">
+                                                        <span style="font-size: 18px;">🛡️</span>
+                                                        <div>
+                                                            <h4 style="margin: 0; font-size: 14px; font-weight: 800; margin-bottom: 4px;">သင့် Privacy ကို ဂရုစိုက်ပါတယ်</h4>
+                                                            <p style="margin: 0; color: #94a3b8; font-size: 13px; font-weight: 500; line-height: 1.6;">
+                                                                သင့်အချက်အလက်များကို လုံခြုံစွာ ထိန်းသိမ်းပြီး သတ်မှတ်ချက်များအတိုင်းသာ အသုံးပြုပါမယ်။
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                                        <span style="font-size: 18px;">🚫</span>
+                                                        <div>
+                                                            <h4 style="margin: 0; font-size: 14px; font-weight: 800; margin-bottom: 4px;">မလိုတော့ရင် နုတ်ထွက်လို့ရပါတယ်</h4>
+                                                            <p style="margin: 0; color: #94a3b8; font-size: 13px; font-weight: 500; line-height: 1.6;">
+                                                                မည်သည့်အချိန်မဆို အောက်က Link ဖြင့် Newsletter မှ လွယ်ကူစွာ နုတ်ထွက်နိုင်ပါတယ်။
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 600px; padding: 32px 0;">
+                    <tr>
+                        <td align="center" style="color: #94a3b8; font-size: 12px; font-weight: 500; line-height: 1.8;">
+                            <p style="margin: 0; margin-bottom: 10px;">Arakkha Tech, Yangon, Myanmar</p>
+                            <p style="margin: 0;">
+                                Newsletter မှ နုတ်ထွက်ရန် — <a href="{{ unsubscribe_url }}" style="color: #6366f1; text-decoration: underline;">Unsubscribe</a>
+                            </p>
+                            <p style="margin: 0; margin-top: 10px;">© {{ year }} Arakkha Tech. All rights reserved.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -2,14 +2,133 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.core.mail import EmailMultiAlternatives, get_connection, send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
+from django.urls import reverse
+from django.utils import timezone
 from .models import Course, Lesson, Enrollment, Notification, CommunityVoice, NewsletterSubscriber, Profile, ContactMessage
-from .forms import CourseForm, LessonForm, StudentCreationForm, ManualEnrollmentForm, CommunityVoiceForm, ProfileForm, UserUpdateForm, SignUpForm, ContactForm
+from .forms import CourseForm, LessonForm, StudentCreationForm, ManualEnrollmentForm, CommunityVoiceForm, ProfileForm, UserUpdateForm, SignUpForm, ContactForm, NewsletterSubscribeForm
 from .helpers import is_admin, is_instructor, can_manage_course, can_manage_book
 from django.db.models import Q, Count
 import markdown
+import datetime
+import urllib.parse
+import traceback
+import logging
+
+logger = logging.getLogger(__name__)
 
 from django.contrib.auth import update_session_auth_hash, login
 from django.contrib.auth.forms import PasswordChangeForm
+
+
+def send_new_course_notification(course):
+    """
+    Send a beautiful HTML email to all active + confirmed newsletter subscribers
+    when a new course is published.
+    Includes a one-click unsubscribe link per recipient.
+    """
+    subscribers_qs = NewsletterSubscriber.objects.filter(is_active=True, confirmed=True)
+    total_subs = subscribers_qs.count()
+    if total_subs == 0:
+        logger.info("send_new_course_notification: no active+confirmed subscribers found")
+        return 0
+
+    subject = f"သင်တန်းအသစ်ထွက်ပါပြီ! 🎉 {course.title}"
+    from_email = settings.DEFAULT_FROM_EMAIL or 'arakkhatech@gmail.com'
+
+    if settings.ALLOWED_HOSTS:
+        base_host = settings.ALLOWED_HOSTS[0]
+    else:
+        base_host = 'localhost:8000'
+    protocol = getattr(settings, 'ACCOUNT_DEFAULT_HTTP_PROTOCOL', 'http')
+
+    if course.slug:
+        course_path = f'/course/{course.slug}/'
+    else:
+        course_path = f'/course/{course.pk}/'
+    course_url = f"{protocol}://{base_host}{course_path}"
+
+    year = datetime.datetime.now().year
+
+    base_html = None
+    try:
+        base_html = render_to_string('emails/new_course.html', {
+            'course': course,
+            'course_url': course_url,
+            'year': year,
+            'unsubscribe_url': '#UNSUBSCRIBE_URL#',
+        })
+    except Exception as e:
+        logger.warning("send_new_course_notification: template failed: %s", e)
+        traceback.print_exc()
+        base_html = None
+
+    count = 0
+    errors = 0
+    try:
+        with get_connection(
+            host=settings.EMAIL_HOST,
+            port=settings.EMAIL_PORT,
+            username=settings.EMAIL_HOST_USER,
+            password=settings.EMAIL_HOST_PASSWORD,
+            use_tls=settings.EMAIL_USE_TLS,
+            timeout=30,
+        ) as connection:
+            for sub in subscribers_qs.iterator():
+                try:
+                    unsub_token = sub.confirmation_token
+                    if unsub_token:
+                        unsub_path = reverse('newsletter_unsubscribe', kwargs={'token': unsub_token})
+                        unsubscribe_oneclick = f"{protocol}://{base_host}{unsub_path}"
+                    else:
+                        unsub_path = reverse('newsletter_unsubscribe_simple')
+                        qs = urllib.parse.urlencode({'email': sub.email})
+                        unsubscribe_oneclick = f"{protocol}://{base_host}{unsub_path}?{qs}"
+
+                    if base_html:
+                        html_content = base_html.replace('#UNSUBSCRIBE_URL#', unsubscribe_oneclick)
+                        plain_content = strip_tags(html_content)
+                    else:
+                        plain_content = (
+                            f"သင်တန်းအသစ်ထွက်ပါပြီ!\n\n"
+                            f"Title: {course.title}\n"
+                            f"{(course.description or '')[:200]}...\n\n"
+                            f"အသေးစိတ်ကြည့်ရန်: {course_url}\n\n"
+                            f"Newsletter မှ နုတ်ထွက်ရန်: {unsubscribe_oneclick}"
+                        )
+                        html_content = None
+
+                    if html_content:
+                        msg = EmailMultiAlternatives(
+                            subject, plain_content, from_email, [sub.email],
+                            connection=connection,
+                        )
+                        msg.attach_alternative(html_content, "text/html")
+                        msg.send(fail_silently=False)
+                    else:
+                        send_mail(
+                            subject, plain_content, from_email, [sub.email],
+                            connection=connection, fail_silently=False,
+                        )
+                    count += 1
+                except Exception as e:
+                    errors += 1
+                    logger.error("send_new_course_notification: failed for %s: %s", sub.email, e)
+                    traceback.print_exc()
+                    continue
+    except Exception as e:
+        logger.error("send_new_course_notification: SMTP connection failed: %s", e)
+        traceback.print_exc()
+
+    logger.info(
+        "send_new_course_notification done: sent=%d failed=%d total=%d course=%s",
+        count, errors, total_subs, course.title,
+    )
+    return count
+
 
 def signup(request):
     if request.user.is_authenticated:
@@ -123,19 +242,334 @@ def privacy_policy(request):
     return render(request, 'courses/privacy_policy.html')
 
 def newsletter_subscribe(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        if email:
-            if NewsletterSubscriber.objects.filter(email=email).exists():
-                messages.info(request, "ဤ Email သည် စာရင်းသွင်းပြီးသား ဖြစ်နေပါသည်။")
-            else:
-                NewsletterSubscriber.objects.create(email=email)
-                messages.success(request, "သတင်းလွှာအတွက် စာရင်းသွင်းမှု အောင်မြင်ပါသည်။ ကျေးဇူးတင်ပါသည်။")
+    if request.method != 'POST':
+        return redirect(request.META.get('HTTP_REFERER', 'course_list'))
+
+    form = NewsletterSubscribeForm(request.POST)
+    if not form.is_valid():
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(request, error)
+        return redirect(request.META.get('HTTP_REFERER', 'course_list'))
+
+    email = form.cleaned_data['email']
+    source = form.cleaned_data.get('source') or 'footer'
+
+    ip_address = _get_client_ip(request)
+    ua = (request.META.get('HTTP_USER_AGENT') or '')[:512]
+
+    if not _check_rate_limit(request, 'newsletter', ip_address, max_requests=5, window_seconds=3600):
+        messages.error(
+            request,
+            "အကြိမ်အကျော် လျှောထားပါပြီ။ ကျေးဇူးတင်ပါတယ်။ နာရီအနည်းငယ် အကြာမှာ ပြန်လည်ကြိုးစားပေးပါ။"
+        )
+        return redirect(request.META.get('HTTP_REFERER', 'course_list'))
+
+    from django.utils import timezone
+    now = timezone.now()
+
+    subscriber = NewsletterSubscriber.objects.filter(email__iexact=email).first()
+
+    if subscriber:
+        if subscriber.confirmed and subscriber.is_active:
+            messages.info(request, "ဤ Email သည် စာရင်းသွင်းပြီးသား ဖြစ်နေပါသည်။")
+        elif not subscriber.confirmed:
+            subscriber.generate_confirmation_token()
+            subscriber.ip_address = ip_address
+            subscriber.user_agent = ua
+            subscriber.source = source
+            subscriber.subscribed_at = now
+            subscriber.unsubscribed_at = None
+            subscriber.save(update_fields=[
+                'confirmation_token', 'ip_address', 'user_agent',
+                'source', 'subscribed_at', 'unsubscribed_at',
+            ])
+            _send_confirmation_email(subscriber, request)
+            messages.success(
+                request,
+                "Email အတည်ပြုလိပ်စာကို ပြန်လည်ပို့ပေးပြီးပါပြီ။ သင့် Email Inbox ကို စစ်ဆေးပေးပါ။"
+            )
         else:
-            messages.error(request, "Email လိပ်စာ ထည့်သွင်းပေးရန် လိုအပ်ပါသည်။")
-    
-    # Redirect back to the page the user was on
+            subscriber.is_active = True
+            subscriber.confirmed = True
+            subscriber.confirmed_at = now
+            subscriber.unsubscribed_at = None
+            subscriber.save(update_fields=[
+                'is_active', 'confirmed', 'confirmed_at', 'unsubscribed_at',
+            ])
+            messages.success(request, "သတင်းလွှာအတွက် စာရင်းသွင်းမှု အောင်မြင်ပါသည်။ ကျေးဇူးတင်ပါသည်။")
+    else:
+        subscriber = NewsletterSubscriber(email=email)
+        subscriber.generate_confirmation_token()
+        subscriber.ip_address = ip_address
+        subscriber.user_agent = ua
+        subscriber.source = source
+        subscriber.subscribed_at = now
+        subscriber.is_active = False
+        subscriber.confirmed = False
+        subscriber.save()
+        _send_confirmation_email(subscriber, request)
+        messages.success(
+            request,
+            "စာရင်းသွင်းမှု အောင်မြင်ပါသည်။ သင့် Email Inbox တွင် ပေးပို့ထားသော Link ကို နှိပ်ပြီး အတည်ပြုပေးပါ။"
+        )
+
     return redirect(request.META.get('HTTP_REFERER', 'course_list'))
+
+
+def newsletter_confirm(request, token):
+    from django.utils import timezone
+    now = timezone.now()
+
+    subscriber = get_object_or_404(NewsletterSubscriber, confirmation_token=token)
+
+    if subscriber.confirmed and subscriber.is_active:
+        messages.info(request, "Email သည် အရင်ကတည်းက အတည်ပြုပြီးသား ဖြစ်ပါတယ်။")
+        return render(request, 'courses/newsletter_status.html', {
+            'status': 'already_confirmed',
+            'subscriber': subscriber,
+            'title': 'Newsletter — အတည်ပြုမှု',
+        })
+
+    if subscriber.unsubscribed_at:
+        subscriber.unsubscribed_at = None
+
+    subscriber.confirmed = True
+    subscriber.is_active = True
+    subscriber.confirmed_at = now
+    subscriber.save(update_fields=[
+        'confirmed', 'is_active', 'confirmed_at', 'unsubscribed_at',
+    ])
+
+    messages.success(request, "Email အတည်ပြုမှု အောင်မြင်ပါသည်။ Newsletter ကို လက်ခံရရှိနိုင်ပါပြီ။ 🎉")
+
+    return render(request, 'courses/newsletter_status.html', {
+        'status': 'confirmed',
+        'subscriber': subscriber,
+        'title': 'Newsletter — အတည်ပြုမှု အောင်မြင်ပါသည်',
+    })
+
+
+def newsletter_unsubscribe(request, token):
+    from django.utils import timezone
+    subscriber = get_object_or_404(NewsletterSubscriber, confirmation_token=token)
+
+    if request.method == 'POST':
+        now = timezone.now()
+        subscriber.is_active = False
+        subscriber.confirmed = False
+        subscriber.unsubscribed_at = now
+        subscriber.save(update_fields=[
+            'is_active', 'confirmed', 'unsubscribed_at',
+        ])
+        messages.success(request, "Newsletter မှ အောင်မြင်စွာ နုတ်ထွက်ပြီးပါပြီ။")
+        return render(request, 'courses/newsletter_status.html', {
+            'status': 'unsubscribed',
+            'subscriber': subscriber,
+            'title': 'Unsubscribe — အောင်မြင်ပါသည်',
+        })
+
+    return render(request, 'courses/newsletter_confirm_unsubscribe.html', {
+        'subscriber': subscriber,
+        'token': token,
+        'title': 'Unsubscribe — အတည်ပြုရန်',
+    })
+
+
+def newsletter_unsubscribe_simple(request):
+    email = (request.GET.get('email') or '').strip().lower()
+    if not email:
+        messages.error(request, "Email လိပ်စာ ထည့်ပေးပါ")
+        return redirect('course_list')
+
+    subscriber = NewsletterSubscriber.objects.filter(email__iexact=email).first()
+    if not subscriber:
+        messages.info(request, "ဤ Email သည် စာရင်းသွင်းထားခြင်း မရှိပါ။")
+        return redirect('course_list')
+
+    from django.utils import timezone
+    subscriber.is_active = False
+    subscriber.confirmed = False
+    subscriber.unsubscribed_at = timezone.now()
+    subscriber.save(update_fields=['is_active', 'confirmed', 'unsubscribed_at'])
+    messages.success(request, f"{email} ကို Newsletter မှ အောင်မြင်စွာ နုတ်ထွက်ပြီးပါပြီ။")
+    return redirect('course_list')
+
+
+@login_required
+@user_passes_test(is_admin)
+def manage_newsletter(request):
+    subscribers = NewsletterSubscriber.objects.all().order_by('-subscribed_at')
+    stats = {
+        'total': subscribers.count(),
+        'active': subscribers.filter(is_active=True, confirmed=True).count(),
+        'pending': subscribers.filter(confirmed=False).count(),
+        'unsubscribed': subscribers.filter(unsubscribed_at__isnull=False).count(),
+    }
+    return render(request, 'courses/management/manage_newsletter.html', {
+        'subscribers': subscribers,
+        'stats': stats,
+        'title': 'Manage Newsletter Subscribers',
+    })
+
+
+@login_required
+@user_passes_test(is_admin)
+def newsletter_toggle_active(request, pk):
+    sub = get_object_or_404(NewsletterSubscriber, pk=pk)
+    sub.is_active = not sub.is_active
+    if sub.is_active and not sub.confirmed:
+        from django.utils import timezone
+        sub.confirmed = True
+        sub.confirmed_at = timezone.now()
+        update_fields = ['is_active', 'confirmed', 'confirmed_at']
+    else:
+        update_fields = ['is_active']
+    sub.save(update_fields=update_fields)
+    status = "activated" if sub.is_active else "deactivated"
+    messages.success(request, f"{sub.email} ကို {status} လုပ်ပြီးပါပြီ")
+    return redirect('manage_newsletter')
+
+
+@login_required
+@user_passes_test(is_admin)
+def newsletter_delete(request, pk):
+    sub = get_object_or_404(NewsletterSubscriber, pk=pk)
+    if request.method == 'POST':
+        email = sub.email
+        sub.delete()
+        messages.success(request, f"{email} ကို ဖျက်သိမ်းပြီးပါပြီ")
+        return redirect('manage_newsletter')
+    return render(request, 'courses/confirm_delete.html', {
+        'item': sub,
+        'type': f'Newsletter Subscriber ({sub.email})',
+    })
+
+
+def _get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0].strip()
+    else:
+        ip = request.META.get('REMOTE_ADDR', '')
+    return ip or None
+
+
+def _check_rate_limit(request, namespace, identifier, max_requests=5, window_seconds=3600):
+    if not identifier:
+        return True
+    from django.core.cache import caches
+    import time
+    try:
+        cache = caches['default']
+    except Exception:
+        cache = None
+    if cache is None:
+        return True
+    key = f"{namespace}:{identifier}"
+    history = cache.get(key, []) or []
+    now = time.time()
+    cutoff = now - window_seconds
+    history = [t for t in history if t > cutoff]
+    if len(history) >= max_requests:
+        return False
+    history.append(now)
+    cache.set(key, history, window_seconds)
+    return True
+
+
+def _send_confirmation_email(subscriber, request):
+    try:
+        if request is not None and hasattr(request, 'scheme'):
+            protocol = request.scheme
+        else:
+            protocol = getattr(settings, 'ACCOUNT_DEFAULT_HTTP_PROTOCOL', 'http')
+
+        if request is not None and hasattr(request, 'get_host'):
+            host = request.get_host()
+        elif settings.ALLOWED_HOSTS:
+            host = settings.ALLOWED_HOSTS[0]
+        else:
+            host = 'localhost:8000'
+
+        try:
+            confirm_path = reverse('newsletter_confirm', kwargs={'token': subscriber.confirmation_token})
+        except Exception as e:
+            logger.error("_send_confirmation_email: reverse confirm failed token=%s err=%s", subscriber.confirmation_token, e)
+            confirm_path = f"/newsletter/confirm/{subscriber.confirmation_token}/"
+        try:
+            unsub_path = reverse('newsletter_unsubscribe', kwargs={'token': subscriber.confirmation_token})
+        except Exception as e:
+            logger.error("_send_confirmation_email: reverse unsub failed token=%s err=%s", subscriber.confirmation_token, e)
+            unsub_path = f"/newsletter/unsubscribe/{subscriber.confirmation_token}/"
+
+        confirm_url = f"{protocol}://{host}{confirm_path}"
+        unsubscribe_url = f"{protocol}://{host}{unsub_path}"
+
+        subject = "Arakkha Tech Newsletter — အီးမေးလ် အတည်ပြုရန် ✉️"
+        from_email = settings.DEFAULT_FROM_EMAIL or 'arakkhatech@gmail.com'
+
+        year = timezone.now().year
+        context = {
+            'subscriber': subscriber,
+            'confirm_url': confirm_url,
+            'unsubscribe_url': unsubscribe_url,
+            'year': year,
+        }
+
+        html_content = None
+        try:
+            html_content = render_to_string('emails/newsletter_confirm.html', context)
+            plain_content = strip_tags(html_content)
+        except Exception as e:
+            logger.warning("_send_confirmation_email: template failed: %s", e)
+            traceback.print_exc()
+            plain_content = (
+                f"မင်္ဂလာပါ,\n\n"
+                f"Arakkha Tech Newsletter ကို စာရင်းသွင်းမှုအတွက် ကျေးဇူးတင်ပါတယ်။\n"
+                f"အောက်ပါ Link ကို နှိပ်ပြီး သင့် Email ကို အတည်ပြုပေးပါ:\n\n"
+                f"{confirm_url}\n\n"
+                f"အကယ်၍ မလိုအပ်ပါက အောက်ပါ Link ဖြင့် နုတ်ထွက်နိုင်ပါတယ်:\n"
+                f"{unsubscribe_url}\n\n"
+                f"ကျေးဇူးတင်ပါတယ်,\nArakkha Tech Team"
+            )
+            html_content = None
+
+        logger.info(
+            "_send_confirmation_email: sending to=%s from=%s host=%s port=%s user=%s",
+            subscriber.email, from_email,
+            getattr(settings, 'EMAIL_HOST', '?'),
+            getattr(settings, 'EMAIL_PORT', '?'),
+            getattr(settings, 'EMAIL_HOST_USER', '') or '(empty)',
+        )
+
+        with get_connection(
+            host=settings.EMAIL_HOST,
+            port=settings.EMAIL_PORT,
+            username=settings.EMAIL_HOST_USER,
+            password=settings.EMAIL_HOST_PASSWORD,
+            use_tls=settings.EMAIL_USE_TLS,
+            timeout=30,
+        ) as connection:
+            if html_content:
+                msg = EmailMultiAlternatives(
+                    subject, plain_content, from_email, [subscriber.email],
+                    connection=connection,
+                )
+                msg.attach_alternative(html_content, "text/html")
+                sent = msg.send(fail_silently=False)
+                logger.info("_send_confirmation_email: HTML sent to=%s result=%s", subscriber.email, sent)
+            else:
+                sent = send_mail(
+                    subject, plain_content, from_email, [subscriber.email],
+                    connection=connection, fail_silently=False,
+                )
+                logger.info("_send_confirmation_email: plain sent to=%s result=%s", subscriber.email, sent)
+            return bool(sent)
+    except Exception as e:
+        logger.error("_send_confirmation_email: FATAL to=%s err=%s", subscriber.email, e)
+        traceback.print_exc()
+        return False
 
 @login_required
 def edit_profile(request):
@@ -293,7 +727,15 @@ def add_course(request):
         if form.is_valid():
             try:
                 course = form.save()
-                messages.success(request, "သင်တန်းအသစ်ကို အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ")
+                # Send notification email to all newsletter subscribers
+                try:
+                    email_count = send_new_course_notification(course)
+                    if email_count > 0:
+                        messages.success(request, f"သင်တန်းအသစ်ကို အောင်မြင်စွာ ထည့်သွင်းပြီး Newsletter Subscribers ({email_count}) ယောက်ထံ အီးမေးလ်ပို့ပြီးပါပြီ")
+                    else:
+                        messages.success(request, "သင်တန်းအသစ်ကို အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ")
+                except Exception:
+                    messages.success(request, "သင်တန်းအသစ်ကို အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ")
                 return redirect('manage_courses')
             except Exception as e:
                 messages.error(request, f"သင်တန်းသိမ်းဆည်းရာတွင် အမှားတစ်ခုဖြစ်ပွားခဲ့ပါသည် - {str(e)}")

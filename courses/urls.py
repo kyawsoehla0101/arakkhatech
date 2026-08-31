@@ -78,4 +78,10 @@ urlpatterns = [
     path('contact/', views.contact_us, name='contact'),
     path('privacy/', views.privacy_policy, name='privacy'),
     path('newsletter/subscribe/', views.newsletter_subscribe, name='newsletter_subscribe'),
+    path('newsletter/confirm/<str:token>/', views.newsletter_confirm, name='newsletter_confirm'),
+    path('newsletter/unsubscribe/<str:token>/', views.newsletter_unsubscribe, name='newsletter_unsubscribe'),
+    path('newsletter/unsubscribe/', views.newsletter_unsubscribe_simple, name='newsletter_unsubscribe_simple'),
+    path('manage/newsletter/', views.manage_newsletter, name='manage_newsletter'),
+    path('manage/newsletter/<int:pk>/toggle-active/', views.newsletter_toggle_active, name='newsletter_toggle_active'),
+    path('manage/newsletter/<int:pk>/delete/', views.newsletter_delete, name='newsletter_delete'),
 ]

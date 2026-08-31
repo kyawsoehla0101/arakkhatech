@@ -267,9 +267,33 @@ if _allauth_signed_up is not None:
             profile.save(update_fields=['role'])
 
 class NewsletterSubscriber(models.Model):
-    email = models.EmailField(unique=True)
-    subscribed_at = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(default=True)
+    email = models.EmailField(unique=True, max_length=255)
+    subscribed_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    is_active = models.BooleanField(default=False, db_index=True)
+    confirmed = models.BooleanField(default=False, db_index=True)
+    confirmed_at = models.DateTimeField(null=True, blank=True)
+    unsubscribed_at = models.DateTimeField(null=True, blank=True)
+    confirmation_token = models.CharField(max_length=64, unique=True, null=True, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.CharField(max_length=512, blank=True, default='')
+    source = models.CharField(max_length=50, default='footer', choices=[
+        ('footer', 'Footer Form'),
+        ('cta', 'CTA Section'),
+        ('manual', 'Manual Entry'),
+        ('other', 'Other'),
+    ])
+
+    class Meta:
+        ordering = ['-subscribed_at']
+        verbose_name = 'Newsletter Subscriber'
+        verbose_name_plural = 'Newsletter Subscribers'
 
     def __str__(self):
         return self.email
+
+    def generate_confirmation_token(self):
+        import secrets
+        import hashlib
+        raw = secrets.token_urlsafe(32)
+        self.confirmation_token = hashlib.sha256(raw.encode()).hexdigest()
+        return self.confirmation_token

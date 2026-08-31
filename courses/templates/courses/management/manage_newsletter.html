@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block title %}Newsletter Subscribers — Admin{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[#fcfcfd] flex flex-col lg:flex-row">
+    {% include 'courses/admin_sidebar_snippet.html' %}
+
+    <main class="flex-grow p-6 lg:p-12">
+        {% include 'courses/admin_topbar_snippet.html' with title="Newsletter Subscribers" subtitle=stats.total|add:" subscribers total • "|add:stats.active|add:" active" %}
+
+        <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-6 md:p-8 mb-10" data-aos="fade-down">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="p-6 rounded-2xl border border-indigo-100 bg-indigo-50/50">
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="text-xs font-black uppercase tracking-widest text-slate-400">Total</p>
+                        <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                            <i class="fas fa-envelope text-indigo-500"></i>
+                        </div>
+                    </div>
+                    <p class="text-3xl font-black text-slate-900">{{ stats.total }}</p>
+                </div>
+                <div class="p-6 rounded-2xl border border-emerald-100 bg-emerald-50/50">
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="text-xs font-black uppercase tracking-widest text-slate-400">Active</p>
+                        <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                            <i class="fas fa-check-circle text-emerald-500"></i>
+                        </div>
+                    </div>
+                    <p class="text-3xl font-black text-emerald-600">{{ stats.active }}</p>
+                </div>
+                <div class="p-6 rounded-2xl border border-amber-100 bg-amber-50/50">
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="text-xs font-black uppercase tracking-widest text-slate-400">Pending Confirm</p>
+                        <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                            <i class="fas fa-clock text-amber-500"></i>
+                        </div>
+                    </div>
+                    <p class="text-3xl font-black text-amber-600">{{ stats.pending }}</p>
+                </div>
+                <div class="p-6 rounded-2xl border border-rose-100 bg-rose-50/50">
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="text-xs font-black uppercase tracking-widest text-slate-400">Unsubscribed</p>
+                        <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                            <i class="fas fa-user-minus text-rose-500"></i>
+                        </div>
+                    </div>
+                    <p class="text-3xl font-black text-rose-600">{{ stats.unsubscribed }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden" data-aos="fade-up">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-slate-50 border-b border-slate-100">
+                        <tr>
+                            <th class="text-left px-6 lg:px-8 py-5 text-[11px] font-black uppercase tracking-widest text-slate-400">Email</th>
+                            <th class="text-left px-6 lg:px-8 py-5 text-[11px] font-black uppercase tracking-widest text-slate-400 hidden md:table-cell">Source</th>
+                            <th class="text-left px-6 lg:px-8 py-5 text-[11px] font-black uppercase tracking-widest text-slate-400 hidden lg:table-cell">IP Address</th>
+                            <th class="text-left px-6 lg:px-8 py-5 text-[11px] font-black uppercase tracking-widest text-slate-400 hidden md:table-cell">Status</th>
+                            <th class="text-left px-6 lg:px-8 py-5 text-[11px] font-black uppercase tracking-widest text-slate-400 hidden md:table-cell">Subscribed</th>
+                            <th class="text-right px-6 lg:px-8 py-5 text-[11px] font-black uppercase tracking-widest text-slate-400">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        {% for sub in subscribers %}
+                            <tr class="group hover:bg-slate-50/70 transition-colors">
+                                <td class="px-6 lg:px-8 py-5 align-top">
+                                    <div class="flex items-start gap-4">
+                                        <div class="w-11 h-11 rounded-2xl {% if sub.is_active and sub.confirmed %}bg-emerald-100 text-emerald-600{% elif sub.unsubscribed_at %}bg-rose-100 text-rose-600{% else %}bg-amber-100 text-amber-600{% endif %} flex items-center justify-center font-black shadow-sm flex-shrink-0">
+                                            <i class="fas fa-envelope text-sm"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="font-black text-slate-800 truncate">{{ sub.email }}</p>
+                                            {% if sub.subscribed_at %}
+                                                <p class="text-[11px] text-slate-400 font-bold mt-0.5 md:hidden">
+                                                    {{ sub.subscribed_at|date:"M d, Y" }}
+                                                </p>
+                                            {% endif %}
+                                            <div class="flex gap-1.5 mt-2 md:hidden">
+                                                {% if sub.is_active and sub.confirmed %}
+                                                    <span class="inline-flex items-center rounded-lg px-2 py-1 text-[9px] font-black bg-emerald-50 text-emerald-700">Active</span>
+                                                {% elif sub.unsubscribed_at %}
+                                                    <span class="inline-flex items-center rounded-lg px-2 py-1 text-[9px] font-black bg-rose-50 text-rose-700">Unsubscribed</span>
+                                                {% else %}
+                                                    <span class="inline-flex items-center rounded-lg px-2 py-1 text-[9px] font-black bg-amber-50 text-amber-700">Pending</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 lg:px-8 py-5 align-top hidden md:table-cell">
+                                    <span class="inline-flex items-center rounded-xl px-3 py-1.5 text-[11px] font-black
+                                        {% if sub.source == 'footer' %}bg-indigo-50 text-indigo-700
+                                        {% elif sub.source == 'cta' %}bg-fuchsia-50 text-fuchsia-700
+                                        {% elif sub.source == 'manual' %}bg-slate-50 text-slate-700
+                                        {% else %}bg-slate-50 text-slate-600{% endif %}">
+                                        {{ sub.get_source_display }}
+                                    </span>
+                                </td>
+                                <td class="px-6 lg:px-8 py-5 align-top hidden lg:table-cell">
+                                    {% if sub.ip_address %}
+                                        <code class="text-[11px] font-bold text-slate-500 bg-slate-50 px-2 py-1 rounded-lg">{{ sub.ip_address }}</code>
+                                    {% else %}
+                                        <span class="text-[11px] text-slate-300 font-bold">—</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 lg:px-8 py-5 align-top hidden md:table-cell">
+                                    <div class="flex flex-col gap-2">
+                                        {% if sub.confirmed %}
+                                            <span class="inline-flex items-center rounded-xl px-3 py-1 text-[10px] font-black bg-emerald-50 text-emerald-700">
+                                                <i class="fas fa-check mr-1"></i> Confirmed
+                                            </span>
+                                        {% else %}
+                                            <span class="inline-flex items-center rounded-xl px-3 py-1 text-[10px] font-black bg-amber-50 text-amber-700">
+                                                <i class="fas fa-question mr-1"></i> Unconfirmed
+                                            </span>
+                                        {% endif %}
+                                        <span class="inline-flex items-center rounded-xl px-3 py-1 text-[10px] font-black
+                                            {% if sub.is_active %}bg-emerald-50 text-emerald-700{% else %}bg-slate-100 text-slate-500{% endif %}">
+                                            <i class="fas fa-toggle-{% if sub.is_active %}on text-emerald-600{% else %}off text-slate-400{% endif %} mr-1"></i>
+                                            {{ sub.is_active|yesno:"Active,Inactive" }}
+                                        </span>
+                                        {% if sub.unsubscribed_at %}
+                                            <span class="inline-flex items-center rounded-xl px-3 py-1 text-[10px] font-black bg-rose-50 text-rose-700">
+                                                <i class="fas fa-times mr-1"></i> Unsubscribed
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-6 lg:px-8 py-5 align-top hidden md:table-cell">
+                                    {% if sub.subscribed_at %}
+                                        <p class="text-[11px] font-bold text-slate-500">{{ sub.subscribed_at|date:"M d, Y H:i" }}</p>
+                                        <p class="text-[10px] font-bold text-slate-300">{{ sub.subscribed_at|timesince }} ago</p>
+                                    {% else %}
+                                        <span class="text-[11px] text-slate-300 font-bold">—</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 lg:px-8 py-5 align-top text-right">
+                                    <div class="flex justify-end gap-2 flex-wrap">
+                                        <form method="post" action="{% url 'newsletter_toggle_active' sub.pk %}" class="inline-block">
+                                            {% csrf_token %}
+                                            <button class="inline-flex items-center px-3.5 py-2 rounded-xl text-[11px] font-black
+                                                {% if sub.is_active %}bg-amber-50 text-amber-700 hover:bg-amber-100{% else %}bg-emerald-50 text-emerald-700 hover:bg-emerald-100{% endif %} transition-colors">
+                                                <i class="fas fa-power-off mr-1.5"></i>
+                                                {% if sub.is_active %}Deactivate{% else %}Activate{% endif %}
+                                            </button>
+                                        </form>
+                                        <form method="post" action="{% url 'newsletter_delete' sub.pk %}" class="inline-block"
+                                              onsubmit="return confirm('{{ sub.email }} ကို ဖျက်မှာသေချာပါသလား?');">
+                                            {% csrf_token %}
+                                            <button class="inline-flex items-center px-3.5 py-2 rounded-xl text-[11px] font-black bg-rose-50 text-rose-700 hover:bg-rose-100 transition-colors">
+                                                <i class="fas fa-trash mr-1.5"></i> Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="px-8 py-20 text-center">
+                                    <div class="w-20 h-20 mx-auto mb-6 rounded-3xl bg-slate-50 flex items-center justify-center">
+                                        <i class="fas fa-inbox text-slate-300 text-3xl"></i>
+                                    </div>
+                                    <h3 class="text-xl font-black text-slate-700 mb-2">မတွေ့ရှိပါ</h3>
+                                    <p class="text-sm text-slate-400 font-medium">Newsletter subscribers မရှိသေးပါ။</p>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
+{% endblock %}

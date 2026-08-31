@@ -438,3 +438,44 @@ class ContactForm(forms.ModelForm):
             raise forms.ValidationError("မက်ဆေ့ဂျ် 5000 စာလုံးထက် မပိုရပါ။")
         return message
 
+
+class NewsletterSubscribeForm(forms.Form):
+    email = forms.EmailField(
+        max_length=255,
+        widget=forms.EmailInput(attrs={
+            'class': 'w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500 transition-all',
+            'placeholder': 'သင်၏ Email Address ထည့်ပါ',
+        })
+    )
+
+    honeypot = forms.CharField(
+        required=False,
+        label='Leave this empty',
+        help_text='ထိုနေရာကို ချန်ထားပါ (Spam စစ်ဆေးရန်အတွက်ဖြစ်ပါသည်)',
+        widget=forms.TextInput(attrs={
+            'tabindex': '-1',
+            'autocomplete': 'off',
+            'class': 'hidden',
+            'style': 'position:absolute;left:-9999px;top:auto;height:0;width:0;overflow:hidden;',
+        })
+    )
+
+    source = forms.CharField(
+        required=False,
+        initial='footer',
+        widget=forms.HiddenInput(),
+    )
+
+    def clean_honeypot(self):
+        if self.cleaned_data.get('honeypot'):
+            raise forms.ValidationError("Spam စစ်ဆေးမှု အတည်မပြုခဲ့ပါ။")
+        return ''
+
+    def clean_email(self):
+        email = (self.cleaned_data.get('email') or '').strip().lower()
+        if not email:
+            raise forms.ValidationError("Email လိပ်စာကို ထည့်ပေးပါ။")
+        if len(email) > 255:
+            raise forms.ValidationError("Email လိပ်စာ အလွန်ရှည်လွန်းပါတယ်။")
+        return email
+

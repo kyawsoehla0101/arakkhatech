@@ -1208,32 +1208,32 @@ def course_list(request):
             'raw_value': active_students,
             'label': 'Active Students',
             'icon': 'fas fa-user-graduate',
-            'accent': 'from-indigo-500/10 to-sky-500/10',
-            'icon_bg': 'bg-indigo-100 text-indigo-600',
+            'accent': 'from-brand-500/10 to-brand-400/10',
+            'icon_bg': 'bg-brand-100 text-brand-600',
         },
         {
             'number': _fmt_count(total_courses),
             'raw_value': total_courses,
             'label': 'Total Courses',
             'icon': 'fas fa-book-open',
-            'accent': 'from-fuchsia-500/10 to-rose-500/10',
-            'icon_bg': 'bg-fuchsia-100 text-fuchsia-600',
+            'accent': 'from-brand2-500/10 to-brand2-400/10',
+            'icon_bg': 'bg-brand2-100 text-brand2-600',
         },
         {
             'number': _fmt_count(total_instructors),
             'raw_value': total_instructors,
             'label': 'Expert Instructors',
             'icon': 'fas fa-chalkboard-teacher',
-            'accent': 'from-emerald-500/10 to-teal-500/10',
-            'icon_bg': 'bg-emerald-100 text-emerald-600',
+            'accent': 'from-brand-400/10 to-brand2-500/10',
+            'icon_bg': 'bg-brand-50 text-brand-700',
         },
         {
             'number': f"{satisfaction_pct}%",
             'raw_value': satisfaction_pct,
             'label': 'Satisfaction Rate',
             'icon': 'fas fa-face-smile',
-            'accent': 'from-amber-500/10 to-orange-500/10',
-            'icon_bg': 'bg-amber-100 text-amber-600',
+            'accent': 'from-amber-400/10 to-amber-300/10',
+            'icon_bg': 'bg-amber-50 text-amber-600',
         },
     ]
 
@@ -1339,9 +1339,9 @@ def courses_page(request):
     ]
 
     hero_stats = [
-        {'number': f'{total_courses}+',  'label': 'Courses Available', 'icon': 'fas fa-book-open',  'accent': 'indigo'},
-        {'number': f'{total_lessons}+',  'label': 'Total Lessons',     'icon': 'fas fa-layer-group', 'accent': 'fuchsia'},
-        {'number': f'{total_students}+', 'label': 'Students Enrolled', 'icon': 'fas fa-users',       'accent': 'emerald'},
+        {'number': f'{total_courses}+',  'label': 'Courses Available', 'icon': 'fas fa-book-open',  'accent': 'brand'},
+        {'number': f'{total_lessons}+',  'label': 'Total Lessons',     'icon': 'fas fa-layer-group', 'accent': 'brand2'},
+        {'number': f'{total_students}+', 'label': 'Students Enrolled', 'icon': 'fas fa-users',       'accent': 'brand'},
         {'number': f'{total_instructors}+','label': 'Expert Instructors','icon':'fas fa-user-graduate','accent':'amber'},
     ]
 

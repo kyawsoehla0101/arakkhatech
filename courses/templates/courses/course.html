@@ -7,17 +7,17 @@
 <section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white pt-28 pb-32">
     <div class="pointer-events-none absolute inset-0 custom-gradient opacity-25"></div>
     <div class="pointer-events-none absolute -top-20 -left-20 h-96 w-96 rounded-full bg-indigo-500/20 blur-3xl"></div>
-    <div class="pointer-events-none absolute -bottom-20 -right-20 h-96 w-96 rounded-full bg-fuchsia-500/20 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-20 -right-20 h-96 w-96 rounded-full bg-brand2-500/20 blur-3xl"></div>
 
     <div class="relative container mx-auto px-6 text-center">
         <span class="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur border border-white/10 text-xs font-black uppercase tracking-widest text-indigo-200 px-5 py-2 mb-7">
             <i class="fas fa-fire text-amber-400"></i> 2026 Cohorts · 100% Arakkha Language
         </span>
         <h1 class="text-4xl md:text-6xl xl:text-7xl font-black leading-tight max-w-5xl mx-auto mb-8">
-            <span class="bg-gradient-to-r from-indigo-300 via-fuchsia-300 to-emerald-300 bg-clip-text text-transparent">
+            <span class="text-gradient-dark">
                 Professional သင်တန်းများ
             </span><br>
-            နန့်အတူ Career ကို စတင်ပါ
+            နန့်အတူ Career ကို စတင်ပါ
         </h1>
         <p class="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed mb-12">
             Industry မှ Senior Instructor များ၏ လက်တွိအခြီပြု သင်တန်းတိကို ဗွီဒီယိုသီးသန့်
@@ -130,7 +130,7 @@
                             {% if c.thumbnail %}
                                 <img src="{{ c.thumbnail.url }}" alt="{{ c.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
                             {% else %}
-                                <div class="w-full h-full bg-gradient-to-br from-indigo-500 via-fuchsia-500 to-emerald-500 flex items-center justify-center">
+                                <div class="w-full h-full custom-gradient flex items-center justify-center">
                                     <i class="fas fa-book text-white text-6xl opacity-20"></i>
                                 </div>
                             {% endif %}
@@ -164,7 +164,7 @@
                             </p>
                             <div class="flex items-center justify-between pt-5 border-t border-slate-100">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-fuchsia-600 flex items-center justify-center text-white text-sm font-black">
+                                    <div class="w-10 h-10 rounded-xl custom-gradient flex items-center justify-center text-white text-sm font-black">
                                         {{ c.instructor.username|slice:":1"|upper }}
                                     </div>
                                     <div class="text-xs text-slate-500 font-bold">
@@ -218,7 +218,7 @@
                         {{ t.text }}
                     </p>
                     <div class="flex items-center gap-4 pt-5 border-t border-slate-200">
-                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-fuchsia-600 flex items-center justify-center text-white text-sm font-black">
+                        <div class="w-12 h-12 rounded-2xl custom-gradient flex items-center justify-center text-white text-sm font-black">
                             {{ t.name|slice:":1" }}
                         </div>
                         <div>
@@ -233,7 +233,7 @@
 </section>
 
 <!-- ====================== FINAL CTA ====================== -->
-<section class="relative overflow-hidden py-24 bg-gradient-to-br from-indigo-600 via-fuchsia-600 to-indigo-700 text-white">
+<section class="relative overflow-hidden py-24 custom-gradient text-white">
     <div class="pointer-events-none absolute -top-10 right-0 h-80 w-80 rounded-full bg-white/10 blur-3xl"></div>
     <div class="pointer-events-none absolute -bottom-10 left-0 h-80 w-80 rounded-full bg-black/10 blur-3xl"></div>
     <div class="relative container mx-auto px-6 text-center">

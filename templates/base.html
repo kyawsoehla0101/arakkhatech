@@ -259,16 +259,16 @@
         <div class="container mx-auto px-6 flex justify-between items-center">
             <a href="{% url 'course_list' %}" class="flex items-center space-x-3">
                 <img src="{% static 'img/arkkhatech.png' %}" alt="Arakkha Tech" class="w-16 h-auto">
-                <span class="text-2xl font-extrabold tracking-tight text-slate-800">အာရက္ခ<span class="text-indigo-600">နည်းပညာ</span></span>
+                <span class="text-2xl font-extrabold tracking-tight text-slate-800">အာရက္ခ<span class="text-blue-600">နည်းပညာ</span></span>
             </a>
             
             <div class="hidden lg:flex items-center space-x-10">
-                <a href="{% url 'courses_page' %}" class="nav-link font-bold text-slate-600 hover:text-indigo-600 {% if active_nav == 'courses' %}nav-active{% endif %}">သင်တန်းများ</a>
-                <a href="{% url 'instructors_list' %}" class="nav-link font-bold text-slate-600 hover:text-indigo-600 flex items-center {% if active_nav == 'instructors' %}nav-active{% endif %}">
+                <a href="{% url 'courses_page' %}" class="nav-link font-bold text-slate-600 hover:text-blue-600 {% if active_nav == 'courses' %}nav-active{% endif %}">သင်တန်းများ</a>
+                <a href="{% url 'instructors_list' %}" class="nav-link font-bold text-slate-600 hover:text-blue-600 flex items-center {% if active_nav == 'instructors' %}nav-active{% endif %}">
                     <!-- <i class="fas fa-chalkboard-user mr-1.5"></i>  -->
                     သင်တန်းဆရာများ
                 </a>
-                <a href="{% url 'docs_list' %}" class="nav-link font-bold text-slate-600 hover:text-indigo-600 {% if active_nav == 'docs' or active_sub == 'books' %}nav-active{% endif %}">စာအုပ်စင်</a>
+                <a href="{% url 'docs_list' %}" class="nav-link font-bold text-slate-600 hover:text-blue-600 {% if active_nav == 'docs' or active_sub == 'books' %}nav-active{% endif %}">စာအုပ်စင်</a>
                 {% if user.is_authenticated and is_instructor_user and not is_admin_user %}
                     <a href="{% url 'manage_courses' %}" class="nav-link font-bold text-emerald-600 hover:text-emerald-700 flex items-center {% if active_sub == 'courses' %}nav-active{% endif %}" style="{% if active_sub == 'courses' %}--primary:#10b981;--secondary:#059669;{% endif %}">
                         <i class="fas fa-chalkboard-teacher mr-1.5"></i>သင်တန်းစီမံရန်
@@ -283,7 +283,7 @@
                         <!-- Public Notifications (Students / Instructors only) -->
                         {% if not is_admin_user %}
                         <div class="relative group/notifications">
-                            <button class="w-10 h-10 rounded-xl hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 transition-all relative">
+                            <button class="w-10 h-10 rounded-xl hover:bg-blue-50 text-slate-400 hover:text-blue-600 transition-all relative">
                                 <i class="fas fa-bell"></i>
                                 {% if unread_notifications_count > 0 %}
                                     <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
@@ -295,14 +295,14 @@
                                     <h3 class="font-black text-slate-800 text-sm">Notifications</h3>
                                     <div class="flex items-center space-x-3">
                                         {% if unread_notifications_count > 0 %}
-                                        <button onclick="markAllRead(event)" class="text-[9px] font-black text-indigo-600 uppercase hover:underline">Mark all read</button>
+                                        <button onclick="markAllRead(event)" class="text-[9px] font-black text-blue-600 uppercase hover:underline">Mark all read</button>
                                         {% endif %}
-                                        <span class="bg-indigo-50 text-indigo-600 text-[10px] font-black px-2 py-1 rounded-lg unread-badge">{{ unread_notifications_count }} New</span>
+                                        <span class="bg-blue-50 text-blue-600 text-[10px] font-black px-2 py-1 rounded-lg unread-badge">{{ unread_notifications_count }} New</span>
                                     </div>
                                 </div>
                                 <div class="max-h-96 overflow-y-auto custom-scrollbar notification-list">
                                     {% for notification in latest_notifications %}
-                                        <div class="px-6 py-4 hover:bg-slate-50 transition-all border-b border-slate-50 last:border-0 {% if not notification.is_read %}bg-indigo-50/10{% endif %}">
+                                        <div class="px-6 py-4 hover:bg-slate-50 transition-all border-b border-slate-50 last:border-0 {% if not notification.is_read %}bg-blue-50/10{% endif %}">
                                             <p class="text-xs font-black text-slate-800 mb-1">{{ notification.title }}</p>
                                             <p class="text-[10px] text-slate-500 font-medium leading-relaxed mb-2">{{ notification.message|truncatechars:100 }}</p>
                                             <p class="text-[9px] font-bold text-slate-300 uppercase">{{ notification.created_at|timesince }} ago</p>
@@ -314,13 +314,13 @@
                                         </div>
                                     {% endfor %}
                                 </div>
-                                <a href="{% url 'all_notifications' %}" class="block text-center mt-4 text-[10px] font-black text-indigo-600 uppercase tracking-widest hover:underline">View All</a>
+                                <a href="{% url 'all_notifications' %}" class="block text-center mt-4 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">View All</a>
                             </div>
                         </div>
                         {% endif %}
 
                         {% if is_admin_user %}
-                            <a href="{% url 'admin_dashboard' %}" class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold btn-hover shadow-lg shadow-indigo-100">
+                            <a href="{% url 'admin_dashboard' %}" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold btn-hover shadow-lg shadow-blue-100">
                                 <i class="fas fa-cog mr-2"></i>Admin Panel
                             </a>
                         {% endif %}
@@ -330,7 +330,7 @@
                         <!--   (Dashboard + ကျွန်ုပ်၏သင်တန်းများ  အပါအဝင်  ထည့်သွင်းထားသည်) -->
                         <!-- ============================================================ -->
                         <div class="flex items-center space-x-3 group cursor-pointer relative group/profile">
-                            <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold group-hover:bg-indigo-600 group-hover:text-white transition-all overflow-hidden custom-gradient shadow-md shadow-indigo-100">
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 font-bold group-hover:bg-blue-600 group-hover:text-white transition-all overflow-hidden custom-gradient shadow-md shadow-blue-100">
                                 {% if user.profile.avatar %}
                                     <img src="{{ user.profile.avatar.url }}" class="w-full h-full object-cover">
                                 {% else %}
@@ -344,7 +344,7 @@
                                     {{ user.username }}
                                 {% endif %}
                             </span>
-                            <i class="fas fa-chevron-down text-[10px] text-slate-400 group-hover:text-indigo-600 transition-colors"></i>
+                            <i class="fas fa-chevron-down text-[10px] text-slate-400 group-hover:text-blue-600 transition-colors"></i>
 
                             <!-- Unified Profile Dropdown -->
                             <div class="absolute right-0 top-full mt-3 w-64 bg-white rounded-[1.75rem] shadow-2xl border border-slate-100 py-3 invisible group-hover/profile:visible opacity-0 group-hover/profile:opacity-100 transition-all transform origin-top-right scale-95 group-hover/profile:scale-100 z-[100]">
@@ -378,8 +378,8 @@
                                 <!-- ──── Student/Non-admin core links: Dashboard + My Courses ──── -->
                                 {% if not is_admin_user %}
                                     <div class="px-2 pb-2 mb-2 border-b border-slate-100">
-                                        <a href="{% url 'student_dashboard' %}#dashboard" class="flex items-center gap-3 px-3 py-3 rounded-2xl hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 transition-all {% if active_drop == 'dashboard' %}drop-active{% endif %}">
-                                            <span class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm">
+                                        <a href="{% url 'student_dashboard' %}#dashboard" class="flex items-center gap-3 px-3 py-3 rounded-2xl hover:bg-blue-50 text-slate-700 hover:text-blue-600 transition-all {% if active_drop == 'dashboard' %}drop-active{% endif %}">
+                                            <span class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm">
                                                 <i class="fas fa-th-large"></i>
                                             </span>
                                             <div>
@@ -424,8 +424,8 @@
                                             </div>
                                             <i class="fas fa-chevron-right ml-auto text-[10px] text-slate-300"></i>
                                         </a>
-                                        <a href="{% url 'manage_enrollments' %}" class="flex items-center gap-3 px-3 py-3 rounded-2xl hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 transition-all {% if active_drop == 'manage_enrollments' %}drop-active{% endif %}">
-                                            <span class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm">
+                                        <a href="{% url 'manage_enrollments' %}" class="flex items-center gap-3 px-3 py-3 rounded-2xl hover:bg-blue-50 text-slate-700 hover:text-blue-600 transition-all {% if active_drop == 'manage_enrollments' %}drop-active{% endif %}">
+                                            <span class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm">
                                                 <i class="fas fa-user-graduate"></i>
                                             </span>
                                             <div>
@@ -439,11 +439,11 @@
 
                                 <!-- Account links -->
                                 <div class="px-2 pb-2">
-                                    <a href="{% url 'edit_profile' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-indigo-600 transition-all {% if active_drop == 'profile' %}drop-active{% endif %}">
+                                    <a href="{% url 'edit_profile' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 transition-all {% if active_drop == 'profile' %}drop-active{% endif %}">
                                         <i class="fas fa-user-edit text-sm text-slate-400 w-5 text-center"></i>
                                         <span class="text-sm font-bold">Edit Profile</span>
                                     </a>
-                                    <a href="{% url 'change_password' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-indigo-600 transition-all {% if active_drop == 'password' %}drop-active{% endif %}">
+                                    <a href="{% url 'change_password' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-blue-600 transition-all {% if active_drop == 'password' %}drop-active{% endif %}">
                                         <i class="fas fa-lock text-sm text-slate-400 w-5 text-center"></i>
                                         <span class="text-sm font-bold">Change Password</span>
                                     </a>
@@ -470,7 +470,7 @@
                     </div>
                 {% else %}
                     <div class="flex items-center space-x-4">
-                        <a href="{% url 'login' %}" class="custom-gradient text-white px-7 py-3 rounded-2xl font-bold btn-hover shadow-xl shadow-indigo-200">စတင်ရန်</a>
+                        <a href="{% url 'login' %}" class="custom-gradient text-white px-7 py-3 rounded-2xl font-bold btn-hover shadow-xl shadow-blue-200">စတင်ရန်</a>
                     </div>
                 {% endif %}
             </div>
@@ -484,7 +484,7 @@
         <!-- Mobile Menu -->
         <div id="mobileMenu" class="lg:hidden fixed inset-0 bg-white z-[100] translate-x-full transition-transform duration-500 p-8">
             <div class="flex justify-between items-center mb-12">
-                <span class="text-2xl font-black">Arakkha<span class="text-indigo-600">Tech</span></span>
+                <span class="text-2xl font-black">Arakkha<span class="text-blue-600">Tech</span></span>
                 <button onclick="toggleMobileMenu()" class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-600">
                     <i class="fas fa-times"></i>
                 </button>
@@ -492,7 +492,7 @@
             <div class="space-y-6">
                 {% if user.is_authenticated %}
                     <div class="flex items-center space-x-4 p-4 bg-slate-50 rounded-3xl mb-8">
-                        <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-black overflow-hidden">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black overflow-hidden">
                             {% if user.profile.avatar %}
                                 <img src="{{ user.profile.avatar.url }}" class="w-full h-full object-cover">
                             {% else %}
@@ -502,9 +502,9 @@
                         <div>
                             <p class="font-black text-slate-800">{{ user.username }}</p>
                             <div class="flex items-center space-x-2">
-                                <a href="{% url 'edit_profile' %}" class="text-[9px] font-black text-slate-400 uppercase hover:text-indigo-600">Edit Profile</a>
+                                <a href="{% url 'edit_profile' %}" class="text-[9px] font-black text-slate-400 uppercase hover:text-blue-600">Edit Profile</a>
                                 <span class="w-1 h-1 bg-slate-200 rounded-full"></span>
-                                <a href="{% url 'all_notifications' %}" class="text-[9px] font-bold text-indigo-600 uppercase">{{ unread_notifications_count }} New Alerts</a>
+                                <a href="{% url 'all_notifications' %}" class="text-[9px] font-bold text-blue-600 uppercase">{{ unread_notifications_count }} New Alerts</a>
                             </div>
                         </div>
                     </div>
@@ -528,7 +528,7 @@
                             <a href="{% url 'manage_books' %}" class="block text-xl font-black text-emerald-600 flex items-center {% if active_sub == 'books' %}mobile-nav-active{% endif %}">
                                 <i class="fas fa-book-open mr-2"></i>စာအုပ်စီမံရန်
                             </a>
-                            <a href="{% url 'manage_enrollments' %}" class="block text-xl font-black text-indigo-600 flex items-center {% if active_sub == 'enrollments' %}mobile-nav-active{% endif %}">
+                            <a href="{% url 'manage_enrollments' %}" class="block text-xl font-black text-blue-600 flex items-center {% if active_sub == 'enrollments' %}mobile-nav-active{% endif %}">
                                 <i class="fas fa-user-graduate mr-2"></i>Enrollment စီမံရန်
                             </a>
                         {% endif %}
@@ -569,7 +569,7 @@
                 <div class="col-span-1 md:col-span-1 lg:col-span-1">
                     <a href="#" class="flex items-center space-x-3 mb-6">
                         <div class="bg-white p-2 rounded-xl">
-                            <i class="fas fa-brain text-indigo-600 text-xl"></i>
+                            <i class="fas fa-brain text-blue-600 text-xl"></i>
                         </div>
                         <span class="text-2xl font-black">ArakkhaTech</span>
                     </a>
@@ -577,10 +577,10 @@
                         အာရက္ခပြည်၏ အဆင့်မြင့်ဆုံး နည်းပညာသင်ကြားရီး platform တစ်ခုဖြစ်ပြီး ခေတ်မီဘာသာရပ်များကို အခြီခံမှစ၍ သင်ကြားပီးနိန်ပါသည်။
                     </p>
                     <div class="flex space-x-4">
-                        <a href="#" class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center hover:bg-indigo-600 transition-all"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center hover:bg-indigo-600 transition-all"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center hover:bg-indigo-600 transition-all"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#" class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center hover:bg-indigo-600 transition-all"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center hover:bg-blue-600 transition-all"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center hover:bg-blue-600 transition-all"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center hover:bg-blue-600 transition-all"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center hover:bg-blue-600 transition-all"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
                 
@@ -616,8 +616,8 @@
                         {% csrf_token %}
                         <input type="text" name="honeypot" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;top:auto;height:0;width:0;overflow:hidden;" aria-label="Leave this empty">
                         <input type="hidden" name="source" value="footer">
-                        <input type="email" name="email" placeholder="Email" required class="bg-slate-800 border-none rounded-xl px-4 py-3 w-full text-sm focus:ring-2 focus:ring-indigo-500">
-                        <button type="submit" class="bg-indigo-600 p-3 rounded-xl hover:bg-indigo-700 transition-all"><i class="fas fa-paper-plane"></i></button>
+                        <input type="email" name="email" placeholder="Email" required class="bg-slate-800 border-none rounded-xl px-4 py-3 w-full text-sm focus:ring-2 focus:ring-blue-500">
+                        <button type="submit" class="bg-blue-600 p-3 rounded-xl hover:bg-blue-700 transition-all"><i class="fas fa-paper-plane"></i></button>
                     </form>
                 </div>
             </div>
@@ -695,11 +695,11 @@
                 if (data.status === 'success') {
                     // Update Public UI
                     document.querySelectorAll('.unread-badge').forEach(el => el.textContent = '0 New');
-                    document.querySelectorAll('.notification-list > div').forEach(el => el.classList.remove('bg-indigo-50/10'));
+                    document.querySelectorAll('.notification-list > div').forEach(el => el.classList.remove('bg-blue-50/10'));
                     
                     // Update Admin UI (if on admin page)
                     document.querySelectorAll('.unread-admin-badge').forEach(el => el.textContent = '0 New');
-                    document.querySelectorAll('.admin-notification-list > div').forEach(el => el.classList.remove('bg-indigo-50/30'));
+                    document.querySelectorAll('.admin-notification-list > div').forEach(el => el.classList.remove('bg-blue-50/30'));
 
                     const dot = document.querySelector('.fa-bell + span');
                     if (dot) dot.remove();

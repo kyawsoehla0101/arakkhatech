@@ -22,7 +22,7 @@
                     <h2 class="text-2xl font-black text-slate-800">သင်ခန်းစာအသစ်ထည့်ရန်</h2>
                     <p class="text-slate-400 text-sm font-medium">သင်ခန်းစာများကို စနစ်တကျ ထည့်သွင်းစီမံနိုင်ပါသည်။</p>
                 </div>
-                <a href="{% url 'add_lesson_general' %}" class="custom-gradient text-white px-10 py-4 rounded-2xl font-black shadow-xl shadow-indigo-100 hover:scale-105 transition-all flex items-center justify-center group">
+                <a href="{% url 'add_lesson_general' %}" class="custom-gradient text-white px-10 py-4 rounded-2xl font-black shadow-xl shadow-blue-100 hover:scale-105 transition-all flex items-center justify-center group">
                     <i class="fas fa-plus-circle mr-3 group-hover:rotate-90 transition-transform"></i> သင်ခန်းစာအသစ်ထည့်ရန်
                 </a>
             </div>
@@ -45,17 +45,17 @@
                         <tr class="group hover:bg-slate-50/30 transition-all">
                             <td class="px-10 py-6">
                                 <div class="flex items-center">
-                                    <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 font-black mr-4 group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-all">
+                                    <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 font-black mr-4 group-hover:bg-blue-100 group-hover:text-blue-600 transition-all">
                                         {{ lesson.order }}
                                     </div>
                                     <div>
-                                        <p class="font-black text-slate-800 group-hover:text-indigo-600 transition-colors leading-tight mb-1">{{ lesson.title }}</p>
+                                        <p class="font-black text-slate-800 group-hover:text-blue-600 transition-colors leading-tight mb-1">{{ lesson.title }}</p>
                                         <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Duration: {{ lesson.duration|default:"--" }}</p>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-10 py-6">
-                                <span class="bg-indigo-50 text-indigo-600 text-[10px] font-black px-3 py-1.5 rounded-lg border border-indigo-100">
+                                <span class="bg-blue-50 text-blue-600 text-[10px] font-black px-3 py-1.5 rounded-lg border border-blue-100">
                                     {{ lesson.course.title|truncatechars:40 }}
                                 </span>
                             </td>
@@ -79,7 +79,7 @@
                             </td>
                             <td class="px-10 py-6 text-right">
                                 <div class="flex items-center justify-end space-x-3">
-                                    <a href="{% url 'edit_lesson' lesson.pk %}" class="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-indigo-50 hover:text-indigo-600 transition-all shadow-sm">
+                                    <a href="{% url 'edit_lesson' lesson.pk %}" class="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-blue-50 hover:text-blue-600 transition-all shadow-sm">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <a href="{% url 'delete_lesson' lesson.pk %}" class="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-rose-50 hover:text-rose-600 transition-all shadow-sm">

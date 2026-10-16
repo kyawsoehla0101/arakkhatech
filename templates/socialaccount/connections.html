@@ -9,10 +9,10 @@
             <div class="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full -ml-24 -mb-24"></div>
             <div class="relative z-10 text-center">
                 <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-xl mx-auto">
-                    <i class="fas fa-link text-indigo-600 text-2xl"></i>
+                    <i class="fas fa-link text-blue-600 text-2xl"></i>
                 </div>
                 <h1 class="text-3xl md:text-5xl font-black mb-4 leading-tight">Social Account ချိတ်ဆက်ရန်</h1>
-                <p class="text-indigo-100 text-lg opacity-90 max-w-2xl mx-auto">
+                <p class="text-blue-100 text-lg opacity-90 max-w-2xl mx-auto">
                     သင်၏ပြင်ပအကောင့်များကို ချိတ်ဆက်ပြီး လွယ်ကူစွာ ဝင်ရောက်နိုင်ပါသည်။
                 </p>
             </div>
@@ -29,7 +29,7 @@
                     <div class="flex items-center justify-between p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-all">
                         <div class="flex items-center space-x-4">
                             <div class="w-11 h-11 rounded-2xl bg-white border border-slate-200 flex items-center justify-center shadow-sm">
-                                <i class="fab fa-{{ account.get_brand.id|default:'google' }} text-xl text-indigo-600"></i>
+                                <i class="fab fa-{{ account.get_brand.id|default:'google' }} text-xl text-blue-600"></i>
                             </div>
                             <div>
                                 <p class="font-black text-slate-800">{{ account }}</p>
@@ -45,7 +45,7 @@
                 </form>
             </div>
             {% else %}
-            <div class="p-6 rounded-2xl bg-indigo-50/40 border border-indigo-100 text-center">
+            <div class="p-6 rounded-2xl bg-blue-50/40 border border-blue-100 text-center">
                 <p class="text-slate-500 font-medium">မည်သည့် Social Account မျှ ချိတ်ဆက်ထားခြင်း မရှိသေးပါ။</p>
             </div>
             {% endif %}

@@ -19,9 +19,9 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             <!-- Total Students Card -->
             <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 relative overflow-hidden group" data-aos="fade-up" data-aos-delay="100">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-[5rem] -z-0 transition-all group-hover:scale-110"></div>
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-[5rem] -z-0 transition-all group-hover:scale-110"></div>
                 <div class="relative z-10">
-                    <div class="w-14 h-14 rounded-2xl bg-indigo-500 text-white flex items-center justify-center text-xl mb-6 shadow-lg shadow-indigo-500/20">
+                    <div class="w-14 h-14 rounded-2xl bg-blue-500 text-white flex items-center justify-center text-xl mb-6 shadow-lg shadow-blue-500/20">
                         <i class="fas fa-users"></i>
                     </div>
                     <p class="text-slate-400 text-xs font-black uppercase tracking-widest mb-1">Total Students</p>
@@ -112,18 +112,18 @@
                 <div class="flex-grow divide-y divide-slate-50">
                     {% for enrollment in recent_enrollments %}
                     <div class="p-6 flex items-center group hover:bg-slate-50/50 transition-all cursor-pointer">
-                        <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-black group-hover:custom-gradient group-hover:text-white transition-all shadow-sm">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 font-black group-hover:custom-gradient group-hover:text-white transition-all shadow-sm">
                             {{ enrollment.student.username|slice:":1"|upper }}
                         </div>
                         <div class="ml-4 flex-grow">
                             <p class="text-sm font-black text-slate-800">{{ enrollment.student.username }}</p>
                             <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Joined {{ enrollment.course.title|truncatechars:15 }}</p>
                             <div class="mt-1 w-full bg-slate-100 h-1 rounded-full overflow-hidden">
-                                <div class="bg-indigo-500 h-full" style="width: {{ enrollment.progress_percentage }}%"></div>
+                                <div class="bg-blue-500 h-full" style="width: {{ enrollment.progress_percentage }}%"></div>
                             </div>
                         </div>
                         <div class="text-right ml-4">
-                            <p class="text-[10px] font-black text-indigo-600 mb-1">{{ enrollment.progress_percentage }}%</p>
+                            <p class="text-[10px] font-black text-blue-600 mb-1">{{ enrollment.progress_percentage }}%</p>
                             <p class="text-[10px] font-black text-slate-300 uppercase">{{ enrollment.date_enrolled|timesince }}</p>
                         </div>
                     </div>
@@ -134,7 +134,7 @@
                     </div>
                     {% endfor %}
                 </div>
-                <a href="{% url 'manage_students' %}" class="p-6 bg-slate-50 text-center text-xs font-black text-indigo-600 uppercase tracking-widest hover:text-indigo-800 transition-colors">
+                <a href="{% url 'manage_students' %}" class="p-6 bg-slate-50 text-center text-xs font-black text-blue-600 uppercase tracking-widest hover:text-blue-800 transition-colors">
                     View All Students
                 </a>
             </div>
@@ -144,7 +144,7 @@
         <div class="mt-8 bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden" data-aos="fade-up">
             <div class="p-10 border-b border-slate-50 flex items-center justify-between">
                 <h3 class="text-2xl font-black text-slate-900">Course Statistics</h3>
-                <a href="{% url 'manage_courses' %}" class="text-xs font-black text-indigo-600 uppercase tracking-widest hover:underline">View All Courses</a>
+                <a href="{% url 'manage_courses' %}" class="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">View All Courses</a>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
@@ -159,7 +159,7 @@
                     <tbody class="divide-y divide-slate-50">
                         {% for course in courses %}
                         <tr class="group hover:bg-slate-50/30 transition-all">
-                            <td class="px-10 py-6 font-black text-slate-800 group-hover:text-indigo-600 transition-colors">{{ course.title }}</td>
+                            <td class="px-10 py-6 font-black text-slate-800 group-hover:text-blue-600 transition-colors">{{ course.title }}</td>
                             <td class="px-10 py-6 text-center">
                                 <span class="bg-slate-100 text-slate-500 text-[10px] font-black px-3 py-1.5 rounded-lg">{{ course.lessons.count }} Units</span>
                             </td>
@@ -167,13 +167,13 @@
                                 <div class="flex items-center justify-center space-x-3">
                                     <span class="text-sm font-black text-slate-900">{{ course.student_count }}</span>
                                     <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                        <div class="bg-indigo-500 h-full" style="width: {{ course.student_count|add:20 }}%"></div>
+                                        <div class="bg-blue-500 h-full" style="width: {{ course.student_count|add:20 }}%"></div>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-10 py-6 text-right">
                                 <div class="flex items-center justify-end space-x-3">
-                                    <a href="{% url 'edit_course' course.pk %}" class="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-indigo-50 hover:text-indigo-600 transition-all"><i class="fas fa-edit"></i></a>
+                                    <a href="{% url 'edit_course' course.pk %}" class="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-blue-50 hover:text-blue-600 transition-all"><i class="fas fa-edit"></i></a>
                                     <a href="{% url 'manage_lessons' course.pk %}" class="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-emerald-50 hover:text-emerald-600 transition-all"><i class="fas fa-plus"></i></a>
                                 </div>
                             </td>
@@ -193,8 +193,8 @@
     document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById('growthChart').getContext('2d');
         const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.2)');
-        gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
+        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
+        gradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
 
         new Chart(ctx, {
             type: 'line',
@@ -203,17 +203,17 @@
                 datasets: [{
                     label: 'Enrollments',
                     data: {{ chart_data|safe }},
-                    borderColor: '#6366f1',
+                    borderColor: '#3b82f6',
                     backgroundColor: gradient,
                     borderWidth: 4,
                     tension: 0.4,
                     fill: true,
                     pointBackgroundColor: '#fff',
-                    pointBorderColor: '#6366f1',
+                    pointBorderColor: '#3b82f6',
                     pointBorderWidth: 2,
                     pointRadius: 6,
                     pointHoverRadius: 8,
-                    pointHoverBackgroundColor: '#6366f1',
+                    pointHoverBackgroundColor: '#3b82f6',
                     pointHoverBorderColor: '#fff',
                     pointHoverBorderWidth: 3,
                 }]
@@ -236,14 +236,14 @@
                     y: {
                         beginAtZero: true,
                         grid: { color: 'rgba(0,0,0,0.02)', drawBorder: false },
-                        ticks: { 
+                        ticks: {
                             font: { weight: 'bold', family: 'Plus Jakarta Sans' },
                             padding: 10
                         }
                     },
                     x: {
                         grid: { display: false },
-                        ticks: { 
+                        ticks: {
                             font: { weight: 'bold', family: 'Plus Jakarta Sans' },
                             padding: 10
                         }

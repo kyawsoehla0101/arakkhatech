@@ -13,11 +13,11 @@
 
         <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-6 md:p-8 mb-10" data-aos="fade-down">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="p-6 rounded-2xl border border-indigo-100 bg-indigo-50/50">
+                <div class="p-6 rounded-2xl border border-blue-100 bg-blue-50/50">
                     <div class="flex items-center justify-between mb-3">
                         <p class="text-xs font-black uppercase tracking-widest text-slate-400">Total</p>
                         <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm">
-                            <i class="fas fa-envelope text-indigo-500"></i>
+                            <i class="fas fa-envelope text-blue-500"></i>
                         </div>
                     </div>
                     <p class="text-3xl font-black text-slate-900">{{ stats.total }}</p>
@@ -94,8 +94,8 @@
                                 </td>
                                 <td class="px-6 lg:px-8 py-5 align-top hidden md:table-cell">
                                     <span class="inline-flex items-center rounded-xl px-3 py-1.5 text-[11px] font-black
-                                        {% if sub.source == 'footer' %}bg-indigo-50 text-indigo-700
-                                        {% elif sub.source == 'cta' %}bg-fuchsia-50 text-fuchsia-700
+                                        {% if sub.source == 'footer' %}bg-blue-50 text-blue-700
+                                        {% elif sub.source == 'cta' %}bg-blue-50 text-blue-700
                                         {% elif sub.source == 'manual' %}bg-slate-50 text-slate-700
                                         {% else %}bg-slate-50 text-slate-600{% endif %}">
                                         {{ sub.get_source_display }}

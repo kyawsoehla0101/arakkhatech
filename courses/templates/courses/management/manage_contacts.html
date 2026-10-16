@@ -14,7 +14,7 @@
         <!-- Stats + Filter bar -->
         <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-6 md:p-8 mb-10" data-aos="fade-down">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <a href="?status=all" class="relative p-6 rounded-2xl border transition-all {% if status == 'all' %}border-indigo-200 bg-indigo-50/60 shadow-sm{% else %}border-slate-100 hover:border-slate-200 hover:bg-slate-50{% endif %}">
+                <a href="?status=all" class="relative p-6 rounded-2xl border transition-all {% if status == 'all' %}border-blue-200 bg-blue-50/60 shadow-sm{% else %}border-slate-100 hover:border-slate-200 hover:bg-slate-50{% endif %}">
                     <p class="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">All Messages</p>
                     <p class="text-3xl font-black text-slate-900">{{ counts.all }}</p>
                 </a>
@@ -37,19 +37,19 @@
                     <label class="text-xs font-black uppercase tracking-widest text-slate-400">Search</label>
                     <div class="flex gap-2">
                         <input type="text" name="q" value="{{ query }}"
-                               class="flex-1 bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500"
+                               class="flex-1 bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500"
                                placeholder="Name / Email / Phone / Message စာလုံးရိုက်ရှာပါ...">
                         <a href="{% url 'manage_contacts' %}" class="px-5 py-4 rounded-2xl text-slate-400 hover:bg-slate-50 font-black text-sm transition-all">
                             Clear
                         </a>
-                        <button type="submit" class="px-7 py-4 rounded-2xl custom-gradient text-white font-black shadow-lg shadow-indigo-100 hover:scale-[1.02] transition-transform">
+                        <button type="submit" class="px-7 py-4 rounded-2xl custom-gradient text-white font-black shadow-lg shadow-blue-100 hover:scale-[1.02] transition-transform">
                             <i class="fas fa-search mr-1"></i> Search
                         </button>
                     </div>
                 </div>
                 <div class="w-full lg:w-72 space-y-2">
                     <label class="text-xs font-black uppercase tracking-widest text-slate-400">Subject Filter</label>
-                    <select name="subject" class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                    <select name="subject" class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
                         <option value="">All Subjects</option>
                         {% for key, label in subjects %}
                             <option value="{{ key }}" {% if subject_filter == key %}selected{% endif %}>{{ label }}</option>
@@ -75,20 +75,20 @@
                     </thead>
                     <tbody class="divide-y divide-slate-50">
                         {% for c in contacts %}
-                            <tr class="group hover:bg-slate-50/70 transition-colors {% if not c.is_read %}bg-indigo-50/10{% endif %}">
+                            <tr class="group hover:bg-slate-50/70 transition-colors {% if not c.is_read %}bg-blue-50/10{% endif %}">
                                 <td class="px-6 lg:px-8 py-5 align-top">
                                     <div class="flex items-start gap-4">
-                                        <div class="w-11 h-11 rounded-2xl {% if c.is_read %}bg-slate-100 text-slate-500{% else %}bg-indigo-100 text-indigo-600{% endif %} flex items-center justify-center font-black shadow-sm flex-shrink-0">
+                                        <div class="w-11 h-11 rounded-2xl {% if c.is_read %}bg-slate-100 text-slate-500{% else %}bg-blue-100 text-blue-600{% endif %} flex items-center justify-center font-black shadow-sm flex-shrink-0">
                                             {{ c.name|slice:":1"|upper }}
                                         </div>
                                         <div class="min-w-0">
                                             <p class="font-black text-slate-800 truncate">
                                                 {{ c.name }}
                                                 {% if not c.is_read %}
-                                                    <span class="ml-2 inline-flex items-center rounded-full bg-indigo-500 text-[9px] font-black text-white px-2 py-0.5 tracking-wider">NEW</span>
+                                                    <span class="ml-2 inline-flex items-center rounded-full bg-blue-500 text-[9px] font-black text-white px-2 py-0.5 tracking-wider">NEW</span>
                                                 {% endif %}
                                             </p>
-                                            <a href="mailto:{{ c.email }}" class="text-[11px] text-indigo-500 font-bold hover:underline block truncate">{{ c.email }}</a>
+                                            <a href="mailto:{{ c.email }}" class="text-[11px] text-blue-500 font-bold hover:underline block truncate">{{ c.email }}</a>
                                             {% if c.phone %}
                                                 <span class="text-[11px] text-slate-400 font-bold">{{ c.phone }}</span>
                                             {% endif %}
@@ -97,12 +97,12 @@
                                 </td>
                                 <td class="px-6 lg:px-8 py-5 align-top">
                                     <span class="inline-flex items-center rounded-xl px-3 py-1.5 text-[11px] font-black
-                                        {% if c.subject == 'course' %}bg-sky-50 text-sky-700
+                                        {% if c.subject == 'course' %}bg-blue-50 text-blue-700
                                         {% elif c.subject == 'support' %}bg-rose-50 text-rose-700
-                                        {% elif c.subject == 'partnership' %}bg-fuchsia-50 text-fuchsia-700
+                                        {% elif c.subject == 'partnership' %}bg-blue-50 text-blue-700
                                         {% elif c.subject == 'feedback' %}bg-emerald-50 text-emerald-700
                                         {% elif c.subject == 'other' %}bg-slate-50 text-slate-600
-                                        {% else %}bg-indigo-50 text-indigo-700{% endif %}">
+                                        {% else %}bg-blue-50 text-blue-700{% endif %}">
                                         {{ c.subject_label }}
                                     </span>
                                 </td>
@@ -111,7 +111,7 @@
                                 </td>
                                 <td class="px-6 lg:px-8 py-5 align-top hidden md:table-cell">
                                     <div class="flex flex-col gap-2">
-                                        <span class="inline-flex items-center rounded-xl px-3 py-1 text-[10px] font-black {% if c.is_read %}bg-emerald-50 text-emerald-700{% else %}bg-indigo-50 text-indigo-700{% endif %}">
+                                        <span class="inline-flex items-center rounded-xl px-3 py-1 text-[10px] font-black {% if c.is_read %}bg-emerald-50 text-emerald-700{% else %}bg-blue-50 text-blue-700{% endif %}">
                                             <i class="fas fa-{% if c.is_read %}eye{% else %}eye-slash{% endif %} mr-1"></i>
                                             {{ c.is_read|yesno:"Read,Unread" }}
                                         </span>
@@ -128,7 +128,7 @@
                                 <td class="px-6 lg:px-8 py-5 align-top text-right">
                                     <div class="flex justify-end gap-2 flex-wrap">
                                         <a href="{% url 'contact_detail' c.pk %}"
-                                           class="inline-flex items-center px-3.5 py-2 rounded-xl text-[11px] font-black bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors">
+                                           class="inline-flex items-center px-3.5 py-2 rounded-xl text-[11px] font-black bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors">
                                             <i class="fas fa-eye mr-1.5"></i> View
                                         </a>
                                         <form method="post" action="{% if c.is_read %}{% url 'contact_mark_unread' c.pk %}{% else %}{% url 'contact_mark_read' c.pk %}{% endif %}" class="inline-block">
@@ -165,7 +165,7 @@
                                     </div>
                                     <p class="font-black text-slate-600 text-lg mb-2">No contact messages.</p>
                                     <p class="text-sm text-slate-400 font-medium mb-6">သင့်ရဲ့ filter / search နှင့် ကိုက်ညီတဲ့ မက်ဆေ့ဂျ် မရှိသေးပါ။</p>
-                                    <a href="{% url 'manage_contacts' %}" class="inline-flex items-center px-5 py-3 rounded-2xl custom-gradient text-white font-black shadow-lg shadow-indigo-100 hover:scale-[1.02] transition-transform">
+                                    <a href="{% url 'manage_contacts' %}" class="inline-flex items-center px-5 py-3 rounded-2xl custom-gradient text-white font-black shadow-lg shadow-blue-100 hover:scale-[1.02] transition-transform">
                                         <i class="fas fa-rotate-right mr-2"></i> Clear filters
                                     </a>
                                 </td>

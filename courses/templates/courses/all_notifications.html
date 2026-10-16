@@ -35,7 +35,7 @@
                         <span>Activity Stream</span>
                     </div>
                     <h1 class="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">Notifications</h1>
-                    <p class="text-indigo-100 text-lg font-medium max-w-2xl mx-auto opacity-80">
+                    <p class="text-blue-100 text-lg font-medium max-w-2xl mx-auto opacity-80">
                         သင့်ရဲ့ သင်ယူမှုခရီးစဉ်မှာ ဖြစ်ပျက်နိန်ရေ နောက်ဆုံးရ သတင်းအချက်အလက်အားလုံးကို တစ်နီရာတည်းမှာ စုစည်းပီးထားပါရေ။
                     </p>
                 </div>
@@ -43,16 +43,16 @@
         {% endif %}
 
         <div class="max-w-4xl mx-auto {% if not user.is_superuser %}-mt-24 px-6 pb-20 relative z-10{% endif %}">
-            <div class="bg-white rounded-[3.5rem] shadow-2xl shadow-indigo-100/50 border border-slate-100 overflow-hidden" data-aos="fade-up">
+            <div class="bg-white rounded-[3.5rem] shadow-2xl shadow-blue-100/50 border border-slate-100 overflow-hidden" data-aos="fade-up">
                 <div class="divide-y divide-slate-50">
                     {% for notification in notifications %}
-                    <div class="p-8 md:p-10 flex items-start group hover:bg-slate-50/50 transition-all {% if not notification.is_read %}bg-indigo-50/30{% endif %}">
-                        <div class="w-14 h-14 rounded-2xl {% if not notification.is_read %}bg-indigo-600 text-white shadow-xl shadow-indigo-200{% else %}bg-slate-100 text-slate-400{% endif %} flex items-center justify-center text-xl mr-6 flex-shrink-0 transition-all group-hover:scale-110">
+                    <div class="p-8 md:p-10 flex items-start group hover:bg-slate-50/50 transition-all {% if not notification.is_read %}bg-blue-50/30{% endif %}">
+                        <div class="w-14 h-14 rounded-2xl {% if not notification.is_read %}bg-blue-600 text-white shadow-xl shadow-blue-200{% else %}bg-slate-100 text-slate-400{% endif %} flex items-center justify-center text-xl mr-6 flex-shrink-0 transition-all group-hover:scale-110">
                             <i class="fas {% if not notification.is_read %}fa-bell{% else %}fa-check-circle{% endif %}"></i>
                         </div>
                         <div class="flex-grow">
                             <div class="flex flex-col md:flex-row md:items-center justify-between mb-2 gap-2">
-                                <h3 class="text-xl font-black text-slate-800 group-hover:text-indigo-600 transition-colors">{{ notification.title }}</h3>
+                                <h3 class="text-xl font-black text-slate-800 group-hover:text-blue-600 transition-colors">{{ notification.title }}</h3>
                                 <span class="text-[10px] font-black text-slate-300 uppercase bg-slate-50 px-3 py-1 rounded-full">{{ notification.created_at|date:"M d, Y H:i" }}</span>
                             </div>
                             <p class="text-slate-500 font-medium leading-relaxed text-lg">{{ notification.message }}</p>
@@ -66,7 +66,7 @@
                         <h3 class="text-2xl font-black text-slate-900 mb-4">No notifications yet</h3>
                         <p class="text-slate-400 font-bold max-w-sm mx-auto">ယှာမတွိသိမ့်ပါ။ သတင်းအသစ်ဟိလာကေ အေမှ ပြသပီးလားဖို့ဖြစ်ပါရေ။</p>
                         <div class="mt-10">
-                            <a href="{% url 'student_dashboard' %}" class="inline-flex items-center px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-indigo-200 hover:scale-105 transition-all">
+                            <a href="{% url 'student_dashboard' %}" class="inline-flex items-center px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-blue-200 hover:scale-105 transition-all">
                                 Back to Dashboard
                             </a>
                         </div>
@@ -74,10 +74,10 @@
                     {% endfor %}
                 </div>
             </div>
-            
+
             {% if not user.is_superuser and notifications %}
             <div class="mt-12 text-center">
-                <a href="{% url 'student_dashboard' %}" class="inline-flex items-center text-slate-400 font-black text-xs uppercase tracking-widest hover:text-indigo-600 transition-colors group">
+                <a href="{% url 'student_dashboard' %}" class="inline-flex items-center text-slate-400 font-black text-xs uppercase tracking-widest hover:text-blue-600 transition-colors group">
                     <i class="fas fa-arrow-left mr-3 group-hover:-translate-x-1 transition-transform"></i> Back to Dashboard
                 </a>
             </div>

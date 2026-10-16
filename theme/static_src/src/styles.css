@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+:root {
+  --color-primary: #4a5568; /* Dark Gray Blue for primary actions/elements */
+  --color-secondary: #edf2f7; /* Light Gray for backgrounds/secondary elements */
+  --color-accent: #ecc94b; /* Yellow for accents/highlights */
+  --color-text-dark: #2d3748; /* Very Dark Gray for main text */
+  --color-text-light: #718096; /* Medium Gray for secondary text */
+  --color-background-light: #ffffff; /* White for main backgrounds */
+  --color-background-dark: #f7fafc; /* Off-white for section backgrounds */
+}
+
 /**
   * A catch-all path to Django template files, JavaScript, and Python files
   * that contain Tailwind CSS classes and will be scanned by Tailwind to generate the final CSS file.

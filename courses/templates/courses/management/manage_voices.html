@@ -20,7 +20,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center">
-                            <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black mr-4">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-black mr-4">
                                 {{ voice.user.username|slice:":1"|upper }}
                             </div>
                             <div>
@@ -36,7 +36,7 @@
                     </div>
                     <p class="text-slate-500 text-sm leading-relaxed italic mb-8">"{{ voice.content }}"</p>
                 </div>
-                
+
                 <div class="flex items-center space-x-3 pt-6 border-t border-slate-50">
                     {% if not voice.is_approved %}
                     <a href="{% url 'approve_voice' voice.pk %}" class="flex-grow bg-emerald-500 text-white text-center py-3 rounded-xl text-xs font-black hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-100">

@@ -8,7 +8,7 @@
         <div class="max-w-6xl mx-auto">
             <!-- Breadcrumbs -->
             <nav class="flex text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-12">
-                <a href="{% url 'docs_list' %}" class="hover:text-indigo-600 transition-colors">Library</a>
+                <a href="{% url 'docs_list' %}" class="hover:text-blue-600 transition-colors">Library</a>
                 <span class="mx-3 text-slate-200">/</span>
                 <span class="text-slate-900">{{ book.title }}</span>
             </nav>
@@ -17,7 +17,7 @@
                 <!-- Book Cover & Info -->
                 <div class="lg:w-1/3">
                     <div class="sticky top-32">
-                        <div class="aspect-[3/4] rounded-[2.5rem] bg-white shadow-2xl shadow-indigo-100 overflow-hidden border-8 border-white mb-10 group">
+                        <div class="aspect-[3/4] rounded-[2.5rem] bg-white shadow-2xl shadow-blue-100 overflow-hidden border-8 border-white mb-10 group">
                             {% if book.thumbnail %}
                                 <img src="{{ book.thumbnail.url }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
                             {% else %}
@@ -45,7 +45,7 @@
                                 <div class="w-px h-10 bg-slate-200"></div>
                                 <div class="text-center flex-grow">
                                     <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Type</p>
-                                    <p class="text-xs font-black text-indigo-600 uppercase tracking-widest">
+                                    <p class="text-xs font-black text-blue-600 uppercase tracking-widest">
                                         {% if book.is_free_book %}Free{% else %}Course{% endif %}
                                     </p>
                                 </div>
@@ -69,20 +69,20 @@
 
                     <div class="space-y-8" data-aos="fade-up" data-aos-delay="100">
                         <h2 class="text-2xl font-black text-slate-900 flex items-center">
-                            <span class="w-2 h-8 bg-indigo-600 rounded-full mr-4"></span> Table of Contents
+                            <span class="w-2 h-8 bg-blue-600 rounded-full mr-4"></span> Table of Contents
                         </h2>
 
                         <div class="grid gap-4">
                             {% for chapter in chapters %}
-                            <a href="{{ chapter.get_absolute_url }}" class="group flex items-center p-6 bg-white rounded-3xl border border-slate-100 hover:border-indigo-600 hover:shadow-xl hover:shadow-indigo-50 transition-all">
-                                <div class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center font-black group-hover:bg-indigo-600 group-hover:text-white transition-all mr-6">
+                            <a href="{{ chapter.get_absolute_url }}" class="group flex items-center p-6 bg-white rounded-3xl border border-slate-100 hover:border-blue-600 hover:shadow-xl hover:shadow-blue-50 transition-all">
+                                <div class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center font-black group-hover:bg-blue-600 group-hover:text-white transition-all mr-6">
                                     {{ forloop.counter|stringformat:"02d" }}
                                 </div>
                                 <div class="flex-grow">
-                                    <h3 class="text-lg font-black text-slate-800 group-hover:text-indigo-600 transition-colors">{{ chapter.title }}</h3>
+                                    <h3 class="text-lg font-black text-slate-800 group-hover:text-blue-600 transition-colors">{{ chapter.title }}</h3>
                                     <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Chapter {{ forloop.counter }}</p>
                                 </div>
-                                <i class="fas fa-chevron-right text-slate-200 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all"></i>
+                                <i class="fas fa-chevron-right text-slate-200 group-hover:text-blue-600 group-hover:translate-x-1 transition-all"></i>
                             </a>
                             {% empty %}
                             <div class="text-center py-20 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200">
@@ -93,7 +93,7 @@
 
                         {% if chapters.exists %}
                         <div class="pt-10">
-                            <a href="{{ chapters.first.get_absolute_url }}" class="inline-flex items-center px-10 py-5 custom-gradient text-white font-black rounded-2xl shadow-2xl shadow-indigo-100 hover:scale-[1.02] transition-transform">
+                            <a href="{{ chapters.first.get_absolute_url }}" class="inline-flex items-center px-10 py-5 custom-gradient text-white font-black rounded-2xl shadow-2xl shadow-blue-100 hover:scale-[1.02] transition-transform">
                                 <i class="fas fa-book-reader mr-3"></i> စတင်ဖတ်ရှုရန်
                             </a>
                         </div>

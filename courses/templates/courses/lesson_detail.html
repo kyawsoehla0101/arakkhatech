@@ -28,7 +28,7 @@
             <span class="mx-3">/</span>
             <a href="{% url 'course_detail' course.slug %}" class="hover:text-white transition-colors">{{ course.title|truncatechars:30 }}</a>
             <span class="mx-3">/</span>
-            <span class="text-indigo-400">{{ lesson.title }}</span>
+            <span class="text-blue-400">{{ lesson.title }}</span>
         </nav>
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-10">
@@ -60,19 +60,19 @@
                 <div class="bg-white rounded-[3rem] p-10 md:p-16 shadow-xl" data-aos="fade-up">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12 pb-12 border-b border-slate-50">
                         <div>
-                            <span class="inline-block bg-indigo-50 text-indigo-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-4">Lesson {{ lesson.order }}</span>
+                            <span class="inline-block bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-4">Lesson {{ lesson.order }}</span>
                             <h1 class="text-3xl md:text-5xl font-black text-slate-800 leading-tight">{{ lesson.title }}</h1>
                         </div>
                         <div class="flex flex-wrap items-center gap-4">
                             {% if lesson.duration %}
-                            <div class="flex-shrink-0 bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-black flex items-center shadow-xl shadow-indigo-100/20">
-                                <i class="far fa-clock mr-3 text-indigo-400"></i> {{ lesson.duration }}
+                            <div class="flex-shrink-0 bg-slate-900 text-white px-6 py-3 rounded-2xl text-sm font-black flex items-center shadow-xl shadow-blue-100/20">
+                                <i class="far fa-clock mr-3 text-blue-400"></i> {{ lesson.duration }}
                             </div>
                             {% endif %}
-                            
+
                             <form id="completionForm" action="{% url 'toggle_lesson_completion' lesson.pk %}" method="POST" class="inline">
                                 {% csrf_token %}
-                                <button type="submit" id="completionBtn" class="flex-shrink-0 {% if is_completed %}bg-emerald-500{% else %}bg-indigo-600{% endif %} text-white px-6 py-3 rounded-2xl text-sm font-black flex items-center shadow-xl shadow-indigo-100/20 hover:scale-105 transition-all">
+                                <button type="submit" id="completionBtn" class="flex-shrink-0 {% if is_completed %}bg-emerald-500{% else %}bg-blue-600{% endif %} text-white px-6 py-3 rounded-2xl text-sm font-black flex items-center shadow-xl shadow-blue-100/20 hover:scale-105 transition-all">
                                     {% if is_completed %}
                                         <i class="fas fa-check-circle mr-3"></i> Completed
                                     {% else %}
@@ -82,7 +82,7 @@
                             </form>
                         </div>
                     </div>
-                    
+
                     <div id="lesson-content" class="prose max-w-none text-slate-600 leading-relaxed text-lg">
                         {{ content_html|safe }}
                     </div>
@@ -90,7 +90,7 @@
                     <!-- Navigation Buttons -->
                     <div class="mt-16 pt-12 border-t border-slate-50 flex justify-between items-center">
                         {% if prev_lesson %}
-                        <a href="{% url 'lesson_detail' course.pk prev_lesson.pk %}" class="flex items-center text-slate-400 font-bold hover:text-indigo-600 transition-colors group">
+                        <a href="{% url 'lesson_detail' course.pk prev_lesson.pk %}" class="flex items-center text-slate-400 font-bold hover:text-blue-600 transition-colors group">
                             <i class="fas fa-arrow-left mr-3 transform group-hover:-translate-x-2 transition-transform"></i> Previous Lesson
                         </a>
                         {% else %}
@@ -98,8 +98,8 @@
                         {% endif %}
 
                         {% if next_lesson %}
-                        <a href="{% url 'lesson_detail' course.pk next_lesson.pk %}" class="flex items-center text-slate-800 font-black hover:text-indigo-600 transition-colors group" id="nextLessonBtn">
-                            Next Lesson <i class="fas fa-arrow-right ml-3 transform group-hover:translate-x-2 transition-transform text-indigo-600"></i>
+                        <a href="{% url 'lesson_detail' course.pk next_lesson.pk %}" class="flex items-center text-slate-800 font-black hover:text-blue-600 transition-colors group" id="nextLessonBtn">
+                            Next Lesson <i class="fas fa-arrow-right ml-3 transform group-hover:translate-x-2 transition-transform text-blue-600"></i>
                         </a>
                         {% endif %}
                     </div>
@@ -111,19 +111,19 @@
                 <div class="glass rounded-[2.5rem] overflow-hidden sticky top-28 border border-white/10 shadow-2xl" data-aos="fade-left">
                     <div class="custom-gradient p-8 text-white">
                         <h3 class="text-xl font-black mb-2">သင်ခန်းစာ မာတိကာ</h3>
-                        <div class="flex items-center justify-between text-xs font-bold text-indigo-100 opacity-80 uppercase tracking-widest">
+                        <div class="flex items-center justify-between text-xs font-bold text-blue-100 opacity-80 uppercase tracking-widest">
                             <span>{{ lessons.count }} Lessons</span>
                             <span class="progress-text">{{ enrollment.progress_percentage }}% Complete</span>
                         </div>
                     </div>
-                    
+
                     <div class="max-h-[calc(100vh-400px)] overflow-y-auto custom-scrollbar bg-slate-900/40">
                         {% for l in lessons %}
-                        <a href="{% url 'lesson_detail' course.pk l.pk %}" 
-                           class="group block p-6 border-b border-white/5 hover:bg-white/5 transition-all {% if l.pk == lesson.pk %}bg-indigo-600/20 border-l-4 border-l-indigo-500{% endif %}">
+                        <a href="{% url 'lesson_detail' course.pk l.pk %}"
+                           class="group block p-6 border-b border-white/5 hover:bg-white/5 transition-all {% if l.pk == lesson.pk %}bg-blue-600/20 border-l-4 border-l-blue-500{% endif %}">
                             <div class="flex items-start">
                                 <div class="relative flex-shrink-0 mr-4">
-                                    <span class="w-8 h-8 rounded-lg {% if l.pk == lesson.pk %}bg-indigo-500 text-white shadow-lg shadow-indigo-500/50{% else %}bg-white/5 text-slate-500{% endif %} flex items-center justify-center text-[10px] font-black transition-all group-hover:scale-110">
+                                    <span class="w-8 h-8 rounded-lg {% if l.pk == lesson.pk %}bg-blue-500 text-white shadow-lg shadow-blue-500/50{% else %}bg-white/5 text-slate-500{% endif %} flex items-center justify-center text-[10px] font-black transition-all group-hover:scale-110">
                                         {{ forloop.counter|stringformat:"02d" }}
                                     </span>
                                     {% if l.id in completed_lesson_ids %}
@@ -144,7 +144,7 @@
                                         {% endif %}
                                         {% if l.video_url or l.video_file %}
                                         <span class="text-[10px] text-slate-500 font-bold flex items-center">
-                                            <i class="fas fa-play-circle mr-1.5 opacity-50 text-indigo-500"></i> Video
+                                            <i class="fas fa-play-circle mr-1.5 opacity-50 text-blue-500"></i> Video
                                         </span>
                                         {% endif %}
                                     </div>
@@ -153,15 +153,15 @@
                         </a>
                         {% endfor %}
                     </div>
-                    
+
                     <!-- Progress Card -->
                     <div class="p-8 bg-white/5 border-t border-white/5">
                         <div class="flex justify-between items-center mb-4">
                             <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Learning Progress</span>
-                            <span class="text-indigo-400 text-xs font-black progress-text">{{ enrollment.progress_percentage }}%</span>
+                            <span class="text-blue-400 text-xs font-black progress-text">{{ enrollment.progress_percentage }}%</span>
                         </div>
                         <div class="w-full bg-white/5 rounded-full h-2 overflow-hidden">
-                            <div class="bg-indigo-500 h-full rounded-full shadow-lg shadow-indigo-500/50 transition-all duration-1000 progress-bar-fill" style="width: {{ enrollment.progress_percentage }}%"></div>
+                            <div class="bg-blue-500 h-full rounded-full shadow-lg shadow-blue-500/50 transition-all duration-1000 progress-bar-fill" style="width: {{ enrollment.progress_percentage }}%"></div>
                         </div>
                     </div>
                 </div>
@@ -174,7 +174,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         var content = document.getElementById('lesson-content');
         if (content) {
-            content.innerHTML = content.innerHTML.replace(/==([^=]+)==/g, '<mark class="bg-yellow-200/80 text-yellow-900 px-1 rounded font-semibold">$1</mark>');
+            content.innerHTML = content.innerHTML.replace(/==([^=]+)==/g, '<mark class="bg-amber-200/80 text-amber-900 px-1 rounded font-semibold">$1</mark>');
 
             try {
                 if (typeof katex !== 'undefined') {
@@ -232,9 +232,9 @@
             });
 
             content.querySelectorAll('details').forEach(function(d) {
-                d.className = 'rounded-xl p-5 my-6 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 shadow-md';
+                d.className = 'rounded-xl p-5 my-6 bg-gradient-to-br from-blue-50 to-blue-50 border border-blue-200 shadow-md';
                 var s = d.querySelector('summary');
-                if (s) { s.className = 'font-bold cursor-pointer text-indigo-800 text-lg mb-2 select-none'; }
+                if (s) { s.className = 'font-bold cursor-pointer text-blue-800 text-lg mb-2 select-none'; }
             });
         }
     });
@@ -245,12 +245,12 @@
          // Find the Plyr instance for this lesson's video
          const playerElement = document.querySelector('.lesson-player');
          let player = null;
-         
+
          if (playerElement) {
              player = new Plyr(playerElement, {
                  autoplay: false,
              });
- 
+
              // Auto-advance logic
              player.on('ended', () => {
                  // Auto mark as complete when video ends
@@ -284,31 +284,31 @@
              .then(data => {
                  // Update UI
                  if (data.completed) {
-                     completionBtn.classList.remove('bg-indigo-600');
+                     completionBtn.classList.remove('bg-blue-600');
                      completionBtn.classList.add('bg-emerald-500');
                      completionBtn.innerHTML = '<i class="fas fa-check-circle mr-3"></i> Completed';
-                     
+
                      // Show success toast
                      toastr.success('သင်ခန်းစာကို ပြီးမြောက်ကြောင်း မှတ်သားပြီးပါပြီ။');
                  } else {
                      completionBtn.classList.remove('bg-emerald-500');
-                     completionBtn.classList.add('bg-indigo-600');
+                     completionBtn.classList.add('bg-blue-600');
                      completionBtn.innerHTML = '<i class="far fa-check-circle mr-3"></i> Mark as Complete';
                  }
 
                  // Update progress bars
                  const progressTexts = document.querySelectorAll('.progress-text');
                  const progressBars = document.querySelectorAll('.progress-bar-fill');
-                 
+
                  progressTexts.forEach(el => el.textContent = data.progress + '%');
                  progressBars.forEach(el => el.style.width = data.progress + '%');
 
                  // Update sidebar status icon for current lesson
-                 const currentLessonLink = document.querySelector('a.bg-indigo-600\\/20');
+                 const currentLessonLink = document.querySelector('a.bg-blue-600\\/20');
                  if (currentLessonLink) {
                      const iconContainer = currentLessonLink.querySelector('.relative.flex-shrink-0');
                      let statusIcon = iconContainer.querySelector('.lesson-status-icon');
-                     
+
                      if (data.completed) {
                          if (!statusIcon) {
                              statusIcon = document.createElement('div');
@@ -360,9 +360,9 @@
 
     /* Custom Markdown Styles */
     #lesson-content { line-height: 1.9; font-family: 'Plus Jakarta Sans', 'Pyidaungsu', sans-serif; font-size: 17px; }
-    #lesson-content h1, #lesson-content .h1-like { font-size: 2.2rem; font-weight: 900; color: #1e1b4b; margin-bottom: 1.5rem; border-bottom: 3px solid #eef2ff; padding-bottom: 0.75rem; }
-    #lesson-content h2 { margin-top: 3rem; font-size: 1.6rem; border-bottom: 2px solid #eef2ff; padding-bottom: 1rem; margin-bottom: 1.5rem; font-weight: 800; color: #312e81; }
-    #lesson-content h3 { margin-top: 2.5rem; font-size: 1.25rem; margin-bottom: 1.25rem; font-weight: 700; color: #3730a3; }
+    #lesson-content h1, #lesson-content .h1-like { font-size: 2.2rem; font-weight: 900; color: #172554; margin-bottom: 1.5rem; border-bottom: 3px solid #eff6ff; padding-bottom: 0.75rem; }
+    #lesson-content h2 { margin-top: 3rem; font-size: 1.6rem; border-bottom: 2px solid #eff6ff; padding-bottom: 1rem; margin-bottom: 1.5rem; font-weight: 800; color: #1e3a8a; }
+    #lesson-content h3 { margin-top: 2.5rem; font-size: 1.25rem; margin-bottom: 1.25rem; font-weight: 700; color: #1e40af; }
     #lesson-content p { margin-bottom: 1.5rem; color: #475569; line-height: 1.9; }
     #lesson-content code:not(pre code) { background: linear-gradient(to right, #fef2f2, #fff1f2); padding: 0.25rem 0.6rem; border-radius: 0.6rem; font-weight: 600; color: #be123c; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.93em; border: 1px solid #fecdd3; }
     #lesson-content pre { background: linear-gradient(145deg, #282c34, #1e2127) !important; border-radius: 1.25rem !important; padding: 1.5rem 1.5rem 1.5rem 1.5rem !important; margin: 2rem 0 !important; overflow: auto !important; border: 1px solid #374151 !important; box-shadow: 0 15px 40px -12px rgba(0,0,0,0.4) !important; }
@@ -371,23 +371,23 @@
     #lesson-content ul li { margin: 0.5rem 0; padding-left: 0.3rem; }
     #lesson-content ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 1.5rem; }
     #lesson-content ol li { margin: 0.5rem 0; padding-left: 0.3rem; }
-    #lesson-content blockquote { padding: 1.5rem 1.75rem; border-radius: 1.25rem; margin: 2rem 0; border-left: 6px solid #6366f1; background: linear-gradient(135deg, #eef2ff, #e0f2fe); color: #312e81; font-style: italic; box-shadow: 0 8px 24px -8px rgba(99,102,241,0.25); }
-    #lesson-content blockquote p { color: #312e81 !important; margin-bottom: 0 !important; }
-    #lesson-content hr { border: none !important; border-top: 3px dashed #c7d2fe !important; margin: 2.5rem 0 !important; }
-    #lesson-content table { border-collapse: collapse; margin: 2rem 0; width: 100%; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 5px 18px -6px rgba(0,0,0,0.08); border: 1px solid #eef2ff; }
-    #lesson-content th { background: linear-gradient(135deg, #4f46e5, #6366f1); color: white; font-weight: 800; padding: 1rem 1.25rem; text-align: left; font-size: 14px; letter-spacing: 0.02em; }
-    #lesson-content td { padding: 1rem 1.25rem; border-bottom: 1px solid #eef2ff; color: #475569; }
+    #lesson-content blockquote { padding: 1.5rem 1.75rem; border-radius: 1.25rem; margin: 2rem 0; border-left: 6px solid #3b82f6; background: linear-gradient(135deg, #eff6ff, #e0f2fe); color: #1e3a8a; font-style: italic; box-shadow: 0 8px 24px -8px rgba(99,102,241,0.25); }
+    #lesson-content blockquote p { color: #1e3a8a !important; margin-bottom: 0 !important; }
+    #lesson-content hr { border: none !important; border-top: 3px dashed #bfdbfe !important; margin: 2.5rem 0 !important; }
+    #lesson-content table { border-collapse: collapse; margin: 2rem 0; width: 100%; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 5px 18px -6px rgba(0,0,0,0.08); border: 1px solid #eff6ff; }
+    #lesson-content th { background: linear-gradient(135deg, #2563eb, #3b82f6); color: white; font-weight: 800; padding: 1rem 1.25rem; text-align: left; font-size: 14px; letter-spacing: 0.02em; }
+    #lesson-content td { padding: 1rem 1.25rem; border-bottom: 1px solid #eff6ff; color: #475569; }
     #lesson-content tr:nth-child(even) td { background-color: #fafbff; }
-    #lesson-content img { border-radius: 1.5rem; box-shadow: 0 20px 50px -12px rgba(0,0,0,0.18); max-width: 100%; margin: 1.75rem 0; border: 1px solid #eef2ff; }
-    #lesson-content a { color: #4f46e5; font-weight: 600; text-decoration: none; border-bottom: 2px solid #c7d2fe; padding-bottom: 1px; }
-    #lesson-content a:hover { color: #4338ca; border-color: #4f46e5; }
+    #lesson-content img { border-radius: 1.5rem; box-shadow: 0 20px 50px -12px rgba(0,0,0,0.18); max-width: 100%; margin: 1.75rem 0; border: 1px solid #eff6ff; }
+    #lesson-content a { color: #2563eb; font-weight: 600; text-decoration: none; border-bottom: 2px solid #bfdbfe; padding-bottom: 1px; }
+    #lesson-content a:hover { color: #1d4ed8; border-color: #2563eb; }
     #lesson-content mark { background: linear-gradient(transparent 60%, #fde68a 60%); padding: 0.1rem 0.35rem; border-radius: 4px; color: inherit; font-weight: 600; }
-    #lesson-content input[type="checkbox"] { width: 1.15em; height: 1.15em; border: 2px solid #c7d2fe; border-radius: 4px; appearance: none; -webkit-appearance: none; cursor: pointer; position: relative; margin-right: 0.4em; vertical-align: -2px; }
-    #lesson-content input[type="checkbox"]:checked { background: #4f46e5; border-color: #4f46e5; }
+    #lesson-content input[type="checkbox"] { width: 1.15em; height: 1.15em; border: 2px solid #bfdbfe; border-radius: 4px; appearance: none; -webkit-appearance: none; cursor: pointer; position: relative; margin-right: 0.4em; vertical-align: -2px; }
+    #lesson-content input[type="checkbox"]:checked { background: #2563eb; border-color: #2563eb; }
     #lesson-content input[type="checkbox"]:checked::after { content: '✓'; position: absolute; color: white; font-size: 0.8em; left: 2px; top: -2px; font-weight: 900; }
 
-    #lesson-content u { text-decoration: underline; text-decoration-color: #6366f1; text-decoration-thickness: 3px; text-underline-offset: 3px; }
-    #lesson-content sup { color: #7c3aed; font-weight: 700; }
+    #lesson-content u { text-decoration: underline; text-decoration-color: #3b82f6; text-decoration-thickness: 3px; text-underline-offset: 3px; }
+    #lesson-content sup { color: #2563eb; font-weight: 700; }
     #lesson-content sub { color: #dc2626; font-weight: 700; }
 
     #lesson-content .admonition { padding: 1.5rem 1.75rem; border-radius: 1.25rem; margin: 2rem 0; border-left: 6px solid; box-shadow: 0 8px 28px -10px rgba(0,0,0,0.18); position: relative; overflow: hidden; }
@@ -407,7 +407,7 @@
     #lesson-content .katex-error { background: linear-gradient(135deg, #fff1f2, #ffe4e6); border: 1px dashed #fb7185; color: #9f1239; padding: 1rem 1.25rem; border-radius: 1rem; display: inline-block; margin: 1rem 0; font-family: monospace; }
     #lesson-content .katex { font-size: 1.1em; }
 
-    #lesson-content div[style*="text-align:center"] { padding: 1.25rem; margin: 1.5rem 0; border: 2px dashed #a5b4fc; border-radius: 1rem; background: linear-gradient(90deg, rgba(238,242,255,0.6), rgba(243,232,255,0.6)); }
+    #lesson-content div[style*="text-align:center"] { padding: 1.25rem; margin: 1.5rem 0; border: 2px dashed #93c5fd; border-radius: 1rem; background: linear-gradient(90deg, rgba(238,242,255,0.6), rgba(243,232,255,0.6)); }
 
     #lesson-content iframe { width: 100%; max-width: 100%; aspect-ratio: 16/9; border-radius: 1.25rem; border: 3px solid #f9a8d4; box-shadow: 0 20px 45px -15px rgba(236,72,153,0.35); margin: 2rem 0; overflow: hidden; display: block; }
     #lesson-content iframe.youtube-player { background: #000; }

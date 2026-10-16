@@ -21,7 +21,7 @@ def docs_list(request):
 
 def book_overview(request, slug):
     book = get_object_or_404(Book, slug=slug)
-    chapters = book.chapters.all().order_by('order')
+    chapters = book.chapters.all().order_by('created_at')
     return render(request, 'docs/book_overview.html', {
         'book': book,
         'chapters': chapters
@@ -30,7 +30,7 @@ def book_overview(request, slug):
 def chapter_detail(request, book_slug, slug):
     chapter = get_object_or_404(Chapter, book__slug=book_slug, slug=slug)
     book = chapter.book
-    chapters = book.chapters.all().order_by('order')
+    chapters = book.chapters.all().order_by('created_at')
     
     # Convert markdown to HTML with robust extension support
     content_html = markdown.markdown(chapter.content, extensions=[

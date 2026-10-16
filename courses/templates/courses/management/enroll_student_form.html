@@ -14,15 +14,15 @@
             {% include 'courses/admin_topbar_snippet.html' with title=title subtitle="ကျောင်းသားရဲ့ Username / Email ကိုရိုက်ပြီး သင်တန်း Access ပေးနိုင်ပါတယ်" %}
 
             <div class="bg-white rounded-[3rem] shadow-xl border border-slate-100 p-8 md:p-12">
-                <div class="mb-10 p-6 bg-gradient-to-br from-indigo-50 to-violet-50 rounded-[2rem] border border-indigo-100 flex items-start gap-5">
-                    <div class="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white flex-shrink-0 shadow-lg shadow-indigo-200">
+                <div class="mb-10 p-6 bg-gradient-to-br from-blue-50 to-blue-50 rounded-[2rem] border border-blue-100 flex items-start gap-5">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white flex-shrink-0 shadow-lg shadow-blue-200">
                         <i class="fas fa-user-check"></i>
                     </div>
                     <div class="space-y-2">
-                        <p class="font-black text-indigo-900 leading-none">မှတ်ချက်</p>
+                        <p class="font-black text-blue-900 leading-none">မှတ်ချက်</p>
                         <ul class="text-xs font-medium text-slate-600 space-y-1.5 leading-relaxed">
                             <li class="flex items-start gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5 text-[10px]"></i> ကျောင်းသားများက မိမိတို့ account ကို မိမိဖွင့်နိုင်ပြီးဖြစ်ပါတယ် (role က အမြဲ student ဖြစ်ပါတယ်)</li>
-                            <li class="flex items-start gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5 text-[10px]"></i> ကျောင်းသားရဲ့ <span class="font-bold text-indigo-700">username</span> ဒါမှမဟုတ် <span class="font-bold text-indigo-700">email</span> ကို ရိုက်ထည့်ရုံနဲ့ ရှာတွေ့နိုင်ပါတယ်</li>
+                            <li class="flex items-start gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5 text-[10px]"></i> ကျောင်းသားရဲ့ <span class="font-bold text-blue-700">username</span> ဒါမှမဟုတ် <span class="font-bold text-blue-700">email</span> ကို ရိုက်ထည့်ရုံနဲ့ ရှာတွေ့နိုင်ပါတယ်</li>
                             <li class="flex items-start gap-2"><i class="fas fa-check-circle text-emerald-500 mt-0.5 text-[10px]"></i> ထပ်တူ enroll လုပ်ခြင်း၊ သင့်မဟုတ်တဲ့သင်တန်း၊ Instructor/Admin account တွေ enroll လုပ်ခြင်းကို အလိုအလျောက် တားဆီးပါသည်</li>
                         </ul>
                     </div>
@@ -30,12 +30,12 @@
 
                 <form method="post" class="space-y-8" novalidate>
                     {% csrf_token %}
-                    
+
                     {% for field in form %}
                     <div>
                         <label for="{{ field.id_for_label }}" class="block text-slate-500 text-[11px] font-black uppercase tracking-widest mb-3 flex items-center gap-2">
                             {% if field.name == 'username_or_email' %}
-                                <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-indigo-50 text-indigo-500 text-xs">
+                                <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-blue-50 text-blue-500 text-xs">
                                     <i class="fas fa-user-search"></i>
                                 </span>
                             {% elif field.name == 'course' %}
@@ -49,7 +49,7 @@
                         {{ field }}
                         {% if field.help_text %}
                             <p class="text-[10px] text-slate-400 mt-2 italic flex items-start space-x-1.5">
-                                <i class="fas fa-info-circle mt-0.5 text-indigo-300 text-[10px]"></i>
+                                <i class="fas fa-info-circle mt-0.5 text-blue-300 text-[10px]"></i>
                                 <span>{{ field.help_text }}</span>
                             </p>
                         {% endif %}
@@ -74,7 +74,7 @@
                     {% endif %}
 
                     <div class="pt-6 flex flex-col md:flex-row gap-4">
-                        <button type="submit" class="flex-grow custom-gradient text-white font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform shadow-xl shadow-indigo-100 flex items-center justify-center">
+                        <button type="submit" class="flex-grow custom-gradient text-white font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform shadow-xl shadow-blue-100 flex items-center justify-center">
                             <i class="fas fa-user-plus mr-3"></i> ကျောင်းသားအား Enroll လုပ်မည်
                         </button>
                         <a href="{% if is_admin_user %}{% url 'manage_students' %}{% else %}{% url 'manage_enrollments' %}{% endif %}" class="px-10 py-5 bg-slate-50 text-slate-400 font-bold rounded-2xl hover:bg-slate-100 transition-all text-center">

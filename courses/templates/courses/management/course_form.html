@@ -39,7 +39,7 @@
 
                 <form method="post" enctype="multipart/form-data" class="space-y-8" novalidate>
                     {% csrf_token %}
-                    
+
                     {% for field in form %}
                     <div>
                         <label for="{{ field.id_for_label }}" class="block text-slate-500 text-xs font-black uppercase tracking-widest mb-3">
@@ -58,7 +58,7 @@
                     {% endfor %}
 
                     <div class="pt-6 flex flex-col md:flex-row gap-4">
-                        <button type="submit" class="flex-grow custom-gradient text-white font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform shadow-xl shadow-indigo-100">
+                        <button type="submit" class="flex-grow custom-gradient text-white font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform shadow-xl shadow-blue-100">
                             <i class="fas fa-save mr-3"></i> သိမ်းဆည်းမည်
                         </button>
                         <a href="{% url 'manage_courses' %}" class="px-10 py-5 bg-slate-50 text-slate-400 font-bold rounded-2xl hover:bg-slate-100 transition-all text-center">
@@ -78,7 +78,7 @@
         ClassicEditor
             .create(el, {
                 toolbar: [
-                    'heading', '|', 
+                    'heading', '|',
                     'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|',
                     'undo', 'redo'
                 ]

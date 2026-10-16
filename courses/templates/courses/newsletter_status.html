@@ -9,7 +9,7 @@
 
             {% if status == 'confirmed' %}
             <div class="mb-10">
-                <div class="w-28 h-28 mx-auto mb-8 rounded-3xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-2xl shadow-emerald-200">
+                <div class="w-28 h-28 mx-auto mb-8 rounded-3xl bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center shadow-2xl shadow-emerald-200">
                     <i class="fas fa-check text-white text-5xl"></i>
                 </div>
                 <h1 class="text-4xl md:text-5xl font-black text-slate-800 mb-6 leading-tight">
@@ -26,7 +26,7 @@
             </div>
             {% elif status == 'already_confirmed' %}
             <div class="mb-10">
-                <div class="w-28 h-28 mx-auto mb-8 rounded-3xl bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center shadow-2xl shadow-sky-200">
+                <div class="w-28 h-28 mx-auto mb-8 rounded-3xl bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center shadow-2xl shadow-blue-200">
                     <i class="fas fa-envelope-open-text text-white text-5xl"></i>
                 </div>
                 <h1 class="text-4xl md:text-5xl font-black text-slate-800 mb-6 leading-tight">
@@ -60,12 +60,12 @@
             {% endif %}
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10">
-                <a href="{% url 'course_list' %}" class="inline-flex items-center justify-center gap-2 px-8 py-5 bg-gradient-to-br from-indigo-600 to-fuchsia-600 text-white font-black rounded-2xl shadow-xl shadow-indigo-200 hover:shadow-2xl hover:-translate-y-0.5 transition-all">
+                <a href="{% url 'course_list' %}" class="inline-flex items-center justify-center gap-2 px-8 py-5 bg-gradient-to-br from-blue-600 to-blue-600 text-white font-black rounded-2xl shadow-xl shadow-blue-200 hover:shadow-2xl hover:-translate-y-0.5 transition-all">
                     <i class="fas fa-home"></i>
                     ပင်မစာမျက်နှာသို့
                 </a>
                 <a href="{% url 'courses_page' %}" class="inline-flex items-center justify-center gap-2 px-8 py-5 bg-white text-slate-700 font-black rounded-2xl shadow-xl border border-slate-100 hover:shadow-2xl hover:-translate-y-0.5 transition-all">
-                    <i class="fas fa-book-open text-indigo-600"></i>
+                    <i class="fas fa-book-open text-blue-600"></i>
                     သင်တန်းများ ကြည့်ရန်
                 </a>
             </div>

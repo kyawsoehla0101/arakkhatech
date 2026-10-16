@@ -8,7 +8,7 @@
         <!-- Hero Section -->
         <div class="max-w-4xl mx-auto text-center mb-20" data-aos="fade-up">
             <h1 class="text-4xl md:text-6xl font-black text-slate-900 mb-6 leading-tight">
-                Digital <span class="text-indigo-600">Library</span>
+                Digital <span class="text-blue-600">Library</span>
             </h1>
             <p class="text-slate-600 text-lg font-medium max-w-2xl mx-auto">
                 နည်းပညာစာအုပ်များနန့် သင်ခန်းစာလမ်းညွှန်ချက်များကို တစ်နီရာတည်းမှာ အခမဲ့ ဖတ်ရှုလေ့လာနိုင်ပါသည်။
@@ -19,7 +19,7 @@
         <div class="mb-24">
             <div class="flex items-center justify-between mb-12 border-b border-slate-100 pb-6">
                 <h2 class="text-3xl font-black text-slate-800 flex items-center">
-                    <span class="w-2 h-10 bg-indigo-600 rounded-full mr-4"></span> အခမဲ့ နည်းပညာစာအုပ်များ
+                    <span class="w-2 h-10 bg-blue-600 rounded-full mr-4"></span> အခမဲ့ နည်းပညာစာအုပ်များ
                 </h2>
                 <span class="text-slate-400 font-bold uppercase tracking-widest text-xs">{{ free_books.count }} Books</span>
             </div>
@@ -42,14 +42,14 @@
                     </div>
 
                     <div class="p-8">
-                        <h3 class="text-2xl font-black text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors">{{ book.title }}</h3>
+                        <h3 class="text-2xl font-black text-slate-900 mb-3 group-hover:text-blue-600 transition-colors">{{ book.title }}</h3>
                         <p class="text-slate-500 text-sm mb-6 line-clamp-2">{{ book.description|default:"အခြေခံမှ စတင်၍ လေ့လာနိုင်သော နည်းပညာစာအုပ်" }}</p>
-                        
+
                         <div class="flex items-center justify-between">
-                            <span class="bg-indigo-50 text-indigo-600 text-[10px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest">
+                            <span class="bg-blue-50 text-blue-600 text-[10px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest">
                                 {{ book.chapters.count }} Chapters
                             </span>
-                            <a href="{% url 'book_overview' book.slug %}" class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-indigo-600 transition-colors">
+                            <a href="{% url 'book_overview' book.slug %}" class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-blue-600 transition-colors">
                                 <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>

@@ -8,12 +8,12 @@
         transition: all 0.3s ease;
     }
     .swiper-button-next:hover, .swiper-button-prev:hover {
-        background-color: #6366f1;
+        background-color: #3b82f6;
         color: white !important;
         transform: scale(1.1);
     }
     .swiper-pagination-bullet-active {
-        background: #6366f1 !important;
+        background: #3b82f6 !important;
         width: 24px !important;
         border-radius: 5px !important;
     }
@@ -23,14 +23,14 @@
 {% block content %}
 <!-- Hero Section -->
 <section class="relative min-h-[90vh] flex items-center pt-10 overflow-hidden bg-slate-50">
-    <div class="absolute top-0 right-0 w-1/3 h-full bg-indigo-50/50 rounded-bl-[10rem] -z-10"></div>
+    <div class="absolute top-0 right-0 w-1/3 h-full bg-blue-50/50 rounded-bl-[10rem] -z-10"></div>
     <div class="container mx-auto px-6">
         <div class="flex flex-col lg:flex-row items-center justify-between gap-16">
             <div class="lg:w-1/2" data-aos="fade-right">
-                <div class="inline-flex items-center space-x-2 bg-indigo-50 px-4 py-2 rounded-full text-indigo-600 font-bold text-sm mb-6">
+                <div class="inline-flex items-center space-x-2 bg-blue-50 px-4 py-2 rounded-full text-blue-600 font-bold text-sm mb-6">
                     <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span>
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
                     </span>
                     <span>အဂုကပင် စတင်လိလာလိုက်ပါ</span>
                 </div>
@@ -41,9 +41,9 @@
                     အာရက္ခနည်းပညာသည် ခေတ်မီနည်းပညာများကို အာရက္ခဘာသာဖြင့် အခြီခံမှစ၍ လက်တွိကျကျ သင်ကြားပီးနိန်သော platform ဖြစ်ပါသည်။
                 </p>
                 <div class="flex flex-wrap gap-4">
-                    <a href="#courses" class="custom-gradient text-white px-8 py-4 rounded-2xl font-bold btn-hover shadow-xl shadow-indigo-200">သင်တန်းများကြည့်ရန်</a>
+                    <a href="#courses" class="custom-gradient text-white px-8 py-4 rounded-2xl font-bold btn-hover shadow-xl shadow-blue-200">သင်တန်းများကြည့်ရန်</a>
                     <a href="#" class="bg-white text-slate-700 px-8 py-4 rounded-2xl font-bold border border-slate-200 hover:bg-slate-50 transition-all flex items-center">
-                        <i class="fas fa-play-circle mr-3 text-indigo-600"></i> Video Preview
+                        <i class="fas fa-play-circle mr-3 text-blue-600"></i> Video Preview
                     </a>
                 </div>
             </div>
@@ -68,13 +68,13 @@
                             <p class="ml-12 mb-2"><span class="text-[#c586c0]">while</span> <span class="text-[#569cd6]">True</span>:</p>
                             <p class="ml-18 mb-2"><span class="text-[#dcdcaa]">print</span>(<span class="text-[#ce9178]">"Building the future..."</span>)</p>
                             <p class="ml-18"><span class="text-[#9cdcfe]">self</span>.<span class="text-[#dcdcaa]">upgrade_skills</span>()</p>
-                            <span class="cursor inline-block w-2 h-5 bg-indigo-500 ml-1 align-middle animate-pulse-fast"></span>
+                            <span class="cursor inline-block w-2 h-5 bg-blue-500 ml-1 align-middle animate-pulse-fast"></span>
                         </div>
                     </div>
                 </div>
                 <!-- Floating Elements -->
                 <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand2-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-                <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+                <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
                 <div class="absolute top-1/2 -left-20 glass p-6 rounded-[2rem] shadow-xl hidden md:block animate-bounce-slow">
                     <div class="flex items-center space-x-4">
                         <div class="bg-emerald-50 p-3 rounded-xl text-emerald-600"><i class="fas fa-check-circle"></i></div>
@@ -116,14 +116,14 @@
 <!-- Features Section -->
 <section id="features" class="py-32 bg-slate-50">
     <div class="container mx-auto px-6 text-center mb-20">
-        <h4 class="text-indigo-600 font-black uppercase tracking-widest text-sm mb-4">Why Arakkha Tech?</h4>
+        <h4 class="text-blue-600 font-black uppercase tracking-widest text-sm mb-4">Why Arakkha Tech?</h4>
         <h2 class="text-4xl lg:text-5xl font-black text-slate-800">ကရို့၏ ထူးခြားချက်များ</h2>
     </div>
     <div class="container mx-auto px-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
             {% for feature in features %}
             <div class="bg-white p-12 rounded-[3rem] shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 border border-slate-100 group" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
-                <div class="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-2xl mb-8 group-hover:custom-gradient group-hover:text-white transition-all">
+                <div class="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 text-2xl mb-8 group-hover:custom-gradient group-hover:text-white transition-all">
                     <i class="{{ feature.icon }}"></i>
                 </div>
                 <h3 class="text-2xl font-black text-slate-800 mb-4">{{ feature.title }}</h3>
@@ -136,18 +136,18 @@
 
 <!-- Course List Section -->
 <section id="courses" class="py-32 bg-white relative overflow-hidden">
-    <div class="absolute top-0 left-0 w-64 h-64 bg-indigo-50 rounded-full -ml-32 -mt-32 opacity-50"></div>
+    <div class="absolute top-0 left-0 w-64 h-64 bg-blue-50 rounded-full -ml-32 -mt-32 opacity-50"></div>
     <div class="container mx-auto px-6">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20">
             <div data-aos="fade-right">
-                <h4 class="text-indigo-600 font-black uppercase tracking-widest text-sm mb-4">Learning Path</h4>
+                <h4 class="text-blue-600 font-black uppercase tracking-widest text-sm mb-4">Learning Path</h4>
                 <h2 class="text-4xl lg:text-5xl font-black text-slate-800">လူကြိုက်များသော သင်တန်းများ</h2>
             </div>
             <!-- Search Bar -->
             <form action="{% url 'course_list' %}" method="get" class="relative md:w-96" data-aos="fade-left">
-                <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search courses..." 
-                       class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
-                <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-600"><i class="fas fa-search"></i></button>
+                <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search courses..."
+                       class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-blue-600"><i class="fas fa-search"></i></button>
             </form>
         </div>
 
@@ -158,12 +158,12 @@
                     {% if course.thumbnail %}
                         <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                     {% else %}
-                        <div class="w-full h-full bg-indigo-50 flex items-center justify-center text-indigo-200">
+                        <div class="w-full h-full bg-blue-50 flex items-center justify-center text-blue-200">
                             <i class="fas fa-laptop-code text-7xl group-hover:scale-110 transition-transform duration-700"></i>
                         </div>
                     {% endif %}
                     <div class="absolute top-4 left-4">
-                        <span class="bg-white/90 backdrop-blur px-4 py-2 rounded-xl text-xs font-bold text-indigo-600 shadow-lg">Featured</span>
+                        <span class="bg-white/90 backdrop-blur px-4 py-2 rounded-xl text-xs font-bold text-blue-600 shadow-lg">Featured</span>
                     </div>
                 </div>
                 <div class="p-8">
@@ -173,13 +173,13 @@
                         </div>
                         <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ course.instructor.username }}</span>
                     </div>
-                    <h3 class="text-xl font-bold mb-3 text-slate-800 group-hover:text-indigo-600 transition-colors leading-snug">{{ course.title }}</h3>
+                    <h3 class="text-xl font-bold mb-3 text-slate-800 group-hover:text-blue-600 transition-colors leading-snug">{{ course.title }}</h3>
                     <p class="text-slate-500 text-sm mb-8 line-clamp-2 leading-relaxed">{{ course.description | safe }}</p>
                     <div class="flex items-center justify-between pt-6 border-t border-slate-50">
-                        <div class="flex items-center text-indigo-600 font-bold">
+                        <div class="flex items-center text-blue-600 font-bold">
                             <span class="text-lg">Free</span>
                         </div>
-                        <a href="{% url 'course_detail' course.slug %}" class="bg-indigo-600 text-white px-6 py-3 rounded-2xl hover:bg-indigo-700 transition-all font-bold text-sm shadow-lg shadow-indigo-100">
+                        <a href="{% url 'course_detail' course.slug %}" class="bg-blue-600 text-white px-6 py-3 rounded-2xl hover:bg-blue-700 transition-all font-bold text-sm shadow-lg shadow-blue-100">
                             Enroll Now
                         </a>
                     </div>
@@ -198,7 +198,7 @@
 <!-- Testimonials -->
 <section id="testimonials" class="py-32 bg-slate-50 overflow-hidden">
     <div class="container mx-auto px-6 text-center mb-20">
-        <h4 class="text-indigo-600 font-black uppercase tracking-widest text-sm mb-4">Community Voice</h4>
+        <h4 class="text-blue-600 font-black uppercase tracking-widest text-sm mb-4">Community Voice</h4>
         <h2 class="text-4xl lg:text-5xl font-black text-slate-800">ကျောင်းသားများ၏ ထင်မြင်ချက်များ</h2>
     </div>
     <div class="container mx-auto px-6">
@@ -210,12 +210,12 @@
                     <div class="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-50 hover:shadow-xl transition-all h-full flex flex-col justify-between" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
                         <div>
                             <div class="flex items-center mb-6">
-                                <div class="w-14 h-14 rounded-2xl custom-gradient flex items-center justify-center text-white text-xl font-black mr-4 shadow-lg shadow-indigo-100">
+                                <div class="w-14 h-14 rounded-2xl custom-gradient flex items-center justify-center text-white text-xl font-black mr-4 shadow-lg shadow-blue-100">
                                     {{ voice.user.username|slice:":1"|upper }}
                                 </div>
                                 <div>
                                     <h4 class="font-black text-slate-800 text-lg">{{ voice.user.username }}</h4>
-                                    <p class="text-xs font-bold text-indigo-500 uppercase tracking-widest">Verified Student</p>
+                                    <p class="text-xs font-bold text-blue-500 uppercase tracking-widest">Verified Student</p>
                                 </div>
                             </div>
                             <p class="text-slate-500 leading-relaxed italic">"{{ voice.content }}"</p>
@@ -228,12 +228,12 @@
                     <div class="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-50 hover:shadow-xl transition-all h-full flex flex-col justify-between" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
                         <div>
                             <div class="flex items-center mb-6">
-                                <div class="w-14 h-14 rounded-2xl custom-gradient flex items-center justify-center text-white text-xl font-black mr-4 shadow-lg shadow-indigo-100">
+                                <div class="w-14 h-14 rounded-2xl custom-gradient flex items-center justify-center text-white text-xl font-black mr-4 shadow-lg shadow-blue-100">
                                     {{ t.name|slice:":1"|upper }}
                                 </div>
                                 <div>
                                     <h4 class="font-black text-slate-800 text-lg">{{ t.name }}</h4>
-                                    <p class="text-xs font-bold text-indigo-500 uppercase tracking-widest">{{ t.role }}</p>
+                                    <p class="text-xs font-bold text-blue-500 uppercase tracking-widest">{{ t.role }}</p>
                                 </div>
                             </div>
                             <p class="text-slate-500 leading-relaxed italic">"{{ t.text }}"</p>
@@ -247,8 +247,8 @@
             <div class="swiper-pagination !-bottom-2"></div>
             <!-- Add Navigation -->
             <div class="hidden md:block">
-                <div class="swiper-button-next !text-indigo-600 !w-12 !h-12 bg-white rounded-full shadow-lg after:!text-xl"></div>
-                <div class="swiper-button-prev !text-indigo-600 !w-12 !h-12 bg-white rounded-full shadow-lg after:!text-xl"></div>
+                <div class="swiper-button-next !text-blue-600 !w-12 !h-12 bg-white rounded-full shadow-lg after:!text-xl"></div>
+                <div class="swiper-button-prev !text-blue-600 !w-12 !h-12 bg-white rounded-full shadow-lg after:!text-xl"></div>
             </div>
         </div>
     </div>
@@ -292,12 +292,12 @@
     <div class="container mx-auto px-6 relative">
         <div class="max-w-5xl mx-auto bg-white rounded-[3rem] shadow-2xl border border-slate-100 p-10 md:p-16 relative overflow-hidden">
             <!-- Decorative elements -->
-            <div class="absolute -top-20 -right-20 w-80 h-80 bg-indigo-50 rounded-full opacity-50 blur-3xl"></div>
+            <div class="absolute -top-20 -right-20 w-80 h-80 bg-blue-50 rounded-full opacity-50 blur-3xl"></div>
             <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-brand2-50 rounded-full opacity-50 blur-3xl"></div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative">
                 <div data-aos="fade-right">
-                    <div class="inline-flex items-center px-4 py-2 rounded-full bg-indigo-50 text-indigo-600 text-xs font-black uppercase tracking-widest mb-6">
+                    <div class="inline-flex items-center px-4 py-2 rounded-full bg-blue-50 text-blue-600 text-xs font-black uppercase tracking-widest mb-6">
                         <i class="fas fa-envelope mr-2"></i> Stay Updated
                     </div>
                     <h2 class="text-4xl md:text-5xl font-black text-slate-800 leading-tight mb-6">
@@ -305,8 +305,8 @@
                         <span class="custom-gradient-text">အရင်ဆုံး သိချင်ပါသလား?</span>
                     </h2>
                     <p class="text-slate-500 text-lg leading-relaxed mb-8">
-                        Newsletter စာရင်းသွင်းလိုက်စွာနန့် သင်တန်းအသစ်တွေ၊ 
-                        Special Discounts နန့် နည်းပညာဆိုင်ရာ Content တွေကို 
+                        Newsletter စာရင်းသွင်းလိုက်စွာနန့် သင်တန်းအသစ်တွေ၊
+                        Special Discounts နန့် နည်းပညာဆိုင်ရာ Content တွေကို
                         အရင်ဆုံးရရှိနိုင်ပါဗျာယ်။
                     </p>
                     <div class="flex flex-wrap gap-3">
@@ -327,24 +327,24 @@
                             <div class="absolute inset-y-0 left-6 flex items-center pointer-events-none">
                                 <i class="fas fa-envelope text-slate-300 text-lg"></i>
                             </div>
-                            <input 
-                                type="email" 
-                                name="email" 
+                            <input
+                                type="email"
+                                name="email"
                                 placeholder="သင်၏ Email Address ထည့်ပါ"
                                 required
-                                class="w-full pl-16 pr-6 py-6 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-indigo-500 focus:bg-white focus:outline-none transition-all text-slate-700 font-bold placeholder:text-slate-300 placeholder:font-medium"
+                                class="w-full pl-16 pr-6 py-6 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-blue-500 focus:bg-white focus:outline-none transition-all text-slate-700 font-bold placeholder:text-slate-300 placeholder:font-medium"
                             >
                         </div>
-                        <button 
-                            type="submit" 
-                            class="w-full custom-gradient text-white font-black py-6 rounded-2xl hover:scale-[1.02] transition-transform shadow-xl shadow-indigo-200 text-lg flex items-center justify-center group"
+                        <button
+                            type="submit"
+                            class="w-full custom-gradient text-white font-black py-6 rounded-2xl hover:scale-[1.02] transition-transform shadow-xl shadow-blue-200 text-lg flex items-center justify-center group"
                         >
                             <i class="fas fa-paper-plane mr-3 group-hover:animate-pulse"></i>
                             အခမဲ့ စာရင်းသွင်းမည်
                         </button>
                         <p class="text-center text-slate-400 text-xs font-bold mt-6">
-                            <i class="fas fa-users text-indigo-400 mr-1"></i> 
-                            လူပေါင်း <span class="text-indigo-600 font-black">2,500+</span> က စာရင်းသွင်းထားပြီးသား
+                            <i class="fas fa-users text-blue-400 mr-1"></i>
+                            လူပေါင်း <span class="text-blue-600 font-black">2,500+</span> က စာရင်းသွင်းထားပြီးသား
                         </p>
                     </form>
                 </div>
@@ -365,7 +365,7 @@
             <div class="group bg-slate-50 rounded-3xl p-6 hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-slate-100" data-aos="fade-up">
                 <h3 class="text-lg font-bold text-slate-800 flex items-center justify-between cursor-pointer">
                     {{ faq.q }}
-                    <i class="fas fa-chevron-down text-slate-300 group-hover:text-indigo-600 transition-colors"></i>
+                    <i class="fas fa-chevron-down text-slate-300 group-hover:text-blue-600 transition-colors"></i>
                 </h3>
                 <div class="mt-4 text-slate-500 leading-relaxed hidden group-hover:block animate-fade-in">
                     {{ faq.a }}
@@ -411,7 +411,7 @@
         50% { opacity: 0; }
     }
     .ml-18 { margin-left: 4.5rem; }
-    
+
     .typing-container p {
         width: 0;
         overflow: hidden;

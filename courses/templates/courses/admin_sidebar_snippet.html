@@ -2,27 +2,27 @@
 <aside class="w-full lg:w-72 bg-slate-900 text-white lg:min-h-screen flex flex-col sticky top-0 z-40">
     <div class="p-8">
         <div class="flex items-center space-x-3 mb-10">
-            <div class="w-10 h-10 rounded-xl bg-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <div class="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
                 <i class="fas fa-shield-alt text-white"></i>
             </div>
             <span class="text-xl font-black tracking-tight">
-                {% if is_admin_user %}Admin<span class="text-indigo-400">Hub</span>{% else %}Instructor<span class="text-emerald-400">Hub</span>{% endif %}
+                {% if is_admin_user %}Admin<span class="text-blue-400">Hub</span>{% else %}Instructor<span class="text-emerald-400">Hub</span>{% endif %}
             </span>
         </div>
 
         <nav class="space-y-2">
             {% if is_admin_user %}
             <a href="{% url 'admin_dashboard' %}" class="flex items-center space-x-4 p-4 rounded-2xl {% if request.resolver_match.url_name == 'admin_dashboard' %}bg-white/10 text-white font-bold border border-white/5 shadow-lg{% else %}text-slate-400 hover:bg-white/5 hover:text-white transition-all group{% endif %}">
-                <i class="fas fa-chart-line {% if request.resolver_match.url_name == 'admin_dashboard' %}text-indigo-400{% else %}group-hover:text-indigo-400{% endif %}"></i>
+                <i class="fas fa-chart-line {% if request.resolver_match.url_name == 'admin_dashboard' %}text-blue-400{% else %}group-hover:text-blue-400{% endif %}"></i>
                 <span>Dashboard</span>
             </a>
             {% endif %}
             <a href="{% url 'manage_courses' %}" class="flex items-center space-x-4 p-4 rounded-2xl {% if request.resolver_match.url_name == 'manage_courses' %}bg-white/10 text-white font-bold border border-white/5 shadow-lg{% else %}text-slate-400 hover:bg-white/5 hover:text-white transition-all group{% endif %}">
-                <i class="fas fa-book {% if request.resolver_match.url_name == 'manage_courses' %}text-indigo-400{% else %}group-hover:text-indigo-400{% endif %}"></i>
+                <i class="fas fa-book {% if request.resolver_match.url_name == 'manage_courses' %}text-blue-400{% else %}group-hover:text-blue-400{% endif %}"></i>
                 <span>Courses</span>
             </a>
             <a href="{% url 'manage_all_lessons' %}" class="flex items-center space-x-4 p-4 rounded-2xl {% if request.resolver_match.url_name == 'manage_all_lessons' %}bg-white/10 text-white font-bold border border-white/5 shadow-lg{% else %}text-slate-400 hover:bg-white/5 hover:text-white transition-all group{% endif %}">
-                <i class="fas fa-play-circle {% if request.resolver_match.url_name == 'manage_all_lessons' %}text-indigo-400{% else %}group-hover:text-indigo-400{% endif %}"></i>
+                <i class="fas fa-play-circle {% if request.resolver_match.url_name == 'manage_all_lessons' %}text-blue-400{% else %}group-hover:text-blue-400{% endif %}"></i>
                 <span>Lessons</span>
             </a>
             <a href="{% url 'manage_enrollments' %}" class="flex items-center space-x-4 p-4 rounded-2xl {% if 'enroll' in request.resolver_match.url_name %}bg-white/10 text-white font-bold border border-white/5 shadow-lg{% else %}text-slate-400 hover:bg-white/5 hover:text-white transition-all group{% endif %}">
@@ -41,7 +41,7 @@
                 {% endif %}
             </a>
             <a href="{% url 'manage_newsletter' %}" class="flex items-center space-x-4 p-4 rounded-2xl {% if request.resolver_match.url_name in 'manage_newsletter|newsletter_toggle_active|newsletter_delete' %}bg-white/10 text-white font-bold border border-white/5 shadow-lg{% else %}text-slate-400 hover:bg-white/5 hover:text-white transition-all group{% endif %}">
-                <i class="fas fa-newspaper {% if request.resolver_match.url_name in 'manage_newsletter|newsletter_toggle_active|newsletter_delete' %}text-fuchsia-400{% else %}group-hover:text-fuchsia-400{% endif %}"></i>
+                <i class="fas fa-newspaper {% if request.resolver_match.url_name in 'manage_newsletter|newsletter_toggle_active|newsletter_delete' %}text-blue-400{% else %}group-hover:text-blue-400{% endif %}"></i>
                 <span>Newsletter</span>
             </a>
             <div class="pt-4 border-t border-white/5">
@@ -53,15 +53,15 @@
             {% if is_admin_user %}
             <div class="pt-4 border-t border-white/5 mt-4">
                 <a href="{% url 'manage_students' %}" class="flex items-center space-x-4 p-4 rounded-2xl {% if request.resolver_match.url_name == 'manage_students' %}bg-white/10 text-white font-bold border border-white/5 shadow-lg{% else %}text-slate-400 hover:bg-white/5 hover:text-white transition-all group{% endif %}">
-                    <i class="fas fa-user-graduate {% if request.resolver_match.url_name == 'manage_students' %}text-indigo-400{% else %}group-hover:text-indigo-400{% endif %}"></i>
+                    <i class="fas fa-user-graduate {% if request.resolver_match.url_name == 'manage_students' %}text-blue-400{% else %}group-hover:text-blue-400{% endif %}"></i>
                     <span>Students</span>
                 </a>
                 <a href="{% url 'manage_users' %}" class="flex items-center space-x-4 p-4 rounded-2xl {% if request.resolver_match.url_name == 'manage_users' %}bg-white/10 text-white font-bold border border-white/5 shadow-lg{% else %}text-slate-400 hover:bg-white/5 hover:text-white transition-all group{% endif %}">
-                    <i class="fas fa-users-cog {% if request.resolver_match.url_name == 'manage_users' %}text-indigo-400{% else %}group-hover:text-indigo-400{% endif %}"></i>
+                    <i class="fas fa-users-cog {% if request.resolver_match.url_name == 'manage_users' %}text-blue-400{% else %}group-hover:text-blue-400{% endif %}"></i>
                     <span>User Management</span>
                 </a>
                 <a href="{% url 'manage_voices' %}" class="flex items-center space-x-4 p-4 rounded-2xl {% if request.resolver_match.url_name == 'manage_voices' %}bg-white/10 text-white font-bold border border-white/5 shadow-lg{% else %}text-slate-400 hover:bg-white/5 hover:text-white transition-all group{% endif %}">
-                    <i class="fas fa-comment-dots {% if request.resolver_match.url_name == 'manage_voices' %}text-indigo-400{% else %}group-hover:text-indigo-400{% endif %}"></i>
+                    <i class="fas fa-comment-dots {% if request.resolver_match.url_name == 'manage_voices' %}text-blue-400{% else %}group-hover:text-blue-400{% endif %}"></i>
                     <span>Community Voice</span>
                 </a>
             </div>
@@ -70,8 +70,8 @@
     </div>
 
     <div class="mt-auto p-8">
-        <div class="bg-indigo-600/20 rounded-[2rem] p-6 border border-indigo-500/20">
-            <p class="text-xs font-black text-indigo-400 uppercase tracking-widest mb-2">Pro Tip</p>
+        <div class="bg-blue-600/20 rounded-[2rem] p-6 border border-blue-500/20">
+            <p class="text-xs font-black text-blue-400 uppercase tracking-widest mb-2">Pro Tip</p>
             <p class="text-[11px] text-slate-400 leading-relaxed">Check course growth in the analytics tab for detailed insights.</p>
         </div>
     </div>

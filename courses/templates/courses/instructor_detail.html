@@ -4,7 +4,7 @@
 
 {% block content %}
 <!-- ================== HERO PROFILE ================== -->
-<section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white pt-28 pb-24">
+<section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white pt-28 pb-24">
     <div class="pointer-events-none absolute inset-0 custom-gradient opacity-20"></div>
     <div class="pointer-events-none absolute -top-24 left-1/4 h-96 w-96 rounded-full bg-brand-500/15 blur-3xl"></div>
     <div class="pointer-events-none absolute -bottom-24 right-1/4 h-96 w-96 rounded-full bg-brand2-500/15 blur-3xl"></div>
@@ -15,7 +15,7 @@
             <i class="fas fa-chevron-right text-[9px] opacity-50"></i>
             <a href="{% url 'instructors_list' %}" class="hover:text-white transition-colors">Instructors</a>
             <i class="fas fa-chevron-right text-[9px] opacity-50"></i>
-            <span class="text-indigo-200">{{ instructor.get_full_name|default:instructor.username }}</span>
+            <span class="text-blue-200">{{ instructor.get_full_name|default:instructor.username }}</span>
         </nav>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
@@ -39,14 +39,14 @@
                                         <i class="fas fa-star mr-1"></i> FEATURED
                                     </span>
                                 {% endif %}
-                                <span class="rounded-full bg-indigo-500/20 text-indigo-200 text-[10px] font-black px-3 py-1 border border-indigo-400/30">
+                                <span class="rounded-full bg-blue-500/20 text-blue-200 text-[10px] font-black px-3 py-1 border border-blue-400/30">
                                     INSTRUCTOR
                                 </span>
                             </div>
                             <h1 class="text-3xl md:text-4xl font-black leading-tight mb-2">
                                 {{ instructor.get_full_name|default:instructor.username }}
                             </h1>
-                            <p class="text-lg text-indigo-200 font-bold mb-4">
+                            <p class="text-lg text-blue-200 font-bold mb-4">
                                 {% if profile.headline %}{{ profile.headline }}{% else %}Professional Teacher{% endif %}
                             </p>
                             <p class="text-xs text-slate-400 mb-5 flex items-center gap-4 flex-wrap">
@@ -79,7 +79,7 @@
                                         <i class="fas fa-globe text-lg"></i>
                                     </a>
                                 {% endif %}
-                                <a href="mailto:{{ instructor.email }}" class="inline-flex items-center gap-2 rounded-2xl custom-gradient text-white px-5 py-3 font-black shadow-xl shadow-indigo-900/40 hover:scale-[1.02] transition-transform">
+                                <a href="mailto:{{ instructor.email }}" class="inline-flex items-center gap-2 rounded-2xl custom-gradient text-white px-5 py-3 font-black shadow-xl shadow-blue-900/40 hover:scale-[1.02] transition-transform">
                                     <i class="fas fa-paper-plane"></i> Contact Teacher
                                 </a>
                             </div>
@@ -123,12 +123,12 @@
 
                 {% if profile.expertise_list %}
                 <div class="rounded-[2rem] bg-white/5 backdrop-blur border border-white/10 p-7">
-                    <p class="text-xs font-black uppercase tracking-widest text-indigo-300 mb-4">
+                    <p class="text-xs font-black uppercase tracking-widest text-blue-300 mb-4">
                         <i class="fas fa-flask mr-2"></i> Areas of Expertise
                     </p>
                     <div class="flex flex-wrap gap-3">
                         {% for s in profile.expertise_list %}
-                            <span class="rounded-full bg-indigo-500/15 text-indigo-100 text-sm font-black px-5 py-2 border border-indigo-400/20">
+                            <span class="rounded-full bg-blue-500/15 text-blue-100 text-sm font-black px-5 py-2 border border-blue-400/20">
                                 {{ s }}
                             </span>
                         {% endfor %}
@@ -144,7 +144,7 @@
 <section class="bg-white py-16 border-b border-slate-100">
     <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-3 gap-10">
         <div class="lg:col-span-2">
-            <p class="text-xs font-black uppercase tracking-[0.25em] text-indigo-600 mb-3">About</p>
+            <p class="text-xs font-black uppercase tracking-[0.25em] text-blue-600 mb-3">About</p>
             <h2 class="text-3xl md:text-4xl font-black text-slate-900 leading-tight mb-7">
                 Instructor အကြောင်း
             </h2>
@@ -208,7 +208,7 @@
     <div class="container mx-auto px-6">
         <div class="flex items-end justify-between mb-12 flex-wrap gap-4">
             <div>
-                <p class="text-xs font-black uppercase tracking-[0.25em] text-indigo-600 mb-3">
+                <p class="text-xs font-black uppercase tracking-[0.25em] text-blue-600 mb-3">
                     <i class="fas fa-book mr-2"></i> Courses
                 </p>
                 <h2 class="text-3xl md:text-5xl font-black text-slate-900 leading-tight">
@@ -216,7 +216,7 @@
                 </h2>
             </div>
             <p class="text-sm text-slate-500 font-bold">
-                <i class="fas fa-book-open mr-2 text-indigo-500"></i>{{ total_courses }} courses
+                <i class="fas fa-book-open mr-2 text-blue-500"></i>{{ total_courses }} courses
             </p>
         </div>
 
@@ -224,7 +224,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for c in courses %}
                     <a href="{% url 'course_detail' c.slug %}"
-                       class="group rounded-[2rem] bg-white border border-slate-200 overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-indigo-100 hover:-translate-y-1 transition-all">
+                       class="group rounded-[2rem] bg-white border border-slate-200 overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-blue-100 hover:-translate-y-1 transition-all">
                         <div class="aspect-video bg-slate-100 overflow-hidden relative">
                             {% if c.thumbnail %}
                                 <img src="{{ c.thumbnail.url }}" alt="{{ c.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
@@ -244,7 +244,7 @@
                             </div>
                         </div>
                         <div class="p-6">
-                            <h3 class="text-xl font-black text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors leading-snug">
+                            <h3 class="text-xl font-black text-slate-900 mb-3 group-hover:text-blue-600 transition-colors leading-snug">
                                 {{ c.title }}
                             </h3>
                             <p class="text-sm text-slate-500 leading-relaxed mb-5 line-clamp-3">
@@ -254,7 +254,7 @@
                                 <div class="inline-flex items-center gap-1 text-amber-500 font-black text-sm">
                                     <i class="fas fa-star"></i> {{ c.total_rating }}
                                 </div>
-                                <span class="inline-flex items-center gap-2 text-sm font-black text-indigo-600 group-hover:translate-x-1 transition-transform">
+                                <span class="inline-flex items-center gap-2 text-sm font-black text-blue-600 group-hover:translate-x-1 transition-transform">
                                     View Course <i class="fas fa-arrow-right text-xs"></i>
                                 </span>
                             </div>

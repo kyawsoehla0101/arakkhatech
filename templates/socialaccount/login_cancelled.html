@@ -9,7 +9,7 @@
             <div class="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full -ml-24 -mb-24"></div>
             <div class="relative z-10 text-center">
                 <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-xl mx-auto">
-                    <i class="fas fa-user-check text-indigo-600 text-2xl"></i>
+                    <i class="fas fa-user-check text-blue-600 text-2xl"></i>
                 </div>
                 <h1 class="text-3xl md:text-5xl font-black mb-4 leading-tight">
                     {% if process == "connect" %}
@@ -18,7 +18,7 @@
                         {{ provider.name }} ဖြင့် စာရင်းသွင်းမည်
                     {% endif %}
                 </h1>
-                <p class="text-indigo-100 text-lg opacity-90 max-w-2xl mx-auto">
+                <p class="text-blue-100 text-lg opacity-90 max-w-2xl mx-auto">
                     {% if process == "connect" %}
                         သင်၏လက်ရှိအကောင့်နှင့် {{ provider.name }} ကို ချိတ်ဆက်ရန် အတည်ပြုပါ။
                     {% else %}
@@ -31,9 +31,9 @@
         <div class="p-10 md:p-16">
             <form method="post" class="max-w-md mx-auto space-y-6">
                 {% csrf_token %}
-                <div class="p-6 rounded-2xl bg-indigo-50/40 border border-indigo-100">
+                <div class="p-6 rounded-2xl bg-blue-50/40 border border-blue-100">
                     <div class="flex items-start gap-4">
-                        <div class="w-11 h-11 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md flex-shrink-0">
+                        <div class="w-11 h-11 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md flex-shrink-0">
                             <i class="fas fa-shield-check text-lg"></i>
                         </div>
                         <div class="space-y-1.5">
@@ -45,7 +45,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="w-full custom-gradient text-white font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform shadow-xl shadow-indigo-100 text-lg tracking-wide">
+                <button type="submit" class="w-full custom-gradient text-white font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform shadow-xl shadow-blue-100 text-lg tracking-wide">
                     {% if process == "connect" %}
                         <i class="fas fa-link mr-2"></i> ချိတ်ဆက်မည်
                     {% else %}

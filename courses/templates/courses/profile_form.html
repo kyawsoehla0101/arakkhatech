@@ -7,7 +7,7 @@
     <div class="container mx-auto px-6">
         <div class="max-w-2xl mx-auto">
             <div class="mb-12 text-center" data-aos="fade-down">
-                <div class="w-24 h-24 rounded-[2.5rem] custom-gradient mx-auto mb-6 flex items-center justify-center text-white text-3xl font-black shadow-xl shadow-indigo-100 relative overflow-hidden group">
+                <div class="w-24 h-24 rounded-[2.5rem] custom-gradient mx-auto mb-6 flex items-center justify-center text-white text-3xl font-black shadow-xl shadow-blue-100 relative overflow-hidden group">
                     {% if user.profile.avatar %}
                         <img src="{{ user.profile.avatar.url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                     {% else %}
@@ -21,7 +21,7 @@
             <div class="bg-white rounded-[3rem] shadow-xl border border-slate-50 p-8 md:p-12" data-aos="fade-up">
                 <form method="post" enctype="multipart/form-data" class="space-y-8">
                     {% csrf_token %}
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {% for field in u_form %}
                         <div>
@@ -55,7 +55,7 @@
                     {% endfor %}
 
                     <div class="pt-6 flex flex-col md:flex-row gap-4">
-                        <button type="submit" class="flex-grow custom-gradient text-white font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform shadow-xl shadow-indigo-200">
+                        <button type="submit" class="flex-grow custom-gradient text-white font-black py-5 rounded-2xl hover:scale-[1.02] transition-transform shadow-xl shadow-blue-200">
                             <i class="fas fa-save mr-3"></i> အပြောင်းအလဲများ သိမ်းမည်
                         </button>
                         <a href="{% url 'student_dashboard' %}" class="px-10 py-5 bg-slate-50 text-slate-400 font-bold rounded-2xl hover:bg-slate-100 transition-all text-center">

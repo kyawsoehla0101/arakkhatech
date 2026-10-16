@@ -35,10 +35,10 @@
         <div class="max-w-12xl mx-auto">
             {% include 'courses/admin_topbar_snippet.html' with title=title subtitle=book.title %}
 
-            <div class="mb-8 p-5 bg-gradient-to-r from-indigo-50 via-sky-50 to-emerald-50 rounded-2xl border border-indigo-100">
+            <div class="mb-8 p-5 bg-gradient-to-r from-blue-50 via-blue-50 to-emerald-50 rounded-2xl border border-blue-100">
                 <div class="flex flex-wrap items-center gap-3 text-xs">
                     <div class="flex items-center gap-2 px-3 py-2 bg-white rounded-xl shadow-sm border border-slate-100">
-                        <span class="inline-flex w-5 h-5 items-center justify-center bg-indigo-600 text-white rounded-md text-[10px] font-black">H</span>
+                        <span class="inline-flex w-5 h-5 items-center justify-center bg-blue-600 text-white rounded-md text-[10px] font-black">H</span>
                         <span class="font-bold text-slate-600">Heading H1-H6</span>
                     </div>
                     <div class="flex items-center gap-2 px-3 py-2 bg-white rounded-xl shadow-sm border border-slate-100">
@@ -54,11 +54,11 @@
                         <span class="font-bold text-slate-600">Bullets / Checklist</span>
                     </div>
                     <div class="flex items-center gap-2 px-3 py-2 bg-white rounded-xl shadow-sm border border-slate-100">
-                        <span class="inline-flex w-5 h-5 items-center justify-center bg-violet-500 text-white rounded-md text-[10px]">∑</span>
+                        <span class="inline-flex w-5 h-5 items-center justify-center bg-blue-500 text-white rounded-md text-[10px]">∑</span>
                         <span class="font-bold text-slate-600">KaTeX Math (ဂဏန်းသင်္ချာ)</span>
                     </div>
                     <div class="flex items-center gap-2 px-3 py-2 bg-white rounded-xl shadow-sm border border-slate-100">
-                        <span class="inline-flex w-5 h-5 items-center justify-center bg-sky-500 text-white rounded-md text-[10px]">💡</span>
+                        <span class="inline-flex w-5 h-5 items-center justify-center bg-blue-500 text-white rounded-md text-[10px]">💡</span>
                         <span class="font-bold text-slate-600">Callout Box (မှတ်ချက်)</span>
                     </div>
                 </div>
@@ -75,7 +75,7 @@
                     </div>
                     {% endfor %}
                     <div class="pt-6 flex flex-col md:flex-row gap-4">
-                        <button type="submit" class="flex-grow custom-gradient text-white font-black py-5 rounded-2xl shadow-xl shadow-indigo-100 transition-transform hover:scale-[1.02]">
+                        <button type="submit" class="flex-grow custom-gradient text-white font-black py-5 rounded-2xl shadow-xl shadow-blue-100 transition-transform hover:scale-[1.02]">
                             <i class="fas fa-save mr-3"></i> သိမ်းဆည်းမည်
                         </button>
                         <a href="{% url 'manage_chapters' book.pk %}" class="px-10 py-5 bg-slate-50 text-slate-400 font-bold rounded-2xl hover:bg-slate-100 text-center">ပယ်ဖျက်မည်</a>
@@ -90,7 +90,7 @@
 <div id="editorHelpModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[9999] hidden items-center justify-center p-4">
     <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-8">
         <div class="flex items-center justify-between mb-6">
-            <h3 class="text-2xl font-black text-slate-800"><i class="fas fa-keyboard text-indigo-500 mr-3"></i> Keyboard Shortcuts</h3>
+            <h3 class="text-2xl font-black text-slate-800"><i class="fas fa-keyboard text-blue-500 mr-3"></i> Keyboard Shortcuts</h3>
             <button onclick="document.getElementById('editorHelpModal').classList.add('hidden'); document.getElementById('editorHelpModal').classList.remove('flex');" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500">
                 <i class="fas fa-times"></i>
             </button>
@@ -116,7 +116,7 @@
         if (!editorEl) return;
 
         function applyMarkdownEnhancements(html) {
-            html = html.replace(/==([^=]+)==/g, '<mark class="bg-yellow-200 text-yellow-900 px-1 rounded">$1</mark>');
+            html = html.replace(/==([^=]+)==/g, '<mark class="bg-amber-200 text-amber-900 px-1 rounded">$1</mark>');
             return html;
         }
 
@@ -165,7 +165,7 @@
                     el.innerHTML = '<i class="far fa-clock mr-1"></i> ' + minutes + ' min read';
                 }
             }],
-            placeholder: "# ခေါင်းစဉ် H1\n\n## ခေါင်းစဉ် H2\n\n### H3 + ==Highlight== + <span style=\"color:#be123c\">Red Color Text</span>\n\n### Math Equation (ဂဏန်းသင်္ချာ)\n\nPythagorean: $a^2 + b^2 = c^2$\n\n$$\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}$$\n\n### Admonition Callout (မှတ်ချက် Box)\n\n!!! note \"သတိပြုရန်\"\n    ဒီအချက်ကို သေချာမှတ်ထားပါ။\n\n!!! warning \"အန္တရာယ်\"\n    မှားလျှင် ပျောက်ဆုံးနိုင်ပါတယ်။\n\n### Collapsible Section\n\n<details><summary>👉 ဖတ်ရန် နှိပ်ပါ</summary>\n\nထဲက အကြောင်းအရာ အရှည်လျားတာတွေ\n\n</details>\n\n### Color / Font Size\n\n- နီရဲရဲ: <span style=\"color:#be123c\">Red Color</span>\n- အပြာရောင်: <span style=\"color:#2563eb\">Blue Text</span>\n- အကြီးစာလုံး: <span style=\"font-size:1.5rem;font-weight:700\">Big Text</span>\n- အလယ်: <div style=\"text-align:center;font-weight:700\">အလယ် ပေါင်းစည်းထားတဲ့ စာကြောင်း</div>\n\n```python\ndef fibonacci(n):\n    if n <= 1: return n\n    return fibonacci(n-1) + fibonacci(n-2)\n```",
+            placeholder: "# ခေါင်းစဉ် H1\n\n## ခေါင်းစဉ် H2\n\n### H3 + ==Highlight== + <span style=\"color:#be123c\">Red Color Text</span>\n\n### Math Equation (ဂဏန်းသင်္ချာ)\n\nPythagorean: $a^2 + b^2 = c^2$\n\n$$\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}$$\n\n### Admonition Callout (မှတ်ချက် Box)\n\n!!! note \"သတိပြုရန်\"\n    ဒီအချက်ကို သေချာမှတ်ထားပါ။\n\n!!! warning \"အန္တရာယ်\"\n    မှားလျှင် ပျောက်ဆုံးနိုင်ပါတယ်။\n\n### Collapsible Section\n\n<details><summary>👉 ဖတ်ရန် နှိပ်ပါ</summary>\n\nထဲက အကြောင်းအရာ အရှည်လျားတာတွေ\n\n</details>\n\n### Color / Font Size\n\n- နီရဲရဲ: <span style=\"color:#be123c\">Red Color</span>\n- အပြာရောင်: <span style=\"color:#2563eb\">Brand Text</span>\n- အကြီးစာလုံး: <span style=\"font-size:1.5rem;font-weight:700\">Big Text</span>\n- အလယ်: <div style=\"text-align:center;font-weight:700\">အလယ် ပေါင်းစည်းထားတဲ့ စာကြောင်း</div>\n\n```python\ndef fibonacci(n):\n    if n <= 1: return n\n    return fibonacci(n-1) + fibonacci(n-2)\n```",
             forceSync: true,
             autosave: { enabled: true, uniqueId: "chapter-" + (editorEl.dataset.bookId || "new") + "-" + Date.now(), delay: 1000 },
             tabSize: 4,
@@ -213,9 +213,9 @@
                             }
                         });
                         preview.querySelectorAll('details').forEach(d => {
-                            d.classList.add('my-5', 'rounded-xl', 'border', 'border-indigo-100', 'overflow-hidden', 'bg-indigo-50/30');
+                            d.classList.add('my-5', 'rounded-xl', 'border', 'border-blue-100', 'overflow-hidden', 'bg-blue-50/30');
                             const sum = d.querySelector('summary');
-                            if (sum) sum.classList.add('cursor-pointer', 'px-4', 'py-3', 'font-bold', 'text-indigo-700', 'bg-indigo-100/40', 'select-none');
+                            if (sum) sum.classList.add('cursor-pointer', 'px-4', 'py-3', 'font-bold', 'text-blue-700', 'bg-blue-100/40', 'select-none');
                         });
                     } catch(e) {}
                 }, 0);
@@ -267,7 +267,7 @@
                 },
                 {
                     name: "color-blue",
-                    action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<span style="color:#2563eb;font-weight:600">', '</span>', 'Blue Text'); },
+                    action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<span style="color:#2563eb;font-weight:600">', '</span>', 'Brand Text'); },
                     className: "fas fa-fill-drip tbtn tbtn-txt-blue",
                     title: "🔵 Blue Color အပြာ"
                 },
@@ -285,7 +285,7 @@
                 },
                 {
                     name: "color-purple",
-                    action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<span style="color:#7c3aed;font-weight:600">', '</span>', 'Purple Text'); },
+                    action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<span style="color:#2563eb;font-weight:600">', '</span>', 'Indigo Text'); },
                     className: "fas fa-fill-drip tbtn tbtn-txt-purple",
                     title: "🟣 Purple Color ခရမ်းရောင်"
                 },
@@ -317,13 +317,13 @@
                 },
                 {
                     name: "font-big",
-                    action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<span style="font-size:1.4rem;font-weight:700;color:#1e1b4b">', '</span>', 'Big Text'); },
+                    action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<span style="font-size:1.4rem;font-weight:700;color:#172554">', '</span>', 'Big Text'); },
                     className: "fas fa-font tbtn tbtn-font-lg",
                     title: "Big Text အကြီး"
                 },
                 {
                     name: "font-huge",
-                    action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<span style="font-size:2rem;font-weight:900;color:#1e1b4b">', '</span>', 'HUGE'); },
+                    action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<span style="font-size:2rem;font-weight:900;color:#172554">', '</span>', 'HUGE'); },
                     className: "fas fa-heading tbtn tbtn-font-xl",
                     title: "Huge Text အကြီးဆုံး"
                 },
@@ -541,16 +541,16 @@
         font-size: 13px !important;
     }
     .editor-toolbar button:hover {
-        background-color: #eef2ff !important;
-        color: #4f46e5 !important;
-        border-color: #e0e7ff !important;
+        background-color: #eff6ff !important;
+        color: #2563eb !important;
+        border-color: #dbeafe !important;
         transform: translateY(-1px);
         box-shadow: 0 4px 10px -4px rgba(99,102,241,0.3);
     }
     .editor-toolbar button.active {
-        background-color: #4f46e5 !important;
+        background-color: #2563eb !important;
         color: white !important;
-        border-color: #4338ca !important;
+        border-color: #1d4ed8 !important;
         box-shadow: 0 4px 12px -3px rgba(79,70,229,0.5);
     }
     .editor-toolbar button {
@@ -604,13 +604,13 @@
     .editor-toolbar button.tbtn-txt-orange { border-color: #fed7aa !important; }
     .editor-toolbar button.tbtn-txt-orange:hover { background: linear-gradient(135deg,#ffedd5,#fed7aa) !important; color: #c2410c !important; border-color: #fb923c !important; transform: translateY(-1px) scale(1.06); box-shadow: 0 6px 14px -5px rgba(249,115,22,0.5); }
 
-    .editor-toolbar button.tbtn-txt-purple i { color: #7c3aed; }
+    .editor-toolbar button.tbtn-txt-purple i { color: #2563eb; }
     .editor-toolbar button.tbtn-txt-purple { border-color: #ddd6fe !important; }
-    .editor-toolbar button.tbtn-txt-purple:hover { background: linear-gradient(135deg,#ede9fe,#ddd6fe) !important; color: #6d28d9 !important; border-color: #a78bfa !important; transform: translateY(-1px) scale(1.06); box-shadow: 0 6px 14px -5px rgba(139,92,246,0.5); }
+    .editor-toolbar button.tbtn-txt-purple:hover { background: linear-gradient(135deg,#ede9fe,#ddd6fe) !important; color: #1d4ed8 !important; border-color: #a78bfa !important; transform: translateY(-1px) scale(1.06); box-shadow: 0 6px 14px -5px rgba(139,92,246,0.5); }
 
     /* ===== Sub/Superscript ===== */
-    .editor-toolbar button.tbtn-sup i { color: #7c3aed; font-weight: 900; }
-    .editor-toolbar button.tbtn-sup:hover { background: linear-gradient(135deg,#f5f3ff,#ede9fe) !important; color: #6d28d9 !important; border-color: #c4b5fd !important; transform: translateY(-1px) scale(1.05); box-shadow: 0 6px 14px -5px rgba(139,92,246,0.45); }
+    .editor-toolbar button.tbtn-sup i { color: #2563eb; font-weight: 900; }
+    .editor-toolbar button.tbtn-sup:hover { background: linear-gradient(135deg,#f5f3ff,#ede9fe) !important; color: #1d4ed8 !important; border-color: #c4b5fd !important; transform: translateY(-1px) scale(1.05); box-shadow: 0 6px 14px -5px rgba(139,92,246,0.45); }
 
     .editor-toolbar button.tbtn-sub i { color: #dc2626; font-weight: 900; }
     .editor-toolbar button.tbtn-sub:hover { background: linear-gradient(135deg,#fef2f2,#fee2e2) !important; color: #b91c1c !important; border-color: #fecaca !important; transform: translateY(-1px) scale(1.05); box-shadow: 0 6px 14px -5px rgba(239,68,68,0.45); }
@@ -622,11 +622,11 @@
     .editor-toolbar button.tbtn-font-md i { font-size: 13px !important; color: #334155; }
     .editor-toolbar button.tbtn-font-md:hover { background: linear-gradient(135deg,#f1f5f9,#e2e8f0) !important; color: #1e293b !important; border-color: #94a3b8 !important; transform: translateY(-1px); }
 
-    .editor-toolbar button.tbtn-font-lg i { font-size: 16px !important; color: #1e1b4b; font-weight: 900; }
-    .editor-toolbar button.tbtn-font-lg:hover { background: linear-gradient(135deg,#eef2ff,#e0e7ff) !important; color: #312e81 !important; border-color: #c7d2fe !important; transform: translateY(-1px) scale(1.06); box-shadow: 0 6px 14px -5px rgba(99,102,241,0.4); }
+    .editor-toolbar button.tbtn-font-lg i { font-size: 16px !important; color: #172554; font-weight: 900; }
+    .editor-toolbar button.tbtn-font-lg:hover { background: linear-gradient(135deg,#eff6ff,#dbeafe) !important; color: #1e3a8a !important; border-color: #bfdbfe !important; transform: translateY(-1px) scale(1.06); box-shadow: 0 6px 14px -5px rgba(99,102,241,0.4); }
 
-    .editor-toolbar button.tbtn-font-xl i { font-size: 18px !important; color: #1e1b4b; font-weight: 900; }
-    .editor-toolbar button.tbtn-font-xl:hover { background: linear-gradient(135deg,#4f46e5,#6366f1) !important; color: white !important; border-color: #4338ca !important; transform: translateY(-1px) scale(1.08); box-shadow: 0 8px 18px -5px rgba(79,70,229,0.6); }
+    .editor-toolbar button.tbtn-font-xl i { font-size: 18px !important; color: #172554; font-weight: 900; }
+    .editor-toolbar button.tbtn-font-xl:hover { background: linear-gradient(135deg,#2563eb,#3b82f6) !important; color: white !important; border-color: #1d4ed8 !important; transform: translateY(-1px) scale(1.08); box-shadow: 0 8px 18px -5px rgba(79,70,229,0.6); }
 
     /* ===== Align buttons ===== */
     .editor-toolbar button.tbtn-align i { color: #0369a1; }
@@ -635,19 +635,19 @@
 
     /* ===== Heading buttons ===== */
     .editor-toolbar button.tbtn-heading i { color: #4c1d95; font-weight: 900; }
-    .editor-toolbar button.tbtn-heading:hover { background: linear-gradient(135deg,#faf5ff,#f3e8ff) !important; color: #581c87 !important; border-color: #d8b4fe !important; transform: translateY(-1px) scale(1.05); box-shadow: 0 6px 14px -5px rgba(168,85,247,0.45); }
-    .editor-toolbar button.tbtn-heading.active { background: linear-gradient(135deg,#7c3aed,#9333ea) !important; color: white !important; border-color: #6d28d9 !important; }
+    .editor-toolbar button.tbtn-heading:hover { background: linear-gradient(135deg,#fef2f2,#fee2e2) !important; color: #7f1d1d !important; border-color: #fca5a5 !important; transform: translateY(-1px) scale(1.05); box-shadow: 0 6px 14px -5px rgba(168,85,247,0.45); }
+    .editor-toolbar button.tbtn-heading.active { background: linear-gradient(135deg,#2563eb,#2563eb) !important; color: white !important; border-color: #1d4ed8 !important; }
 
     /* ===== Code buttons ===== */
-    .editor-toolbar button.tbtn-code i { color: #0891b2; }
-    .editor-toolbar button.tbtn-code { background: linear-gradient(135deg,#ecfeff,#cffafe) !important; border-color: #a5f3fc !important; }
-    .editor-toolbar button.tbtn-code:hover { background: linear-gradient(135deg,#0891b2,#06b6d4) !important; color: white !important; border-color: #0e7490 !important; transform: translateY(-1px) scale(1.06); box-shadow: 0 6px 14px -5px rgba(6,182,212,0.5); }
-    .editor-toolbar button.tbtn-code.active { background: linear-gradient(135deg,#0e7490,#155e75) !important; color: white !important; border-color: #164e63 !important; }
+    .editor-toolbar button.tbtn-code i { color: #2563eb; }
+    .editor-toolbar button.tbtn-code { background: linear-gradient(135deg,#eff6ff,#dbeafe) !important; border-color: #bfdbfe !important; }
+    .editor-toolbar button.tbtn-code:hover { background: linear-gradient(135deg,#2563eb,#3b82f6) !important; color: white !important; border-color: #1d4ed8 !important; transform: translateY(-1px) scale(1.06); box-shadow: 0 6px 14px -5px rgba(6,182,212,0.5); }
+    .editor-toolbar button.tbtn-code.active { background: linear-gradient(135deg,#1d4ed8,#1e40af) !important; color: white !important; border-color: #1e3a8a !important; }
 
     /* ===== Math buttons ===== */
-    .editor-toolbar button.tbtn-math i { color: #6d28d9; }
+    .editor-toolbar button.tbtn-math i { color: #1d4ed8; }
     .editor-toolbar button.tbtn-math { background: linear-gradient(135deg,#f5f3ff,#ede9fe) !important; border-color: #ddd6fe !important; }
-    .editor-toolbar button.tbtn-math:hover { background: linear-gradient(135deg,#7c3aed,#8b5cf6) !important; color: white !important; border-color: #6d28d9 !important; transform: translateY(-1px) scale(1.05); box-shadow: 0 6px 14px -5px rgba(139,92,246,0.55); }
+    .editor-toolbar button.tbtn-math:hover { background: linear-gradient(135deg,#2563eb,#3b82f6) !important; color: white !important; border-color: #1d4ed8 !important; transform: translateY(-1px) scale(1.05); box-shadow: 0 6px 14px -5px rgba(139,92,246,0.55); }
 
     /* ===== Quote ===== */
     .editor-toolbar button.tbtn-quote i { color: #0f766e; }
@@ -682,8 +682,8 @@
     .editor-toolbar button.tbtn-checklist.active { background: linear-gradient(135deg,#166534,#14532d) !important; color: white !important; border-color: #14532d !important; }
 
     /* ===== Collapsible ===== */
-    .editor-toolbar button.tbtn-collapse i { color: #6366f1; }
-    .editor-toolbar button.tbtn-collapse:hover { background: linear-gradient(135deg,#eef2ff,#e0e7ff) !important; color: #4338ca !important; border-color: #c7d2fe !important; transform: translateY(-1px) scale(1.06); box-shadow: 0 6px 14px -5px rgba(99,102,241,0.5); }
+    .editor-toolbar button.tbtn-collapse i { color: #3b82f6; }
+    .editor-toolbar button.tbtn-collapse:hover { background: linear-gradient(135deg,#eff6ff,#dbeafe) !important; color: #1d4ed8 !important; border-color: #bfdbfe !important; transform: translateY(-1px) scale(1.06); box-shadow: 0 6px 14px -5px rgba(99,102,241,0.5); }
 
     /* ===== YouTube ===== */
     .editor-toolbar button.tbtn-youtube i { color: #ff0000; }
@@ -691,8 +691,8 @@
     .editor-toolbar button.tbtn-youtube:hover { background: linear-gradient(135deg,#ef4444,#dc2626) !important; color: white !important; border-color: #b91c1c !important; transform: translateY(-1px) scale(1.08); box-shadow: 0 8px 20px -5px rgba(239,68,68,0.6); }
 
     /* ===== Date ===== */
-    .editor-toolbar button.tbtn-date i { color: #0e7490; }
-    .editor-toolbar button.tbtn-date:hover { background: linear-gradient(135deg,#ecfeff,#cffafe) !important; color: #155e75 !important; border-color: #a5f3fc !important; transform: translateY(-1px); }
+    .editor-toolbar button.tbtn-date i { color: #1d4ed8; }
+    .editor-toolbar button.tbtn-date:hover { background: linear-gradient(135deg,#eff6ff,#dbeafe) !important; color: #1e40af !important; border-color: #bfdbfe !important; transform: translateY(-1px); }
 
     /* ===== Clear Format ===== */
     .editor-toolbar button.tbtn-clear i { color: #9a3412; }
@@ -700,9 +700,9 @@
     .editor-toolbar button.tbtn-clear:hover { background: linear-gradient(135deg,#ea580c,#f97316) !important; color: white !important; border-color: #c2410c !important; transform: translateY(-1px) scale(1.06); box-shadow: 0 6px 14px -5px rgba(249,115,22,0.55); }
 
     /* ===== Help ===== */
-    .editor-toolbar button.tbtn-help i { color: #7c3aed; }
-    .editor-toolbar button.tbtn-help { background: linear-gradient(135deg,#faf5ff,#f3e8ff) !important; border-color: #e9d5ff !important; }
-    .editor-toolbar button.tbtn-help:hover { background: linear-gradient(135deg,#8b5cf6,#a78bfa) !important; color: white !important; border-color: #7c3aed !important; transform: translateY(-1px) scale(1.08); box-shadow: 0 8px 18px -5px rgba(139,92,246,0.6); }
+    .editor-toolbar button.tbtn-help i { color: #2563eb; }
+    .editor-toolbar button.tbtn-help { background: linear-gradient(135deg,#fef2f2,#fee2e2) !important; border-color: #fecaca !important; }
+    .editor-toolbar button.tbtn-help:hover { background: linear-gradient(135deg,#3b82f6,#a78bfa) !important; color: white !important; border-color: #2563eb !important; transform: translateY(-1px) scale(1.08); box-shadow: 0 8px 18px -5px rgba(139,92,246,0.6); }
 
     /* ===== View buttons ===== */
     .editor-toolbar button.tbtn-view i { color: #1d4ed8; }
@@ -710,8 +710,8 @@
     .editor-toolbar button.tbtn-view.active { background: linear-gradient(135deg,#2563eb,#3b82f6) !important; color: white !important; border-color: #1d4ed8 !important; }
 
     /* ===== History Undo/Redo ===== */
-    .editor-toolbar button.tbtn-history i { color: #0891b2; }
-    .editor-toolbar button.tbtn-history:hover { background: linear-gradient(135deg,#ecfeff,#cffafe) !important; color: #0e7490 !important; border-color: #67e8f9 !important; transform: translateY(-1px); }
+    .editor-toolbar button.tbtn-history i { color: #2563eb; }
+    .editor-toolbar button.tbtn-history:hover { background: linear-gradient(135deg,#eff6ff,#dbeafe) !important; color: #1d4ed8 !important; border-color: #93c5fd !important; transform: translateY(-1px); }
     .editor-toolbar button.tbtn-history:active { transform: scale(0.9) !important; }
 
     /* ===== Separator spacing ===== */
@@ -724,7 +724,7 @@
     }
 
     /* ===== Status bar icons ===== */
-    .editor-statusbar .read-time i { color: #6366f1; margin-right: 4px; }
+    .editor-statusbar .read-time i { color: #3b82f6; margin-right: 4px; }
     .editor-statusbar { padding: 0.5rem 1rem !important; font-size: 12px !important; font-weight: 600 !important; color: #64748b !important; }
     .editor-statusbar span:not(:last-child)::after { content: '•'; margin: 0 8px; color: #cbd5e1; font-weight: 900; }
 
@@ -772,10 +772,10 @@
         padding: 2rem !important;
         color: #0f172a !important;
     }
-    .editor-preview h1, .editor-preview-side h1 { font-size: 2.2rem !important; font-weight: 900; color: #1e1b4b; margin-bottom: 1.5rem; border-bottom: 3px solid #eef2ff; padding-bottom: 0.75rem; }
-    .editor-preview h2, .editor-preview-side h2 { font-size: 1.6rem !important; font-weight: 800; color: #312e81; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid #eef2ff; padding-bottom: 0.75rem; }
-    .editor-preview h3, .editor-preview-side h3 { font-size: 1.25rem !important; font-weight: 700; color: #3730a3; margin-top: 1.5rem; margin-bottom: 0.75rem; }
-    .editor-preview h4, .editor-preview-side h4 { font-size: 1.05rem !important; font-weight: 700; color: #4338ca; margin-top: 1rem; }
+    .editor-preview h1, .editor-preview-side h1 { font-size: 2.2rem !important; font-weight: 900; color: #172554; margin-bottom: 1.5rem; border-bottom: 3px solid #eff6ff; padding-bottom: 0.75rem; }
+    .editor-preview h2, .editor-preview-side h2 { font-size: 1.6rem !important; font-weight: 800; color: #1e3a8a; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid #eff6ff; padding-bottom: 0.75rem; }
+    .editor-preview h3, .editor-preview-side h3 { font-size: 1.25rem !important; font-weight: 700; color: #1e40af; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+    .editor-preview h4, .editor-preview-side h4 { font-size: 1.05rem !important; font-weight: 700; color: #1d4ed8; margin-top: 1rem; }
     .editor-preview p, .editor-preview-side p { margin-bottom: 1rem; }
     .editor-preview ul, .editor-preview-side ul { list-style: disc; padding-left: 1.75rem; margin: 1rem 0; }
     .editor-preview ol, .editor-preview-side ol { list-style: decimal; padding-left: 1.75rem; margin: 1rem 0; }
@@ -807,12 +807,12 @@
         font-size: 0.92em !important;
     }
     .editor-preview blockquote, .editor-preview-side blockquote {
-        border-left: 4px solid #6366f1 !important;
-        background: #eef2ff !important;
+        border-left: 4px solid #3b82f6 !important;
+        background: #eff6ff !important;
         padding: 1rem 1.5rem !important;
         border-radius: 0 1rem 1rem 0 !important;
         margin: 1.5rem 0 !important;
-        color: #312e81 !important;
+        color: #1e3a8a !important;
         font-style: italic !important;
     }
     .editor-preview table, .editor-preview-side table {
@@ -824,7 +824,7 @@
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     .editor-preview th, .editor-preview-side th {
-        background: linear-gradient(to right, #4f46e5, #6366f1) !important;
+        background: linear-gradient(to right, #2563eb, #3b82f6) !important;
         color: white !important;
         font-weight: 700;
         padding: 0.75rem 1rem;
@@ -832,12 +832,12 @@
     }
     .editor-preview td, .editor-preview-side td {
         padding: 0.75rem 1rem;
-        border-bottom: 1px solid #eef2ff;
+        border-bottom: 1px solid #eff6ff;
     }
     .editor-preview tr:nth-child(even) td, .editor-preview-side tr:nth-child(even) td { background-color: #fafbff; }
     .editor-preview hr, .editor-preview-side hr {
         border: none !important;
-        border-top: 3px dashed #c7d2fe !important;
+        border-top: 3px dashed #bfdbfe !important;
         margin: 2rem 0 !important;
     }
     .editor-preview mark, .editor-preview-side mark {
@@ -852,12 +852,12 @@
         max-width: 100%;
         margin: 1rem 0;
     }
-    .editor-preview a, .editor-preview-side a { color: #4f46e5; font-weight: 600; text-decoration: underline; }
-    .editor-preview sup, .editor-preview-side sup { vertical-align: super; font-size: 0.75em; color: #7c3aed; font-weight: 600; }
+    .editor-preview a, .editor-preview-side a { color: #2563eb; font-weight: 600; text-decoration: underline; }
+    .editor-preview sup, .editor-preview-side sup { vertical-align: super; font-size: 0.75em; color: #2563eb; font-weight: 600; }
     .editor-preview sub, .editor-preview-side sub { vertical-align: sub; font-size: 0.75em; color: #be123c; font-weight: 600; }
-    .editor-preview u, .editor-preview-side u { text-decoration: underline; text-decoration-color: #6366f1; text-underline-offset: 4px; text-decoration-thickness: 2px; }
+    .editor-preview u, .editor-preview-side u { text-decoration: underline; text-decoration-color: #3b82f6; text-underline-offset: 4px; text-decoration-thickness: 2px; }
     .editor-preview div[style*="text-align:center"], .editor-preview-side div[style*="text-align:center"] {
-        padding: 1rem; background: linear-gradient(135deg, #f5f3ff, #eef2ff); border-radius: 1rem; margin: 1rem 0; border: 1px dashed #c7d2fe;
+        padding: 1rem; background: linear-gradient(135deg, #f5f3ff, #eff6ff); border-radius: 1rem; margin: 1rem 0; border: 1px dashed #bfdbfe;
     }
     .editor-preview .admonition, .editor-preview-side .admonition,
     .editor-preview .warning, .editor-preview-side .warning,
@@ -880,15 +880,15 @@
     .editor-preview .success, .editor-preview-side .success { background: #ecfdf5; border-color: #10b981; color: #064e3b; }
     .editor-preview .success::before, .editor-preview-side .success::before { content: '✅ '; font-size: 1.4rem; margin-right: 0.5rem; font-weight: 800; }
     .editor-preview .admonition-title, .editor-preview-side .admonition-title { font-weight: 800; margin-bottom: 0.5rem; display: block; }
-    .katex-display-wrapper { padding: 1rem; background: linear-gradient(135deg, #f5f3ff, #eef2ff); border-radius: 1rem; border: 1px solid #e0e7ff; }
+    .katex-display-wrapper { padding: 1rem; background: linear-gradient(135deg, #f5f3ff, #eff6ff); border-radius: 1rem; border: 1px solid #dbeafe; }
     .katex-inline { font-size: 1.05em !important; }
     .cm-s-easymde .cm-comment { color: #737c8c; }
     .cm-s-easymde .cm-keyword { color: #c678dd; }
     .cm-s-easymde .cm-string { color: #98c379; }
     .cm-s-easymde .cm-number { color: #d19a66; }
     .cm-s-easymde .cm-atom { color: #61afef; }
-    .editor-preview input[type="checkbox"] { width: 1.15em; height: 1.15em; border: 2px solid #c7d2fe; border-radius: 4px; appearance: none; -webkit-appearance: none; cursor: pointer; position: relative; margin-right: 0.4em; vertical-align: -2px; }
-    .editor-preview input[type="checkbox"]:checked { background: #4f46e5; border-color: #4f46e5; }
+    .editor-preview input[type="checkbox"] { width: 1.15em; height: 1.15em; border: 2px solid #bfdbfe; border-radius: 4px; appearance: none; -webkit-appearance: none; cursor: pointer; position: relative; margin-right: 0.4em; vertical-align: -2px; }
+    .editor-preview input[type="checkbox"]:checked { background: #2563eb; border-color: #2563eb; }
     .editor-preview input[type="checkbox"]:checked::after { content: '✓'; position: absolute; color: white; font-size: 0.8em; left: 2px; top: -2px; font-weight: 900; }
 </style>
 {% endblock %}

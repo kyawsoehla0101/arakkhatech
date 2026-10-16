@@ -8,9 +8,9 @@
     <div class="custom-gradient pt-28 pb-32 px-6 mb-12 relative overflow-hidden">
         <!-- Animated Background Shapes -->
         <div class="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48 blur-3xl animate-pulse"></div>
-        <div class="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/20 rounded-full -ml-48 -mb-48 blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full -ml-48 -mb-48 blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
-        
+
         <div class="container mx-auto relative z-10">
             <div class="flex flex-col lg:flex-row items-center justify-between gap-12">
                 <div class="flex-grow text-center lg:text-left" data-aos="fade-right">
@@ -25,7 +25,7 @@
                                     </div>
                                 {% endif %}
                             </div>
-                            <a href="{% url 'edit_profile' %}" class="absolute -bottom-2 -right-2 w-10 h-10 bg-white rounded-2xl flex items-center justify-center text-indigo-600 shadow-xl hover:scale-110 transition-transform">
+                            <a href="{% url 'edit_profile' %}" class="absolute -bottom-2 -right-2 w-10 h-10 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-xl hover:scale-110 transition-transform">
                                 <i class="fas fa-camera"></i>
                             </a>
                         </div>
@@ -33,7 +33,7 @@
                             <h1 class="text-4xl md:text-6xl font-black text-white mb-4 leading-tight">
                                 <span id="hero-typewriter"></span>
                             </h1>
-                            <p class="text-indigo-100 text-lg font-medium max-w-2xl opacity-90">
+                            <p class="text-blue-100 text-lg font-medium max-w-2xl opacity-90">
                                 {% if user.profile.bio %}{{ user.profile.bio }}{% else %}သင်ယူမှုခရီးစဉ်ကို ဆက်လက်လျှောက်လှမ်းလိုက်ပါ။ အောက်မှာ သင်အပ်နှံထားရေ သင်တန်းတိကို ကြည့်ရှုနိုင်ပါရေ။{% endif %}
                             </p>
                         </div>
@@ -45,80 +45,80 @@
                                 <i class="fas fa-book-open"></i>
                             </div>
                             <div>
-                                <p class="text-[10px] font-black text-indigo-100 uppercase tracking-widest">Enrolled</p>
+                                <p class="text-[10px] font-black text-blue-100 uppercase tracking-widest">Enrolled</p>
                                 <p class="text-2xl font-black text-white">{{ total_courses }}</p>
                             </div>
                         </div>
-                        
+
                         <div class="glass p-6 rounded-[2rem] flex items-center space-x-4 border-white/20 hover:bg-white/30 transition-all cursor-default group/stat">
                             <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center text-white text-xl shadow-lg group-hover/stat:scale-110 transition-transform">
                                 <i class="fas fa-certificate"></i>
                             </div>
                             <div>
-                                <p class="text-[10px] font-black text-indigo-100 uppercase tracking-widest">Certificates</p>
+                                <p class="text-[10px] font-black text-blue-100 uppercase tracking-widest">Certificates</p>
                                 <p class="text-2xl font-black text-white">0</p>
                             </div>
                         </div>
                     </div>
                     {% if is_instructor_user or is_admin_user %}
                     <div class="mt-10 flex flex-col sm:flex-row flex-wrap justify-center lg:justify-start gap-4" data-aos="fade-up" data-aos-delay="150">
-                        <a href="{% url 'manage_courses' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-indigo-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
+                        <a href="{% url 'manage_courses' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-blue-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
                             <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
                                 <i class="fas fa-chalkboard-teacher text-lg"></i>
                             </div>
                             <div class="text-left">
                                 <p class="text-sm font-black tracking-wide">သင်တန်းစီမံရန်</p>
-                                <p class="text-[10px] text-indigo-100 opacity-80 font-bold uppercase tracking-widest">Manage Courses</p>
+                                <p class="text-[10px] text-blue-100 opacity-80 font-bold uppercase tracking-widest">Manage Courses</p>
                             </div>
                             <i class="fas fa-arrow-right ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
                         </a>
-                        <a href="{% url 'add_course' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-indigo-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
+                        <a href="{% url 'add_course' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-blue-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
                             <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
                                 <i class="fas fa-plus-circle text-lg"></i>
                             </div>
                             <div class="text-left">
                                 <p class="text-sm font-black tracking-wide">သင်တန်းအသစ်ဖွင့်ရန်</p>
-                                <p class="text-[10px] text-indigo-100 opacity-80 font-bold uppercase tracking-widest">New Course</p>
+                                <p class="text-[10px] text-blue-100 opacity-80 font-bold uppercase tracking-widest">New Course</p>
                             </div>
                             <i class="fas fa-arrow-right ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
                         </a>
-                        <a href="{% url 'manage_enrollments' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-indigo-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
+                        <a href="{% url 'manage_enrollments' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-blue-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
                             <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
                                 <i class="fas fa-user-graduate text-lg"></i>
                             </div>
                             <div class="text-left">
                                 <p class="text-sm font-black tracking-wide">Enrollment စီမံရန်</p>
-                                <p class="text-[10px] text-indigo-100 opacity-80 font-bold uppercase tracking-widest">Manage Students</p>
+                                <p class="text-[10px] text-blue-100 opacity-80 font-bold uppercase tracking-widest">Manage Students</p>
                             </div>
                             <i class="fas fa-arrow-right ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
                         </a>
-                        <a href="{% url 'enroll_student_general' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-indigo-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
+                        <a href="{% url 'enroll_student_general' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-blue-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
                             <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
                                 <i class="fas fa-user-plus text-lg"></i>
                             </div>
                             <div class="text-left">
                                 <p class="text-sm font-black tracking-wide">ကျောင်းသား Enroll လုပ်ရန်</p>
-                                <p class="text-[10px] text-indigo-100 opacity-80 font-bold uppercase tracking-widest">New Enrollment</p>
+                                <p class="text-[10px] text-blue-100 opacity-80 font-bold uppercase tracking-widest">New Enrollment</p>
                             </div>
                             <i class="fas fa-arrow-right ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
                         </a>
-                        <a href="{% url 'manage_books' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-indigo-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
+                        <a href="{% url 'manage_books' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-blue-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
                             <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
                                 <i class="fas fa-book-open text-lg"></i>
                             </div>
                             <div class="text-left">
                                 <p class="text-sm font-black tracking-wide">စာအုပ်စီမံရန်</p>
-                                <p class="text-[10px] text-indigo-100 opacity-80 font-bold uppercase tracking-widest">Manage Books</p>
+                                <p class="text-[10px] text-blue-100 opacity-80 font-bold uppercase tracking-widest">Manage Books</p>
                             </div>
                             <i class="fas fa-arrow-right ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
                         </a>
-                        <a href="{% url 'add_book' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-indigo-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
+                        <a href="{% url 'add_book' %}" class="group inline-flex items-center space-x-3 bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-xl shadow-blue-500/20 border border-white/30 hover:border-white/50 transition-all hover:scale-[1.02]">
                             <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
                                 <i class="fas fa-book-medical text-lg"></i>
                             </div>
                             <div class="text-left">
                                 <p class="text-sm font-black tracking-wide">စာအုပ်အသစ်ထည့်ရန်</p>
-                                <p class="text-[10px] text-indigo-100 opacity-80 font-bold uppercase tracking-widest">New Book</p>
+                                <p class="text-[10px] text-blue-100 opacity-80 font-bold uppercase tracking-widest">New Book</p>
                             </div>
                             <i class="fas fa-arrow-right ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
                         </a>
@@ -189,7 +189,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {% for enrollment in enrollments %}
             {% with course=enrollment.course %}
-            <div class="group bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-indigo-100 transition-all transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+            <div class="group bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-blue-100 transition-all transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
                 <div class="relative h-56 overflow-hidden">
                     {% if course.thumbnail %}
                         <img src="{{ course.thumbnail.url }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
@@ -199,10 +199,10 @@
                         </div>
                     {% endif %}
                     <div class="absolute top-4 left-4">
-                        <span class="bg-indigo-600 text-white text-[10px] font-black px-4 py-2 rounded-full shadow-lg uppercase tracking-widest">Authorized</span>
+                        <span class="bg-blue-600 text-white text-[10px] font-black px-4 py-2 rounded-full shadow-lg uppercase tracking-widest">Authorized</span>
                     </div>
                 </div>
-                
+
                 <div class="p-8">
                     <div class="flex items-center space-x-2 mb-4">
                         <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
@@ -210,21 +210,21 @@
                             {% if enrollment.progress_percentage == 100 %}Completed{% else %}Ready to learn{% endif %}
                         </span>
                     </div>
-                    <h3 class="text-xl font-black text-slate-900 mb-4 group-hover:text-indigo-600 transition-colors leading-tight">
+                    <h3 class="text-xl font-black text-slate-900 mb-4 group-hover:text-blue-600 transition-colors leading-tight">
                         {{ course.title }}
                     </h3>
-                    
+
                     <div class="mb-8">
                         <div class="flex justify-between items-center mb-2">
                             <span class="text-[10px] font-black text-slate-400 uppercase">Progress</span>
-                            <span class="text-[10px] font-black text-indigo-600 uppercase">{{ enrollment.progress_percentage }}%</span>
+                            <span class="text-[10px] font-black text-blue-600 uppercase">{{ enrollment.progress_percentage }}%</span>
                         </div>
                         <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div class="bg-indigo-600 h-full transition-all duration-1000" style="width: {{ enrollment.progress_percentage }}%"></div>
+                            <div class="bg-blue-600 h-full transition-all duration-1000" style="width: {{ enrollment.progress_percentage }}%"></div>
                         </div>
                     </div>
 
-                    <a href="{% url 'course_detail' course.slug %}" class="block w-full text-center custom-gradient text-white font-black py-4 rounded-2xl shadow-xl shadow-indigo-100 hover:scale-[1.02] transition-transform">
+                    <a href="{% url 'course_detail' course.slug %}" class="block w-full text-center custom-gradient text-white font-black py-4 rounded-2xl shadow-xl shadow-blue-100 hover:scale-[1.02] transition-transform">
                         သင်ခန်းစာများကြည့်ရန်
                     </a>
                 </div>
@@ -239,7 +239,7 @@
                 <p class="text-slate-400 font-bold max-w-md mx-auto mb-10">
                     လက်ရှိမှာ သင်အပ်နှံထားရေ သင်တန်းမဟိသိမ့်ပါ။ သင်တန်းတက်ရောက်လိုပါက Admin ကို ဆက်သွယ်ပီးပါ။
                 </p>
-                <a href="{% url 'course_list' %}" class="inline-flex items-center text-indigo-600 font-black uppercase tracking-widest hover:underline">
+                <a href="{% url 'course_list' %}" class="inline-flex items-center text-blue-600 font-black uppercase tracking-widest hover:underline">
                     Browse All Courses <i class="fas fa-arrow-right ml-2"></i>
                 </a>
             </div>
@@ -248,9 +248,9 @@
 
         <!-- Community Voice Submission -->
         <div class="mt-24 bg-white rounded-[3.5rem] shadow-2xl border border-slate-50 overflow-hidden relative" data-aos="fade-up">
-            <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-            <div class="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/5 rounded-full -ml-32 -mb-32 blur-3xl"></div>
-            
+            <div class="absolute top-0 right-0 w-64 h-64 bg-blue-50/50 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full -ml-32 -mb-32 blur-3xl"></div>
+
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-0 relative z-10">
                 <!-- Left Side: Code Editor Style -->
                 <div class="p-10 md:p-16 lg:p-20 bg-[#1e1e1e] text-white flex flex-col justify-center relative font-mono overflow-hidden group">
@@ -301,7 +301,7 @@
                     </div>
 
                     <!-- Decorative elements -->
-                    <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all"></div>
+                    <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all"></div>
                 </div>
 
                 <!-- Right Side: Form -->
@@ -312,7 +312,7 @@
                             <label class="block text-slate-500 text-xs font-black uppercase tracking-widest mb-4">Your Message</label>
                             {{ voice_form.content }}
                         </div>
-                        <button type="submit" class="w-full custom-gradient text-white font-black py-6 rounded-[2rem] hover:scale-[1.02] transition-transform shadow-2xl shadow-indigo-200 flex items-center justify-center group text-lg">
+                        <button type="submit" class="w-full custom-gradient text-white font-black py-6 rounded-[2rem] hover:scale-[1.02] transition-transform shadow-2xl shadow-blue-200 flex items-center justify-center group text-lg">
                             <span>ပီးပို့မည်</span>
                             <i class="fas fa-paper-plane ml-3 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
                         </button>

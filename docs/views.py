@@ -132,7 +132,7 @@ def manage_chapters(request, book_pk):
     if not can_manage_book(request.user, book):
         messages.error(request, "ဤစာအုပ်ကို ကြည့်ရှုခွင့်မရှိပါ။")
         return redirect('manage_books')
-    chapters = book.chapters.all().order_by('order')
+    chapters = book.chapters.all().order_by('created_at')
     return render(request, 'docs/management/manage_chapters.html', {'book': book, 'chapters': chapters})
 
 @login_required

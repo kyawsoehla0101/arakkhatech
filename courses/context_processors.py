@@ -67,8 +67,10 @@ def navbar_active(request):
 
         path = request.path or ''
 
-        if url_name in {'courses_page', 'course_list', 'course_detail', 'course_detail_pk_redirect'}:
+        if url_name in {'courses_page', 'course_detail', 'course_detail_pk_redirect'}:
             nav = 'courses'
+        elif url_name == 'course_list':
+            nav = 'home'
         elif url_name in {'instructors_list', 'instructor_detail'}:
             nav = 'instructors'
         elif url_name in {'docs_list', 'book_detail', 'chapter_detail', 'lesson_detail'}:

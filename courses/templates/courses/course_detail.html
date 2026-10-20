@@ -5,9 +5,9 @@
 {% block content %}
 <!-- ========================== HERO ========================== -->
 <section class="relative overflow-hidden bg-slate-900 pb-32 pt-24 text-white">
-    <div class="pointer-events-none absolute inset-0 custom-gradient opacity-20"></div>
-    <div class="pointer-events-none absolute -top-32 -right-32 h-96 w-96 rounded-full bg-blue-600/30 blur-3xl"></div>
-    <div class="pointer-events-none absolute -bottom-24 -left-32 h-96 w-96 rounded-full bg-brand2-600/20 blur-3xl"></div>
+    <div class="pointer-events-none absolute inset-0 bg-blue-600 opacity-5"></div>
+    <div class="pointer-events-none absolute -top-32 -right-32 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-24 -left-32 h-96 w-96 rounded-full bg-indigo-500/10 blur-3xl"></div>
 
     <div class="relative container mx-auto px-6">
         <!-- Breadcrumb -->
@@ -70,7 +70,7 @@
                         {% if instructor_profile and instructor_profile.avatar %}
                             <img src="{{ instructor_profile.avatar.url }}" alt="{{ course.instructor.username }}" class="w-14 h-14 rounded-2xl object-cover border-2 border-white/30 shadow-lg">
                         {% else %}
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-500 flex items-center justify-center text-xl font-black shadow-lg">
+                            <div class="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center text-xl font-black shadow-lg">
                                 {{ course.instructor.username|slice:":1"|upper }}
                             </div>
                         {% endif %}
@@ -119,9 +119,9 @@
             <!-- Hero media / sticky preview card -->
             <div class="lg:col-span-5" data-aos="fade-left">
                 <div class="relative">
-                    <div class="absolute -inset-2 rounded-[2.5rem] bg-gradient-to-br from-blue-500/30 via-blue-500/20 to-emerald-400/20 blur-2xl opacity-80"></div>
+                    <div class="absolute -inset-2 rounded-[2.5rem] bg-blue-500/10 blur-2xl opacity-80"></div>
                     <div class="relative rounded-[2rem] overflow-hidden bg-slate-800 border border-white/10 shadow-2xl">
-                        <div class="aspect-video bg-gradient-to-br from-slate-800 via-blue-950 to-slate-900 flex items-center justify-center relative overflow-hidden">
+                        <div class="aspect-video bg-slate-900 flex items-center justify-center relative overflow-hidden">
                             {% if course.thumbnail %}
                                 <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="w-full h-full object-cover">
                             {% else %}
@@ -167,7 +167,7 @@
                                         <span class="text-xs font-black text-emerald-400">{{ progress_pct }}%</span>
                                     </div>
                                     <div class="h-2 w-full rounded-full bg-emerald-500/15 overflow-hidden">
-                                        <div class="h-full rounded-full bg-gradient-to-r from-emerald-400 to-blue-500 transition-all duration-700" style="width:{{ progress_pct }}%"></div>
+                                        <div class="h-full rounded-full bg-emerald-500 transition-all duration-700" style="width:{{ progress_pct }}%"></div>
                                     </div>
                                 </div>
                                 <a href="{% if lessons %}{% url 'lesson_detail' course.pk lessons.0.pk %}{% else %}#{% endif %}"

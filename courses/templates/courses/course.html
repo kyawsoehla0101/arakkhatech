@@ -4,17 +4,17 @@
 
 {% block content %}
 <!-- ====================== HERO ====================== -->
-<section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white pt-28 pb-32">
-    <div class="pointer-events-none absolute inset-0 custom-gradient opacity-25"></div>
-    <div class="pointer-events-none absolute -top-20 -left-20 h-96 w-96 rounded-full bg-blue-500/20 blur-3xl"></div>
-    <div class="pointer-events-none absolute -bottom-20 -right-20 h-96 w-96 rounded-full bg-brand2-500/20 blur-3xl"></div>
+<section class="relative overflow-hidden bg-slate-900 text-white pt-28 pb-32">
+    <div class="pointer-events-none absolute inset-0 bg-blue-600 opacity-5"></div>
+    <div class="pointer-events-none absolute -top-20 -left-20 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-20 -right-20 h-96 w-96 rounded-full bg-indigo-500/10 blur-3xl"></div>
 
     <div class="relative container mx-auto px-6 text-center">
         <span class="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur border border-white/10 text-xs font-black uppercase tracking-widest text-blue-200 px-5 py-2 mb-7">
             <i class="fas fa-fire text-amber-400"></i> 2026 Cohorts · 100% Arakkha Language
         </span>
         <h1 class="text-4xl md:text-6xl xl:text-7xl font-black leading-tight max-w-5xl mx-auto mb-8">
-            <span class="text-gradient-dark">
+            <span class="text-blue-300">
                 Professional သင်တန်းများ
             </span><br>
             နန့်အတူ Career ကို စတင်ပါ
@@ -207,7 +207,7 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             {% for t in testimonials %}
-                <div class="rounded-[2rem] bg-gradient-to-br from-slate-50 to-blue-50/30 border border-slate-200 p-8 hover:shadow-xl hover:shadow-blue-100 hover:-translate-y-0.5 transition-all">
+                <div class="rounded-[2rem] bg-slate-50 border border-slate-200 p-8 hover:shadow-lg hover:-translate-y-0.5 transition-all">
                     <div class="flex items-center gap-1 text-amber-400 mb-5">
                         {% for _ in "12345" %}
                             <i class="fas fa-star"></i>
@@ -279,10 +279,10 @@
         transform: translateY(-1px);
     }
     .cat-pill.active {
-        background: linear-gradient(135deg,#3b82f6,#2563eb);
+        background: #2563eb;
         color:white;
         border-color:transparent;
-        box-shadow: 0 14px 30px -12px rgba(99,102,241,0.6);
+        box-shadow: 0 10px 20px -10px rgba(37, 99, 235, 0.4);
     }
 </style>
 {% endblock %}

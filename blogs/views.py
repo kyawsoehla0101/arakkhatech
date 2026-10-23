@@ -1,3 +1,4 @@
+import markdown
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
@@ -11,7 +12,17 @@ def blog_list(request):
 
 def blog_detail(request, slug):
     post = get_object_or_404(Post, slug=slug, status='published')
-    return render(request, 'blogs/blog_detail.html', {'post': post})
+
+    # Convert post.content markdown to HTML with full extension support
+    try:
+        content_html = markdown.markdown(post.content or '', extensions=[
+            'extra', 'codehilite', 'toc', 'nl2br', 'sane_lists',
+            'fenced_code', 'attr_list', 'admonition',
+        ])
+    except Exception:
+        content_html = post.content or ''
+
+    return render(request, 'blogs/blog_detail.html', {'post': post, 'content_html': content_html})
 
 # --- Admin Dashboard CRUD ---
 

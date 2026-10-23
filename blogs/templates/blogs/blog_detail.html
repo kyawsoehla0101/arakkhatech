@@ -4,6 +4,23 @@
 {% block title %}{{ post.title }} - Arakkha Tech{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/html.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/dart.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
 <style>
     .blog-content h1 { font-size: 2.25rem; font-weight: 800; margin-bottom: 1.5rem; color: #1e293b; }
     .blog-content h2 { font-size: 1.875rem; font-weight: 800; margin-top: 2.5rem; margin-bottom: 1.25rem; color: #1e293b; }
@@ -15,6 +32,55 @@
     .blog-content li { margin-bottom: 0.5rem; color: #475569; font-size: 1.125rem; }
     .blog-content blockquote { border-left: 4px solid #6366f1; padding-left: 1.5rem; font-style: italic; margin-bottom: 1.5rem; color: #6366f1; }
     .blog-content img { border-radius: 1.5rem; margin-bottom: 2rem; margin-top: 2rem; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1); }
+
+    /* Code */
+    .blog-content code:not(pre code) { background: linear-gradient(to right, #fef2f2, #fff1f2); padding: 0.25rem 0.6rem; border-radius: 0.6rem; font-weight: 600; color: #be123c; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.93em; border: 1px solid #fecdd3; }
+    .blog-content pre { background: linear-gradient(145deg, #282c34, #1e2127) !important; border-radius: 1.25rem !important; padding: 1.5rem !important; margin: 2rem 0 !important; overflow: auto !important; border: 1px solid #374151 !important; box-shadow: 0 15px 40px -12px rgba(0,0,0,0.4) !important; }
+    .blog-content pre code { background: transparent !important; color: #e5e7eb !important; font-family: 'JetBrains Mono', ui-monospace, monospace !important; font-size: 14.5px !important; line-height: 1.8 !important; padding: 0 !important; }
+
+    .blog-content hr { border: none !important; border-top: 3px dashed #bfdbfe !important; margin: 2.5rem 0 !important; }
+    .blog-content table { border-collapse: collapse; margin: 2rem 0; width: 100%; border-radius: 1.25rem; overflow: hidden; box-shadow: 0 5px 18px -6px rgba(0,0,0,0.08); border: 1px solid #eff6ff; }
+    .blog-content th { background: linear-gradient(135deg, #2563eb, #3b82f6); color: white; font-weight: 800; padding: 1rem 1.25rem; text-align: left; font-size: 14px; }
+    .blog-content td { padding: 1rem 1.25rem; border-bottom: 1px solid #eff6ff; color: #475569; }
+    .blog-content tr:nth-child(even) td { background-color: #fafbff; }
+    .blog-content a { color: #2563eb; font-weight: 600; text-decoration: none; border-bottom: 2px solid #bfdbfe; padding-bottom: 1px; }
+    .blog-content a:hover { color: #1d4ed8; border-color: #2563eb; }
+    .blog-content mark { background: linear-gradient(transparent 60%, #fde68a 60%); padding: 0.1rem 0.35rem; border-radius: 4px; color: inherit; font-weight: 600; }
+    .blog-content u { text-decoration: underline; text-decoration-color: #3b82f6; text-decoration-thickness: 3px; text-underline-offset: 3px; }
+    .blog-content sup { color: #2563eb; font-weight: 700; }
+    .blog-content sub { color: #dc2626; font-weight: 700; }
+    .blog-content input[type="checkbox"] { width: 1.15em; height: 1.15em; border: 2px solid #bfdbfe; border-radius: 4px; appearance: none; -webkit-appearance: none; cursor: pointer; position: relative; margin-right: 0.4em; vertical-align: -2px; }
+    .blog-content input[type="checkbox"]:checked { background: #2563eb; border-color: #2563eb; }
+    .blog-content input[type="checkbox"]:checked::after { content: '✓'; position: absolute; color: white; font-size: 0.8em; left: 2px; top: -2px; font-weight: 900; }
+
+    /* Callouts / Admonitions */
+    .blog-content .admonition { padding: 1.5rem 1.75rem; border-radius: 1.25rem; margin: 2rem 0; border-left: 6px solid; box-shadow: 0 8px 28px -10px rgba(0,0,0,0.18); }
+    .blog-content .admonition-title { font-weight: 800; margin-bottom: 0.5rem; font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem; }
+    .blog-content .admonition.note { background: linear-gradient(135deg, #eff6ff, #dbeafe); border-left-color: #3b82f6; color: #1e40af; }
+    .blog-content .admonition.note .admonition-title::before { content: "💡"; }
+    .blog-content .admonition.warning { background: linear-gradient(135deg, #fffbeb, #fef3c7); border-left-color: #f59e0b; color: #92400e; }
+    .blog-content .admonition.warning .admonition-title::before { content: "⚠️"; }
+    .blog-content .admonition.success { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-left-color: #10b981; color: #166534; }
+    .blog-content .admonition.success .admonition-title::before { content: "✅"; }
+    .blog-content .admonition.danger { background: linear-gradient(135deg, #fef2f2, #fee2e2); border-left-color: #ef4444; color: #991b1b; }
+    .blog-content .admonition.danger .admonition-title::before { content: "🚨"; }
+    .blog-content .admonition p { margin-bottom: 0; }
+    .blog-content .admonition p + p { margin-top: 0.75rem; }
+
+    /* Math */
+    .blog-content .katex-display-wrapper { padding: 2rem 1.5rem; margin: 2rem 0; background: linear-gradient(135deg, #f5f3ff, #ede9fe); border-radius: 1.5rem; border: 1px solid #c4b5fd; overflow-x: auto; text-align: center; }
+    .blog-content .katex-error { background: linear-gradient(135deg, #fff1f2, #ffe4e6); border: 1px dashed #fb7185; color: #9f1239; padding: 1rem 1.25rem; border-radius: 1rem; display: inline-block; margin: 1rem 0; font-family: monospace; }
+    .blog-content .katex { font-size: 1.1em; }
+
+    /* Aligned blocks */
+    .blog-content div[style*="text-align:center"] { padding: 1.25rem; margin: 1.5rem 0; border: 2px dashed #93c5fd; border-radius: 1rem; background: linear-gradient(90deg, rgba(238,242,255,0.6), rgba(243,232,255,0.6)); }
+
+    /* Collapsible */
+    .blog-content details { border-radius: 1rem; padding: 1.25rem; margin: 1.5rem 0; background: linear-gradient(to bottom right, #eff6ff, #f5f3ff); border: 1px solid #bfdbfe; }
+    .blog-content details summary { font-weight: 800; cursor: pointer; color: #1e40af; font-size: 1.05rem; margin-bottom: 0.5rem; user-select: none; }
+
+    /* Embeds */
+    .blog-content iframe { width: 100%; max-width: 100%; aspect-ratio: 16/9; border-radius: 1.25rem; border: 3px solid #f9a8d4; box-shadow: 0 20px 45px -15px rgba(236,72,153,0.35); margin: 2rem 0; overflow: hidden; display: block; background: #000; }
 </style>
 {% endblock %}
 
@@ -35,7 +101,7 @@
             <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 leading-tight mb-8">
                 {{ post.title }}
             </h1>
-            
+
             <div class="flex items-center justify-between py-8 border-y border-slate-100">
                 <div class="flex items-center space-x-4">
                     <div class="w-14 h-14 rounded-2xl custom-gradient flex items-center justify-center text-white font-black overflow-hidden shadow-lg shadow-blue-100">
@@ -50,7 +116,7 @@
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Author • {{ post.created_at|date:"M d, Y" }}</p>
                     </div>
                 </div>
-                
+
                 <div class="flex items-center space-x-3">
                     <button class="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-all flex items-center justify-center shadow-sm">
                         <i class="fab fa-facebook-f"></i>
@@ -73,8 +139,8 @@
         {% endif %}
 
         <!-- Content -->
-        <div class="blog-content" data-aos="fade-up" data-aos-delay="300">
-            {{ post.content|safe|linebreaks }}
+        <div id="blog-content" class="blog-content" data-aos="fade-up" data-aos-delay="300">
+            {{ content_html|safe }}
         </div>
 
         <!-- Footer / Tags -->
@@ -100,4 +166,66 @@
         </footer>
     </div>
 </article>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var content = document.getElementById('blog-content');
+        if (!content) return;
+
+        // Highlight ==text==
+        content.innerHTML = content.innerHTML.replace(/==([^=]+)==/g, '<mark class="bg-amber-200/80 text-amber-900 px-1 rounded font-semibold">$1</mark>');
+
+        // KaTeX math
+        try {
+            if (typeof katex !== 'undefined') {
+                var html = content.innerHTML;
+                html = html.replace(/\$\$([\s\S]+?)\$\$/g, function(match, math) {
+                    try {
+                        return '<div class="katex-display-wrapper">' + katex.renderToString(math.trim(), { throwOnError: false, displayMode: true }) + '</div>';
+                    } catch(e) { return '<div class="katex-error">' + match + '</div>'; }
+                });
+                html = html.replace(/\$`([^`]+)`\$/g, function(match, math) {
+                    try { return katex.renderToString(math.trim(), { throwOnError: false, displayMode: false }); }
+                    catch(e) { return match; }
+                });
+                html = html.replace(/(^|[^\\])\$([^$\n]+?)\$/g, function(match, prefix, math) {
+                    try { return prefix + katex.renderToString(math.trim(), { throwOnError: false, displayMode: false }); }
+                    catch(e) { return match; }
+                });
+                content.innerHTML = html;
+            }
+        } catch(e) {}
+
+        // Syntax highlighting
+        try {
+            content.querySelectorAll('pre code').forEach(function(block) {
+                if (!block.dataset.highlighted) hljs.highlightElement(block);
+            });
+        } catch(e) {}
+
+        // Copy code buttons
+        content.querySelectorAll('pre').forEach(function(pre) {
+            if (pre.querySelector('.copy-code-btn')) return;
+            var wrapper = document.createElement('div');
+            wrapper.className = 'relative group';
+            pre.parentNode.insertBefore(wrapper, pre);
+            wrapper.appendChild(pre);
+            var btn = document.createElement('button');
+            btn.className = 'copy-code-btn absolute top-4 right-4 z-10 px-4 py-2 text-xs font-black rounded-xl bg-white/10 hover:bg-white/30 text-white border border-white/20 backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 shadow-lg';
+            btn.innerHTML = '<i class="far fa-copy mr-2"></i> Copy Code';
+            btn.onclick = function() {
+                var txt = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+                navigator.clipboard.writeText(txt).then(function() {
+                    btn.innerHTML = '<i class="fas fa-check mr-2"></i> Copied!';
+                    btn.classList.add('bg-emerald-500/50');
+                    setTimeout(function() {
+                        btn.innerHTML = '<i class="far fa-copy mr-2"></i> Copy Code';
+                        btn.classList.remove('bg-emerald-500/50');
+                    }, 1800);
+                });
+            };
+            wrapper.appendChild(btn);
+        });
+    });
+</script>
 {% endblock %}

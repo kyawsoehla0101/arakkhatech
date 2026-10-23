@@ -16,6 +16,7 @@ urlpatterns = [
     path('api/v1/', include('docs.urls_api')),
 
     # Website
+    path('blogs/', include('blogs.urls')),
     path('docs/', include('docs.urls')),
     path('', include('courses.urls')),
 

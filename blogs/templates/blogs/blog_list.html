@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Blogs - Arakkha Tech{% endblock %}
+
+{% block content %}
+<section class="py-20 bg-slate-50">
+    <div class="container mx-auto px-6">
+        <!-- Header -->
+        <div class="text-center mb-16" data-aos="fade-up">
+            <h2 class="text-4xl md:text-5xl font-black text-slate-800 mb-6">နောက်ဆုံးရ <span class="text-blue-600">ဆောင်းပါးများ</span></h2>
+            <p class="text-slate-500 max-w-2xl mx-auto text-lg font-medium">
+                နည်းပညာဆိုင်ရာ အတွေ့အကြုံများ၊ ဗဟုသုတများနှင့် နောက်ဆုံးရ သတင်းများကို ဤနေရာတွင် ဖတ်ရှုနိုင်ပါသည်။
+            </p>
+        </div>
+
+        <!-- Blog Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {% for post in posts %}
+            <article class="bg-white rounded-[2.5rem] overflow-hidden shadow-brand-sm hover:shadow-brand transition-all duration-500 group border border-slate-100 flex flex-col" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+                <!-- Thumbnail -->
+                <div class="relative h-64 overflow-hidden">
+                    {% if post.thumbnail %}
+                        <img src="{{ post.thumbnail.url }}" alt="{{ post.title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    {% else %}
+                        <div class="w-full h-full bg-blue-50 flex items-center justify-center">
+                            <i class="fas fa-newspaper text-blue-200 text-6xl"></i>
+                        </div>
+                    {% endif %}
+                    <div class="absolute top-6 left-6">
+                        <span class="bg-white/90 backdrop-blur-md text-blue-600 text-[10px] font-black px-4 py-2 rounded-full uppercase tracking-widest shadow-sm">Article</span>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-8 flex-grow flex flex-col">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-8 h-8 rounded-full custom-gradient flex items-center justify-center text-white text-[10px] font-black overflow-hidden">
+                            {% if post.author.profile.avatar %}
+                                <img src="{{ post.author.profile.avatar.url }}" class="w-full h-full object-cover">
+                            {% else %}
+                                {{ post.author.username|slice:":1"|upper }}
+                            {% endif %}
+                        </div>
+                        <span class="text-xs font-bold text-slate-400">{{ post.author.username }} • {{ post.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    
+                    <h3 class="text-xl font-black text-slate-800 mb-4 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">
+                        <a href="{% url 'blogs:blog_detail' post.slug %}">{{ post.title }}</a>
+                    </h3>
+                    
+                    <p class="text-slate-500 text-sm font-medium leading-relaxed mb-6 line-clamp-3">
+                        {{ post.content|striptags|truncatewords:20 }}
+                    </p>
+
+                    <div class="mt-auto pt-6 border-t border-slate-50">
+                        <a href="{% url 'blogs:blog_detail' post.slug %}" class="inline-flex items-center text-sm font-black text-blue-600 group/link">
+                            Read More
+                            <i class="fas fa-arrow-right ml-2 group-hover/link:translate-x-1 transition-transform"></i>
+                        </a>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="col-span-full py-20 text-center" data-aos="fade-up">
+                <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
+                    <i class="fas fa-newspaper text-4xl"></i>
+                </div>
+                <h3 class="text-xl font-black text-slate-800 mb-2">ဆောင်းပါးများ မရှိသေးပါ။</h3>
+                <p class="text-slate-500 font-medium">မကြာမီ ဆောင်းပါးကောင်းများ ရောက်ရှိလာတော့မည် ဖြစ်ပါသည်။</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -95,6 +95,7 @@ INSTALLED_APPS = [
     # Apps
     'courses',
     'docs',
+    'blogs',
 
     # REST Framework
     'rest_framework',

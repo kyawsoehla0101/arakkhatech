@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }} - Arakkha Tech{% endblock %}
+
+{% block extra_css %}
+<style>
+    .blog-content h1 { font-size: 2.25rem; font-weight: 800; margin-bottom: 1.5rem; color: #1e293b; }
+    .blog-content h2 { font-size: 1.875rem; font-weight: 800; margin-top: 2.5rem; margin-bottom: 1.25rem; color: #1e293b; }
+    .blog-content h3 { font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: #1e293b; }
+    .blog-content p { margin-bottom: 1.5rem; line-height: 1.8; color: #475569; font-size: 1.125rem; }
+    .blog-content ul, .blog-content ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+    .blog-content ul { list-style-type: disc; }
+    .blog-content ol { list-style-type: decimal; }
+    .blog-content li { margin-bottom: 0.5rem; color: #475569; font-size: 1.125rem; }
+    .blog-content blockquote { border-left: 4px solid #6366f1; padding-left: 1.5rem; font-style: italic; margin-bottom: 1.5rem; color: #6366f1; }
+    .blog-content img { border-radius: 1.5rem; margin-bottom: 2rem; margin-top: 2rem; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1); }
+</style>
+{% endblock %}
+
+{% block content %}
+<article class="py-20 bg-white">
+    <div class="container mx-auto px-6 max-w-4xl">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center space-x-2 text-xs font-black text-slate-400 uppercase tracking-widest mb-10" data-aos="fade-up">
+            <a href="{% url 'course_list' %}" class="hover:text-blue-600 transition-colors">Home</a>
+            <i class="fas fa-chevron-right text-[8px]"></i>
+            <a href="{% url 'blogs:blog_list' %}" class="hover:text-blue-600 transition-colors">Blogs</a>
+            <i class="fas fa-chevron-right text-[8px]"></i>
+            <span class="text-slate-800">Article Detail</span>
+        </nav>
+
+        <!-- Post Header -->
+        <header class="mb-12" data-aos="fade-up" data-aos-delay="100">
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 leading-tight mb-8">
+                {{ post.title }}
+            </h1>
+            
+            <div class="flex items-center justify-between py-8 border-y border-slate-100">
+                <div class="flex items-center space-x-4">
+                    <div class="w-14 h-14 rounded-2xl custom-gradient flex items-center justify-center text-white font-black overflow-hidden shadow-lg shadow-blue-100">
+                        {% if post.author.profile.avatar %}
+                            <img src="{{ post.author.profile.avatar.url }}" class="w-full h-full object-cover">
+                        {% else %}
+                            {{ post.author.username|slice:":1"|upper }}
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p class="font-black text-slate-800">{{ post.author.username }}</p>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Author • {{ post.created_at|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <button class="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-all flex items-center justify-center shadow-sm">
+                        <i class="fab fa-facebook-f"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-all flex items-center justify-center shadow-sm">
+                        <i class="fab fa-twitter"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-all flex items-center justify-center shadow-sm">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Featured Image -->
+        {% if post.thumbnail %}
+        <div class="mb-16 rounded-[3rem] overflow-hidden shadow-2xl shadow-blue-100/50" data-aos="zoom-in" data-aos-delay="200">
+            <img src="{{ post.thumbnail.url }}" alt="{{ post.title }}" class="w-full h-auto">
+        </div>
+        {% endif %}
+
+        <!-- Content -->
+        <div class="blog-content" data-aos="fade-up" data-aos-delay="300">
+            {{ post.content|safe|linebreaks }}
+        </div>
+
+        <!-- Footer / Tags -->
+        <footer class="mt-20 pt-12 border-t border-slate-100" data-aos="fade-up">
+            <div class="bg-slate-50 rounded-[2.5rem] p-10 md:p-12 flex flex-col md:flex-row items-center gap-8">
+                <div class="w-24 h-24 rounded-[2rem] custom-gradient flex items-center justify-center text-white text-2xl font-black overflow-hidden shadow-xl">
+                    {% if post.author.profile.avatar %}
+                        <img src="{{ post.author.profile.avatar.url }}" class="w-full h-full object-cover">
+                    {% else %}
+                        {{ post.author.username|slice:":1"|upper }}
+                    {% endif %}
+                </div>
+                <div class="text-center md:text-left flex-grow">
+                    <h4 class="text-xl font-black text-slate-800 mb-2">Written by {{ post.author.username }}</h4>
+                    <p class="text-slate-500 font-medium leading-relaxed max-w-xl">
+                        Arakkha Tech ၏ ပညာရေးလမ်းညွှန်နှင့် နည်းပညာဆောင်းပါးရှင် တစ်ဦးဖြစ်ပါသည်။ ဗဟုသုတအသစ်များကို အမြဲမျှဝေပေးလျက်ရှိပါသည်။
+                    </p>
+                </div>
+                <a href="{% url 'blogs:blog_list' %}" class="bg-white text-slate-800 px-8 py-4 rounded-2xl font-black text-sm shadow-sm hover:shadow-md transition-all border border-slate-100">
+                    All Articles
+                </a>
+            </div>
+        </footer>
+    </div>
+</article>
+{% endblock %}

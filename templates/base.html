@@ -262,6 +262,7 @@
             
             <div class="hidden lg:flex items-center space-x-10">
                 <a href="{% url 'courses_page' %}" class="nav-link font-bold text-slate-600 hover:text-blue-600 {% if active_nav == 'courses' %}nav-active{% endif %}">သင်တန်းများ</a>
+                <a href="{% url 'blogs:blog_list' %}" class="nav-link font-bold text-slate-600 hover:text-blue-600 {% if active_nav == 'blogs' %}nav-active{% endif %}">ဆောင်းပါးများ</a>
                 <a href="{% url 'instructors_list' %}" class="nav-link font-bold text-slate-600 hover:text-blue-600 flex items-center {% if active_nav == 'instructors' %}nav-active{% endif %}">
                     <!-- <i class="fas fa-chalkboard-user mr-1.5"></i>  -->
                     သင်တန်းဆရာများ
@@ -517,6 +518,7 @@
 
                 <nav class="space-y-4">
                     <a href="{% url 'course_list' %}" class="block text-xl font-black text-slate-800 {% if active_nav == 'courses' %}mobile-nav-active{% endif %}">သင်တန်းများ</a>
+                    <a href="{% url 'blogs:blog_list' %}" class="block text-xl font-black text-slate-800 {% if active_nav == 'blogs' %}mobile-nav-active{% endif %}">ဆောင်းပါးများ</a>
                     <a href="{% url 'docs_list' %}" class="block text-xl font-black text-slate-800 {% if active_nav == 'docs' %}mobile-nav-active{% endif %}">စာအုပ်စင်</a>
                     {% if user.is_authenticated %}
                         {% if is_instructor_user and not is_admin_user %}

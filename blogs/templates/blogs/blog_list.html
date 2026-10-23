@@ -10,7 +10,7 @@
         <div class="text-center mb-16" data-aos="fade-up">
             <h2 class="text-4xl md:text-5xl font-black text-slate-800 mb-6">နောက်ဆုံးရ <span class="text-blue-600">ဆောင်းပါးများ</span></h2>
             <p class="text-slate-500 max-w-2xl mx-auto text-lg font-medium">
-                နည်းပညာဆိုင်ရာ အတွေ့အကြုံများ၊ ဗဟုသုတများနှင့် နောက်ဆုံးရ သတင်းများကို ဤနေရာတွင် ဖတ်ရှုနိုင်ပါသည်။
+                နည်းပညာဆိုင်ရာ အတွိအကြုံများ၊ ဗဟုသုတများနန့် နောက်ဆုံးရ သတင်းများကို အေနီရာတွင် ဖတ်ရှုနိုင်ပါသည်။
             </p>
         </div>
 
@@ -50,7 +50,7 @@
                     </h3>
                     
                     <p class="text-slate-500 text-sm font-medium leading-relaxed mb-6 line-clamp-3">
-                        {{ post.content|striptags|truncatewords:20 }}
+                        {{ content_html|safe|truncatewords:20 }}
                     </p>
 
                     <div class="mt-auto pt-6 border-t border-slate-50">

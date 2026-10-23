@@ -8,7 +8,7 @@ from courses.helpers import is_instructor, is_admin
 
 def blog_list(request):
     posts = Post.objects.filter(status='published')
-    return render(request, 'blogs/blog_list.html', {'posts': posts})
+    return render(request, 'blogs/blog_list.html', {'posts': posts,'active_nav': 'blogs'})
 
 def blog_detail(request, slug):
     post = get_object_or_404(Post, slug=slug, status='published')

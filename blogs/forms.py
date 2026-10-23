@@ -18,7 +18,7 @@ class PostForm(forms.ModelForm):
                 'class': 'w-full bg-slate-50 border-slate-200 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition-all',
             }),
             'content': forms.Textarea(attrs={
-                'id': 'tinymce-editor',
+                'id': 'markdown-editor',
                 'class': 'w-full bg-slate-50 border-slate-200 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition-all',
                 'rows': 15
             }),

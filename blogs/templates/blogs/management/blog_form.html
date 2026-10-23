@@ -7,28 +7,191 @@
 {% block footer %}{% endblock %}
 
 {% block extra_css %}
-<!-- TinyMCE CDN -->
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-<script>
-  tinymce.init({
-    selector: '#tinymce-editor',
-    plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
-    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
-    height: 600,
-    border_radius: '1.5rem',
-    skin: 'oxide',
-    content_css: 'default',
-    setup: function (editor) {
-        editor.on('change', function () {
-            editor.save();
-        });
-    }
-  });
-</script>
+<!-- EasyMDE & Dependencies -->
+<link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/html.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/dart.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script> try { hljs.highlightAll(); } catch(e) {} </script>
+
 <style>
-    .tox-tinymce {
-        border-radius: 1.5rem !important;
-        border: 1px solid #e2e8f0 !important;
+    /* Same styles as lesson_form.html */
+    .CodeMirror {
+        border: 1px solid #f1f5f9 !important;
+        background-color: #f8fafc !important;
+        padding: 1rem !important;
+        border-radius: 0 0 1.5rem 1.5rem !important;
+        font-family: 'Plus Jakarta Sans', 'JetBrains Mono', ui-monospace, monospace !important;
+        min-height: 550px !important;
+        font-size: 15px !important;
+        line-height: 1.8 !important;
+    }
+    .editor-toolbar {
+        border: 1px solid #f1f5f9 !important;
+        background: linear-gradient(to right, #ffffff, #fafbff) !important;
+        border-bottom: none !important;
+        border-radius: 1.5rem 1.5rem 0 0 !important;
+        padding: 0.5rem 0.75rem !important;
+        display: flex !important;
+        flex-wrap: wrap;
+        gap: 2px;
+    }
+    .editor-toolbar button, .editor-toolbar button:hover {
+        border-radius: 0.5rem !important;
+        margin: 0 1px !important;
+        height: 34px !important;
+        width: 34px !important;
+        font-size: 13px !important;
+    }
+    .editor-toolbar button:hover {
+        background-color: #eff6ff !important;
+        color: #2563eb !important;
+        border-color: #dbeafe !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px -4px rgba(99,102,241,0.3);
+    }
+    .editor-toolbar button.active {
+        background-color: #2563eb !important;
+        color: white !important;
+        border-color: #1d4ed8 !important;
+        box-shadow: 0 4px 12px -3px rgba(79,70,229,0.5);
+    }
+    .editor-toolbar button {
+        transition: all 0.18s cubic-bezier(0.4,0,0.2,1) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        position: relative;
+        overflow: visible;
+    }
+    .editor-toolbar button:active { transform: scale(0.94) !important; }
+    
+    .editor-toolbar button.tbtn-basic { color: #334155; }
+    .editor-toolbar button.tbtn-basic:hover { background: linear-gradient(135deg,#f1f5f9,#e2e8f0) !important; color: #0f172a !important; }
+    .editor-toolbar button.tbtn-basic.active { background: linear-gradient(135deg,#334155,#0f172a) !important; color: white !important; }
+
+    .editor-toolbar button.tbtn-hl-yellow i { color: #ca8a04; }
+    .editor-toolbar button.tbtn-hl-yellow { background: linear-gradient(135deg,#fefce8,#fef9c3) !important; border-color: #fde047 !important; }
+    .editor-toolbar button.tbtn-hl-yellow:hover { background: linear-gradient(135deg,#fef08a,#fde047) !important; color: #854d0e !important; border-color: #ca8a04 !important; }
+
+    .editor-toolbar button.tbtn-hl-green i { color: #15803d; }
+    .editor-toolbar button.tbtn-hl-green { background: linear-gradient(135deg,#f0fdf4,#dcfce7) !important; border-color: #86efac !important; }
+    .editor-toolbar button.tbtn-hl-green:hover { background: linear-gradient(135deg,#86efac,#4ade80) !important; color: #166534 !important; border-color: #22c55e !important; }
+
+    .editor-toolbar button.tbtn-hl-blue i { color: #1d4ed8; }
+    .editor-toolbar button.tbtn-hl-blue { background: linear-gradient(135deg,#eff6ff,#dbeafe) !important; border-color: #93c5fd !important; }
+    .editor-toolbar button.tbtn-hl-blue:hover { background: linear-gradient(135deg,#93c5fd,#60a5fa) !important; color: #1e40af !important; border-color: #3b82f6 !important; }
+
+    .editor-toolbar button.tbtn-hl-pink i { color: #be185d; }
+    .editor-toolbar button.tbtn-hl-pink { background: linear-gradient(135deg,#fdf2f8,#fce7f3) !important; border-color: #f9a8d4 !important; }
+    .editor-toolbar button.tbtn-hl-pink:hover { background: linear-gradient(135deg,#f9a8d4,#f472b6) !important; color: #9d174d !important; border-color: #ec4899 !important; }
+
+    .editor-toolbar button.tbtn-txt-red i { color: #dc2626; }
+    .editor-toolbar button.tbtn-txt-red:hover { background: linear-gradient(135deg,#fee2e2,#fecaca) !important; color: #b91c1c !important; }
+    .editor-toolbar button.tbtn-txt-blue i { color: #2563eb; }
+    .editor-toolbar button.tbtn-txt-blue:hover { background: linear-gradient(135deg,#dbeafe,#bfdbfe) !important; color: #1d4ed8 !important; }
+    .editor-toolbar button.tbtn-txt-green i { color: #16a34a; }
+    .editor-toolbar button.tbtn-txt-green:hover { background: linear-gradient(135deg,#dcfce7,#bbf7d0) !important; color: #15803d !important; }
+    .editor-toolbar button.tbtn-txt-orange i { color: #ea580c; }
+    .editor-toolbar button.tbtn-txt-orange:hover { background: linear-gradient(135deg,#ffedd5,#fed7aa) !important; color: #c2410c !important; }
+    .editor-toolbar button.tbtn-txt-purple i { color: #2563eb; }
+    .editor-toolbar button.tbtn-txt-purple:hover { background: linear-gradient(135deg,#ede9fe,#ddd6fe) !important; color: #1d4ed8 !important; }
+
+    .editor-toolbar button.tbtn-sup i { color: #2563eb; font-weight: 900; }
+    .editor-toolbar button.tbtn-sub i { color: #dc2626; font-weight: 900; }
+    
+    .editor-toolbar button.tbtn-font-sm i { font-size: 10px !important; color: #64748b; }
+    .editor-toolbar button.tbtn-font-md i { font-size: 13px !important; color: #334155; }
+    .editor-toolbar button.tbtn-font-lg i { font-size: 16px !important; color: #172554; font-weight: 900; }
+    .editor-toolbar button.tbtn-font-xl i { font-size: 18px !important; color: #172554; font-weight: 900; }
+
+    .editor-toolbar button.tbtn-align i { color: #0369a1; }
+    .editor-toolbar button.tbtn-align.active { background: linear-gradient(135deg,#0284c7,#0ea5e9) !important; color: white !important; }
+
+    .editor-toolbar button.tbtn-heading i { color: #4c1d95; font-weight: 900; }
+    .editor-toolbar button.tbtn-heading.active { background: linear-gradient(135deg,#2563eb,#2563eb) !important; color: white !important; }
+
+    .editor-toolbar button.tbtn-code i { color: #2563eb; }
+    .editor-toolbar button.tbtn-code.active { background: linear-gradient(135deg,#1d4ed8,#1e40af) !important; color: white !important; }
+
+    .editor-toolbar button.tbtn-math i { color: #1d4ed8; }
+    .editor-toolbar button.tbtn-math:hover { background: linear-gradient(135deg,#2563eb,#3b82f6) !important; color: white !important; }
+
+    .editor-toolbar button.tbtn-quote i { color: #0f766e; }
+    .editor-toolbar button.tbtn-quote.active { background: linear-gradient(135deg,#0d9488,#14b8a6) !important; color: white !important; }
+
+    .editor-toolbar button.tbtn-callout-note i { color: #2563eb; }
+    .editor-toolbar button.tbtn-callout-warning i { color: #d97706; }
+    .editor-toolbar button.tbtn-callout-success i { color: #059669; }
+    .editor-toolbar button.tbtn-callout-danger i { color: #dc2626; }
+
+    .editor-toolbar button.tbtn-list i { color: #0369a1; }
+    .editor-toolbar button.tbtn-list.active { background: linear-gradient(135deg,#0284c7,#0ea5e9) !important; color: white !important; }
+
+    .editor-toolbar button.tbtn-checklist i { color: #15803d; }
+    .editor-toolbar button.tbtn-checklist.active { background: linear-gradient(135deg,#166534,#14532d) !important; color: white !important; }
+
+    .editor-toolbar button.tbtn-collapse i { color: #3b82f6; }
+    .editor-toolbar button.tbtn-youtube i { color: #ff0000; }
+    .editor-toolbar button.tbtn-date i { color: #1d4ed8; }
+    .editor-toolbar button.tbtn-clear i { color: #9a3412; }
+    .editor-toolbar button.tbtn-help i { color: #2563eb; }
+    
+    .editor-toolbar button.tbtn-view i { color: #1d4ed8; }
+    .editor-toolbar button.tbtn-view.active { background: linear-gradient(135deg,#2563eb,#3b82f6) !important; color: white !important; }
+
+    .editor-toolbar button.tbtn-history i { color: #2563eb; }
+
+    .editor-toolbar .separator {
+        background: linear-gradient(180deg, transparent 15%, #cbd5e1 15%, #cbd5e1 85%, transparent 85%) !important;
+        width: 2px !important;
+        height: 22px !important;
+        margin: 0 6px !important;
+    }
+
+    .editor-statusbar { padding: 0.5rem 1rem !important; font-size: 12px !important; font-weight: 600 !important; color: #64748b !important; border: 1px solid #f1f5f9 !important; border-top: none !important; border-radius: 0 0 1.5rem 1.5rem !important; background-color: #ffffff !important; }
+    .editor-statusbar span:not(:last-child)::after { content: '•'; margin: 0 8px; color: #cbd5e1; }
+
+    .editor-preview-side, .editor-preview { font-size: 16px !important; line-height: 1.9 !important; font-family: 'Plus Jakarta Sans', 'Pyidaungsu', sans-serif !important; padding: 2rem !important; color: #0f172a !important; }
+    .editor-preview h1 { font-size: 2.2rem !important; font-weight: 900; color: #172554; margin-bottom: 1.5rem; border-bottom: 3px solid #eff6ff; padding-bottom: 0.75rem; }
+    .editor-preview h2 { font-size: 1.6rem !important; font-weight: 800; color: #1e3a8a; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid #eff6ff; padding-bottom: 0.75rem; }
+    .editor-preview pre { background: #282c34 !important; border-radius: 1rem !important; padding: 1.25rem !important; margin: 1.5rem 0 !important; overflow: auto !important; position: relative !important; }
+    .editor-preview code { background-color: #fef2f2 !important; color: #be123c !important; border-radius: 6px !important; padding: 2px 6px !important; }
+    
+    /* Admonitions/Callouts styles */
+    .editor-preview .note { background: #eff6ff; border-left: 6px solid #3b82f6; padding: 1.25rem 1.5rem; border-radius: 1rem; margin: 1.5rem 0; color: #1e3a8a; }
+    .editor-preview .warning { background: #fffbeb; border-left: 6px solid #f59e0b; padding: 1.25rem 1.5rem; border-radius: 1rem; margin: 1.5rem 0; color: #78350f; }
+    .editor-preview .danger { background: #fef2f2; border-left: 6px solid #ef4444; padding: 1.25rem 1.5rem; border-radius: 1rem; margin: 1.5rem 0; color: #7f1d1d; }
+    .editor-preview .success { background: #ecfdf5; border-left: 6px solid #10b981; padding: 1.25rem 1.5rem; border-radius: 1rem; margin: 1.5rem 0; color: #064e3b; }
+
+    /* Tooltip */
+    .editor-toolbar button[title]:hover::after {
+        content: attr(title);
+        position: absolute;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #0f172a;
+        color: white;
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-size: 11px;
+        white-space: nowrap;
+        z-index: 9999;
     }
 </style>
 {% endblock %}
@@ -41,13 +204,39 @@
     <!-- Main Content Area -->
     <main class="flex-grow p-6 lg:p-12">
         <!-- Top Bar -->
-        {% include 'courses/admin_topbar_snippet.html' with title=title subtitle="Fill in the details to publish your article." %}
+        {% include 'courses/admin_topbar_snippet.html' with title=title subtitle="ဆောင်းပါးအချက်အလက်များကို ဖြည့်စွက်ပေးပါ။" %}
 
-        <div class="max-w-5xl" data-aos="fade-up">
-            <form method="POST" enctype="multipart/form-data" class="space-y-8">
+        <!-- Markdown Info Banner -->
+        <div class="mb-8 p-5 bg-gradient-to-r from-rose-50 via-amber-50 to-emerald-50 rounded-2xl border border-amber-100" data-aos="fade-up">
+            <div class="flex flex-wrap items-center gap-3 text-xs">
+                <div class="flex items-center gap-2 px-3 py-2 bg-white rounded-xl shadow-sm border border-slate-100">
+                    <span class="inline-flex w-5 h-5 items-center justify-center bg-blue-600 text-white rounded-md text-[10px] font-black">H</span>
+                    <span class="font-bold text-slate-600">Heading H1-H6</span>
+                </div>
+                <div class="flex items-center gap-2 px-3 py-2 bg-white rounded-xl shadow-sm border border-slate-100">
+                    <span class="inline-flex w-5 h-5 items-center justify-center bg-amber-500 text-white rounded-md text-[10px]"><i class="fas fa-code"></i></span>
+                    <span class="font-bold text-slate-600">Code Block + Syntax</span>
+                </div>
+                <div class="flex items-center gap-2 px-3 py-2 bg-white rounded-xl shadow-sm border border-slate-100">
+                    <span class="inline-flex w-5 h-5 items-center justify-center bg-rose-500 text-white rounded-md text-[10px]">🎨</span>
+                    <span class="font-bold text-slate-600">Color / Font Size</span>
+                </div>
+                <div class="flex items-center gap-2 px-3 py-2 bg-white rounded-xl shadow-sm border border-slate-100">
+                    <span class="inline-flex w-5 h-5 items-center justify-center bg-blue-500 text-white rounded-md text-[10px]">∑</span>
+                    <span class="font-bold text-slate-600">KaTeX Math (ဂဏန်းသင်္ချာ)</span>
+                </div>
+                <div class="flex items-center gap-2 px-3 py-2 bg-white rounded-xl shadow-sm border border-slate-100">
+                    <span class="inline-flex w-5 h-5 items-center justify-center bg-blue-500 text-white rounded-md text-[10px]">💡</span>
+                    <span class="font-bold text-slate-600">Callout Box (မှတ်ချက်)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-12xl" data-aos="fade-up">
+            <form method="POST" enctype="multipart/form-data" id="blog-form" class="space-y-8" novalidate>
                 {% csrf_token %}
                 
-                <div class="bg-white p-8 md:p-12 rounded-[3rem] shadow-sm border border-slate-100 space-y-8">
+                <div class="bg-white p-8 md:p-12 rounded-[3rem] shadow-xl border border-slate-100 space-y-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <!-- Title -->
                         <div class="space-y-3">
@@ -65,7 +254,6 @@
                             {% if form.slug.errors %}
                                 <p class="text-rose-500 text-xs font-bold mt-2 ml-2">{{ form.slug.errors.0 }}</p>
                             {% endif %}
-                            <p class="text-[10px] text-slate-400 font-bold ml-2">Leave blank to auto-generate from title.</p>
                         </div>
                     </div>
 
@@ -74,25 +262,21 @@
                         <div class="space-y-3">
                             <label class="text-sm font-black text-slate-800 uppercase tracking-widest ml-2">Featured Image</label>
                             {{ form.thumbnail }}
-                            {% if form.thumbnail.errors %}
-                                <p class="text-rose-500 text-xs font-bold mt-2 ml-2">{{ form.thumbnail.errors.0 }}</p>
-                            {% endif %}
                         </div>
 
                         <!-- Status -->
                         <div class="space-y-3">
                             <label class="text-sm font-black text-slate-800 uppercase tracking-widest ml-2">Status</label>
                             {{ form.status }}
-                            {% if form.status.errors %}
-                                <p class="text-rose-500 text-xs font-bold mt-2 ml-2">{{ form.status.errors.0 }}</p>
-                            {% endif %}
                         </div>
                     </div>
 
-                    <!-- Content -->
+                    <!-- Content (EasyMDE) -->
                     <div class="space-y-3">
                         <label class="text-sm font-black text-slate-800 uppercase tracking-widest ml-2">Article Content</label>
-                        {{ form.content }}
+                        <div class="markdown-editor-wrapper">
+                            {{ form.content }}
+                        </div>
                         {% if form.content.errors %}
                             <p class="text-rose-500 text-xs font-bold mt-2 ml-2">{{ form.content.errors.0 }}</p>
                         {% endif %}
@@ -112,4 +296,157 @@
         </div>
     </main>
 </div>
+
+<!-- Help Modal -->
+<div id="editorHelpModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[9999] hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-8">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-black text-slate-800"><i class="fas fa-keyboard text-blue-500 mr-3"></i> Keyboard Shortcuts</h3>
+            <button onclick="document.getElementById('editorHelpModal').classList.add('hidden'); document.getElementById('editorHelpModal').classList.remove('flex');" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+            <div class="p-3 bg-slate-50 rounded-xl"><kbd class="px-2 py-1 bg-white rounded-md border border-slate-200 font-mono font-bold text-xs">Ctrl/Cmd + B</kbd> <span class="ml-2 text-slate-600">Bold</span></div>
+            <div class="p-3 bg-slate-50 rounded-xl"><kbd class="px-2 py-1 bg-white rounded-md border border-slate-200 font-mono font-bold text-xs">Ctrl/Cmd + I</kbd> <span class="ml-2 text-slate-600">Italic</span></div>
+            <div class="p-3 bg-slate-50 rounded-xl"><kbd class="px-2 py-1 bg-white rounded-md border border-slate-200 font-mono font-bold text-xs">Ctrl/Cmd + U</kbd> <span class="ml-2 text-slate-600">Underline</span></div>
+            <div class="p-3 bg-slate-50 rounded-xl"><kbd class="px-2 py-1 bg-white rounded-md border border-slate-200 font-mono font-bold text-xs">Ctrl/Cmd + K</kbd> <span class="ml-2 text-slate-600">Link</span></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const editorEl = document.getElementById("markdown-editor");
+        if (!editorEl) return;
+
+        function applyMarkdownEnhancements(html) {
+            html = html.replace(/==([^=]+)==/g, '<mark class="bg-amber-200 text-amber-900 px-1 rounded">$1</mark>');
+            return html;
+        }
+
+        function renderMathInPreview(el) {
+            try {
+                if (!window.katex) return;
+                const html = el.innerHTML;
+                const processed = html
+                    .replace(/\$\$([\s\S]+?)\$\$/g, function(match, expr) {
+                        try { return '<div class="katex-display-wrapper my-5 flex justify-center">' + katex.renderToString(expr.trim(), { throwOnError: false, displayMode: true }) + '</div>'; }
+                        catch(e) { return '<div class="text-rose-500">Math error</div>'; }
+                    })
+                    .replace(/\$([^\$\n]+?)\$/g, function(match, expr) {
+                        try { return '<span class="katex-inline">' + katex.renderToString(expr.trim(), { throwOnError: false, displayMode: false }) + '</span>'; }
+                        catch(e) { return '<span class="text-rose-500">$Math error$</span>'; }
+                    });
+                el.innerHTML = processed;
+            } catch(e) {}
+        }
+
+        function wrapSelectionInHTML(cm, before, after, defaultText) {
+            var selectedText = cm.getSelection();
+            var text = selectedText || defaultText;
+            cm.replaceSelection(before + text + after);
+            if (!selectedText) {
+                var cursor = cm.getCursor();
+                cm.setCursor(cursor.line, cursor.ch - after.length - text.length);
+            }
+        }
+
+        const easyMDE = new EasyMDE({
+            element: editorEl,
+            spellChecker: false,
+            status: ["lines", "words", "cursor"],
+            placeholder: "# ဆောင်းပါးခေါင်းစဉ် H1\n\nဒီနေရာမှာ ဆောင်းပါးအကြောင်းအရာများကို Markdown ဖြင့် ရေးသားနိုင်ပါသည်။",
+            forceSync: true,
+            autosave: { enabled: true, uniqueId: "blog-content-" + Date.now(), delay: 1000 },
+            tabSize: 4,
+            indentWithTabs: false,
+            lineNumbers: true,
+            inputStyle: "contenteditable",
+            renderingConfig: {
+                singleLineBreaks: true,
+                codeSyntaxHighlighting: true,
+                hljs: hljs
+            },
+            previewRender: function(plainText, preview) {
+                setTimeout(function() {
+                    var rendered = easyMDE.markdown(plainText);
+                    rendered = applyMarkdownEnhancements(rendered);
+                    preview.innerHTML = rendered;
+                    renderMathInPreview(preview);
+                    try {
+                        preview.querySelectorAll('pre code').forEach((block) => {
+                            if (!block.dataset.highlighted) hljs.highlightElement(block);
+                        });
+                    } catch(e) {}
+                }, 0);
+                return '<div class="markdown-preview-enhanced"><div class="animate-pulse text-slate-400 text-sm p-4">Rendering...</div></div>';
+            },
+            toolbar: [
+                { name: "bold", action: EasyMDE.toggleBold, className: "fas fa-bold tbtn-basic", title: "Bold" },
+                { name: "italic", action: EasyMDE.toggleItalic, className: "fas fa-italic tbtn-basic", title: "Italic" },
+                { name: "underline", action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<u>', '</u>', 'Underline text'); }, className: "fas fa-underline tbtn-basic", title: "Underline" },
+                { name: "strikethrough", action: EasyMDE.toggleStrikethrough, className: "fas fa-strikethrough tbtn-basic", title: "Strikethrough" },
+                "|",
+                { name: "highlight-yellow", action: function(editor) { wrapSelectionInHTML(editor.codemirror, '==', '==', 'Highlight'); }, className: "fas fa-highlighter tbtn tbtn-hl-yellow", title: "Highlight" },
+                "|",
+                { name: "color-red", action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<span style="color:#be123c;font-weight:600">', '</span>', 'Red Text'); }, className: "fas fa-fill-drip tbtn tbtn-txt-red", title: "Red Color" },
+                { name: "color-blue", action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<span style="color:#2563eb;font-weight:600">', '</span>', 'Blue Text'); }, className: "fas fa-fill-drip tbtn tbtn-txt-blue", title: "Blue Color" },
+                "|",
+                { name: "font-big", action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<span style="font-size:1.4rem;font-weight:700;color:#172554">', '</span>', 'Big Text'); }, className: "fas fa-font tbtn tbtn-font-lg", title: "Big Text" },
+                "|",
+                { name: "heading-smaller", action: EasyMDE.toggleHeadingSmaller, className: "fas fa-heading tbtn tbtn-heading", title: "Heading Smaller" },
+                { name: "heading-bigger", action: EasyMDE.toggleHeadingBigger, className: "fas fa-heading tbtn tbtn-heading", title: "Heading Bigger" },
+                "|",
+                { name: "code", action: EasyMDE.toggleCodeBlock, className: "fas fa-code tbtn tbtn-code", title: "Code Block" },
+                {
+                    name: "math-block",
+                    action: function(ed) {
+                        var cm = ed.codemirror;
+                        var formula = cm.getSelection() || '\\sum_{n=1}^{\\infty} \\frac{1}{n^2}';
+                        cm.replaceSelection('\n$$' + formula + '$$\n');
+                    },
+                    className: "fas fa-calculator tbtn tbtn-math",
+                    title: "Math Block"
+                },
+                "|",
+                {
+                    name: "callout-note",
+                    action: function(ed) {
+                        var cm = ed.codemirror;
+                        var content = cm.getSelection() || 'ဒီနေရာမှာ မှတ်ချက် အကြောင်းအရာ ရေးပါ';
+                        cm.replaceSelection('\n!!! note "သတိပြုရန်"\n    ' + content + '\n\n');
+                    },
+                    className: "fas fa-info-circle tbtn tbtn-callout-note",
+                    title: "Note"
+                },
+                "|",
+                { name: "unordered-list", action: EasyMDE.toggleUnorderedList, className: "fas fa-list-ul tbtn tbtn-list", title: "Bullet List" },
+                { name: "ordered-list", action: EasyMDE.toggleOrderedList, className: "fas fa-list-ol tbtn tbtn-list", title: "Numbered List" },
+                "|",
+                { name: "link", action: EasyMDE.drawLink, className: "fas fa-link tbtn", title: "Link" },
+                { name: "image", action: EasyMDE.drawImage, className: "fas fa-image tbtn", title: "Image" },
+                "|",
+                {
+                    name: "help",
+                    action: function() {
+                        var m = document.getElementById('editorHelpModal');
+                        m.classList.remove('hidden');
+                        m.classList.add('flex');
+                    },
+                    className: "fas fa-question-circle no-disable tbtn tbtn-help",
+                    title: "Help"
+                },
+                "|",
+                { name: "preview", action: EasyMDE.togglePreview, className: "fas fa-eye no-disable tbtn tbtn-view", title: "Preview" },
+                { name: "side-by-side", action: EasyMDE.toggleSideBySide, className: "fas fa-columns no-disable no-mobile tbtn tbtn-view", title: "Side by Side" },
+                { name: "fullscreen", action: EasyMDE.toggleFullScreen, className: "fas fa-expand no-disable no-mobile tbtn tbtn-view", title: "Fullscreen" }
+            ]
+        });
+
+        document.getElementById('blog-form').addEventListener('submit', function() {
+            easyMDE.save();
+        });
+    });
+</script>
 {% endblock %}

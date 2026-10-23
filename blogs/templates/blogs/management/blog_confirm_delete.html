@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Article - Arakkha Tech{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-[#fcfcfd] flex flex-col lg:flex-row">
+    <!-- Modern Sidebar -->
+    {% include 'courses/admin_sidebar_snippet.html' %}
+
+    <!-- Main Content Area -->
+    <main class="flex-grow p-6 lg:p-12 flex items-center justify-center">
+        <div class="max-w-md w-full" data-aos="zoom-in">
+            <div class="bg-white p-10 md:p-12 rounded-[3.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 text-center space-y-8">
+                <div class="w-24 h-24 bg-rose-50 rounded-[2rem] flex items-center justify-center mx-auto text-rose-500 text-3xl shadow-inner">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                
+                <div class="space-y-3">
+                    <h2 class="text-3xl font-black text-slate-800">Are you sure?</h2>
+                    <p class="text-slate-400 font-medium leading-relaxed">
+                        You are about to delete <span class="text-slate-800 font-black">"{{ post.title }}"</span>. This action cannot be undone.
+                    </p>
+                </div>
+
+                <form method="POST" class="space-y-4 pt-4">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full bg-rose-500 text-white py-5 rounded-3xl font-black shadow-xl shadow-rose-100 hover:bg-rose-600 hover:scale-105 transition-all">
+                        Yes, Delete Article
+                    </button>
+                    <a href="{% url 'blogs:manage_blogs' %}" class="block w-full bg-slate-50 text-slate-400 py-5 rounded-3xl font-black hover:bg-slate-100 transition-all">
+                        No, Keep It
+                    </a>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

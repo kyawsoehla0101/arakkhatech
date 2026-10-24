@@ -1,0 +1,738 @@
+{# ------------------------------------------------------------------
+   Shared EasyMDE initialiser for the Arakkha Tech technical editor.
+   Works for any page whose Markdown textarea has id="markdown-editor":
+   the form and the autosave slot are detected automatically.
+
+   Extra technical-writing tools added on top of EasyMDE:
+     - searchable code-language picker for fenced code blocks
+     - table builder (columns / rows / alignment)
+     - [TOC] table of contents, rendered live in the preview
+     - Ctrl/Cmd + 1..6 heading shortcuts (+ 0 to reset)
+
+   Used by: courses lesson_form, blogs blog_form, docs chapter_form.
+   ------------------------------------------------------------------ #}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var editorEl = document.getElementById("markdown-editor");
+        if (!editorEl || typeof EasyMDE === "undefined") return;
+
+        var formEl = editorEl.closest("form");
+        // Drafts are keyed by URL so every record keeps its own autosave slot.
+        var autosaveKey = "arakkha-draft:" + window.location.pathname;
+
+        /* ==========================================================
+           Code languages offered by the picker: [fence id, label]
+           ========================================================== */
+        var CODE_LANGUAGES = [
+            ["python", "Python"], ["javascript", "JavaScript"], ["typescript", "TypeScript"],
+            ["dart", "Dart / Flutter"], ["java", "Java"], ["kotlin", "Kotlin"], ["swift", "Swift"],
+            ["c", "C"], ["cpp", "C++"], ["csharp", "C#"], ["go", "Go"], ["rust", "Rust"],
+            ["php", "PHP"], ["ruby", "Ruby"], ["scala", "Scala"], ["r", "R"],
+            ["sql", "SQL"], ["bash", "Bash / Shell"], ["powershell", "PowerShell"],
+            ["html", "HTML"], ["css", "CSS"], ["scss", "SCSS"], ["less", "Less"],
+            ["xml", "XML"], ["json", "JSON"], ["yaml", "YAML"], ["ini", "INI / TOML"],
+            ["markdown", "Markdown"], ["dockerfile", "Dockerfile"], ["nginx", "Nginx"],
+            ["apache", "Apache"], ["makefile", "Makefile"], ["cmake", "CMake"],
+            ["graphql", "GraphQL"], ["http", "HTTP"], ["diff", "Diff / Patch"],
+            ["protobuf", "Protobuf"], ["x86asm", "Assembly"], ["properties", "Properties"],
+            ["lua", "Lua"], ["perl", "Perl"], ["elixir", "Elixir"], ["erlang", "Erlang"],
+            ["haskell", "Haskell"], ["julia", "Julia"], ["matlab", "MATLAB"], ["fortran", "Fortran"],
+            ["groovy", "Groovy"], ["clojure", "Clojure"], ["tex", "LaTeX"], ["vim", "Vim Script"],
+            ["plaintext", "Plain Text"]
+        ];
+
+        var popoverEl = null;
+        var tableModalEl = null;
+        var langButtonEl = null;
+        var langAnchorEl = null;
+
+        function editorIsBusy() {
+            try {
+                return typeof easyMDE.isPreviewActive === "function" && easyMDE.isPreviewActive();
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function focusEditor() {
+            try { easyMDE.codemirror.focus(); } catch (e) {}
+        }
+
+        /* ==========================================================
+           Preview pipeline
+           ========================================================== */
+        function applyMarkdownEnhancements(html) {
+            return html.replace(/==([^=]+)==/g, '<mark class="bg-amber-200 text-amber-900 px-1 rounded">$1</mark>');
+        }
+
+        function renderMathInPreview(el) {
+            try {
+                if (!window.katex) return;
+                var html = el.innerHTML;
+                var processed = html
+                    .replace(/\$\$([\s\S]+?)\$\$/g, function(match, expr) {
+                        try { return '<div class="katex-display-wrapper my-5 flex justify-center">' + katex.renderToString(expr.trim(), { throwOnError: false, displayMode: true }) + '</div>'; }
+                        catch(e) { return '<div class="text-rose-500">Math error: ' + match + '</div>'; }
+                    })
+                    .replace(/\$([^\$\n]+?)\$/g, function(match, expr) {
+                        try { return '<span class="katex-inline">' + katex.renderToString(expr.trim(), { throwOnError: false, displayMode: false }) + '</span>'; }
+                        catch(e) { return '<span class="text-rose-500">$Math error$</span>'; }
+                    });
+                if (processed !== html) el.innerHTML = processed;
+            } catch(e) {}
+        }
+
+        // Turns the "[TOC]" marker into a real table of contents built from
+        // the rendered headings, and gives every heading an anchor id.
+        function renderTableOfContents(preview) {
+            var paragraphs = preview.querySelectorAll("p");
+            var marker = null;
+            for (var i = 0; i < paragraphs.length; i++) {
+                var text = (paragraphs[i].textContent || "").trim().toUpperCase();
+                if (text === "[TOC]" || text === "[[TOC]]") { marker = paragraphs[i]; break; }
+            }
+            if (!marker) return;
+
+            var headings = preview.querySelectorAll("h1, h2, h3, h4, h5, h6");
+            if (!headings.length) { marker.parentNode.removeChild(marker); return; }
+
+            var minLevel = 6;
+            for (var h = 0; h < headings.length; h++) {
+                minLevel = Math.min(minLevel, parseInt(headings[h].tagName.charAt(1), 10));
+            }
+
+            var usedIds = {};
+            var items = "";
+            for (var k = 0; k < headings.length; k++) {
+                var el = headings[k];
+                var level = parseInt(el.tagName.charAt(1), 10);
+                var id = el.id;
+                if (!id) {
+                    id = ((el.textContent || "").trim().toLowerCase().replace(/[^\w\u1000-\u109f]+/g, "-").replace(/^-+|-+$/g, "")) || ("section-" + k);
+                    el.id = id;
+                }
+                if (usedIds[id]) { usedIds[id] += 1; el.id = id + "-" + usedIds[id]; }
+                else { usedIds[id] = 1; }
+                items += '<li style="padding-left:' + ((level - minLevel) * 18) + 'px"><a href="#' + el.id + '">' +
+                    (el.innerHTML || "") + '</a></li>';
+            }
+
+            var box = document.createElement("div");
+            box.className = "markdown-toc";
+            box.innerHTML = '<p class="markdown-toc-title">မာတိကာ (Table of Contents)</p>' +
+                '<ul class="markdown-toc-list">' + items + '</ul>';
+            marker.parentNode.replaceChild(box, marker);
+        }
+
+        // Highlights fenced code and adds a language chip + copy button.
+        function decorateCodeBlocks(preview) {
+            try {
+                preview.querySelectorAll("pre code").forEach(function (block) {
+                    if (!block.dataset.highlighted && typeof hljs !== "undefined") {
+                        try { hljs.highlightElement(block); } catch (e) {}
+                    }
+                });
+
+                preview.querySelectorAll("pre").forEach(function (pre) {
+                    if (pre.parentNode && pre.parentNode.classList && pre.parentNode.classList.contains("code-block-shell")) return;
+
+                    var wrapper = document.createElement("div");
+                    wrapper.className = "relative group code-block-shell";
+                    pre.parentNode.insertBefore(wrapper, pre);
+                    wrapper.appendChild(pre);
+
+                    var code = pre.querySelector("code");
+                    var lang = "";
+                    if (code) {
+                        var match = (code.className || "").match(/(?:language|lang)-([\w+#.-]+)/i);
+                        if (match) lang = match[1];
+                    }
+                    if (lang && lang.toLowerCase() !== "plaintext") {
+                        var chip = document.createElement("span");
+                        chip.className = "code-lang-chip";
+                        chip.textContent = lang;
+                        wrapper.appendChild(chip);
+                    }
+
+                    var btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.className = "copy-code-btn absolute top-3 right-3 z-10 px-3 py-1 text-[10px] font-black rounded-lg bg-white/10 hover:bg-white/30 text-white border border-white/20 backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100";
+                    btn.innerHTML = '<i class="far fa-copy mr-1"></i> Copy';
+                    btn.onclick = function () {
+                        navigator.clipboard.writeText(code ? code.innerText : pre.innerText).then(function () {
+                            btn.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+                            btn.classList.add('bg-emerald-500/40');
+                            setTimeout(function () {
+                                btn.innerHTML = '<i class="far fa-copy mr-1"></i> Copy';
+                                btn.classList.remove('bg-emerald-500/40');
+                            }, 1500);
+                        });
+                    };
+                    wrapper.appendChild(btn);
+                });
+
+                preview.querySelectorAll("details").forEach(function (d) {
+                    d.classList.add("my-5", "rounded-xl", "border", "border-blue-100", "overflow-hidden", "bg-blue-50/30");
+                    var sum = d.querySelector("summary");
+                    if (sum) sum.classList.add("cursor-pointer", "px-4", "py-3", "font-bold", "text-blue-700", "bg-blue-100/40", "select-none");
+                });
+            } catch (e) {}
+        }
+
+        /* ==========================================================
+           Insert helpers
+           ========================================================== */
+        function wrapSelectionInHTML(cm, before, after, defaultText) {
+            var selectedText = cm.getSelection();
+            var text = selectedText || defaultText;
+            cm.replaceSelection(before + text + after);
+            if (!selectedText) {
+                var cursor = cm.getCursor();
+                cm.setCursor(cursor.line, cursor.ch - after.length - text.length);
+            }
+        }
+
+        function insertCodeBlock(lang) {
+            var cm = easyMDE.codemirror;
+            var selection = cm.getSelection();
+            var lead = "";
+            var tail = "";
+            if (!selection) {
+                var before = cm.getRange({ line: 0, ch: 0 }, cm.getCursor());
+                var lastLine = cm.getLineCount() - 1;
+                var after = cm.getRange(cm.getCursor(), { line: lastLine, ch: cm.getLine(lastLine).length });
+                lead = (before === "" || /\n\s*$/.test(before)) ? "" : "\n";
+                tail = (after === "" || /^\s*\n/.test(after)) ? "" : "\n";
+            }
+
+            var anchor = cm.getCursor();
+            var fence = lang ? "```" + lang : "```";
+            cm.replaceSelection(lead + fence + "\n" + selection + "\n```\n" + tail);
+
+            if (!selection) {
+                cm.setCursor({ line: anchor.line + (lead ? 1 : 0) + 1, ch: 0 });
+            }
+            focusEditor();
+        }
+
+        function transformHeading(level) {
+            var cm = easyMDE.codemirror;
+            cm.operation(function () {
+                var ranges = cm.listSelections();
+                for (var i = 0; i < ranges.length; i++) {
+                    var from = ranges[i].from();
+                    var to = ranges[i].to();
+                    if (to.ch === 0 && to.line > from.line) {
+                        to = { line: to.line - 1, ch: cm.getLine(to.line - 1).length };
+                    }
+                    for (var line = from.line; line <= to.line; line++) {
+                        var text = cm.getLine(line);
+                        var current = (text.match(/^\s*(#{1,6})\s+/) || [])[1];
+                        // Pressing the same level again turns the heading back into a paragraph.
+                        var effective = (level > 0 && current && current.length === level) ? 0 : level;
+                        var prefix = effective > 0 ? new Array(effective + 1).join("#") + " " : "";
+                        cm.replaceRange(prefix + text.replace(/^\s*#{1,6}\s+/, ""),
+                            { line: line, ch: 0 }, { line: line, ch: text.length });
+                    }
+                }
+            });
+            focusEditor();
+        }
+
+        function insertTableOfContents() {
+            var cm = easyMDE.codemirror;
+            cm.replaceSelection("\n[TOC]\n\n");
+            focusEditor();
+        }
+
+        function buildTableMarkdown(cols, rows, align, withHeader) {
+            var separator = "---";
+            if (align === "center") separator = ":---:";
+            else if (align === "right") separator = "---:";
+            else if (align === "left") separator = ":---";
+
+            var headerCells = [];
+            var separatorCells = [];
+            var emptyCells = [];
+            for (var i = 1; i <= cols; i++) {
+                headerCells.push(withHeader ? " Header " + i + " " : "  ");
+                separatorCells.push(" " + separator + " ");
+                emptyCells.push("  ");
+            }
+
+            var lines = ["|" + headerCells.join("|") + "|", "|" + separatorCells.join("|") + "|"];
+            for (var r = 0; r < rows; r++) lines.push("|" + emptyCells.join("|") + "|");
+            return "\n" + lines.join("\n") + "\n\n";
+        }
+
+        /* ==========================================================
+           Code-language picker
+           ========================================================== */
+        function renderLanguageItems(filter) {
+            var list = popoverEl.querySelector(".md-popover-list");
+            var query = (filter || "").trim().toLowerCase();
+            var html = "";
+            for (var i = 0; i < CODE_LANGUAGES.length; i++) {
+                var id = CODE_LANGUAGES[i][0];
+                var label = CODE_LANGUAGES[i][1];
+                if (query && label.toLowerCase().indexOf(query) === -1 && id.indexOf(query) === -1) continue;
+                html += '<button type="button" class="md-popover-item" data-lang="' + id + '">' +
+                    '<span class="md-dot"></span>' + label + '</button>';
+            }
+            list.innerHTML = html || '<div class="md-popover-empty">ဘာသာစကား ရှာမတွေ့ပါ</div>';
+        }
+
+        function hideLanguageMenu() {
+            if (popoverEl) {
+                popoverEl.classList.add("hidden");
+                langAnchorEl = null;
+            }
+        }
+
+        function buildPopover() {
+            if (popoverEl) return popoverEl;
+
+            popoverEl = document.createElement("div");
+            popoverEl.className = "md-popover hidden";
+            popoverEl.innerHTML = '<input type="text" class="md-popover-search" placeholder="ရှာပါ... python, sql, yaml, docker">' +
+                '<div class="md-popover-list"></div>';
+            document.body.appendChild(popoverEl);
+
+            popoverEl.querySelector(".md-popover-search").addEventListener("input", function () {
+                renderLanguageItems(this.value);
+            });
+            popoverEl.querySelector(".md-popover-list").addEventListener("click", function (e) {
+                var item = e.target.closest(".md-popover-item");
+                if (!item) return;
+                var lang = item.getAttribute("data-lang");
+                hideLanguageMenu();
+                insertCodeBlock(lang);
+            });
+
+            document.addEventListener("click", function (e) {
+                if (!popoverEl || popoverEl.classList.contains("hidden")) return;
+                if (popoverEl.contains(e.target)) return;
+                if (langAnchorEl && langAnchorEl.contains(e.target)) return;
+                hideLanguageMenu();
+            });
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Escape") hideLanguageMenu();
+            });
+            window.addEventListener("resize", hideLanguageMenu);
+            window.addEventListener("scroll", function (e) {
+                if (!popoverEl || popoverEl.classList.contains("hidden")) return;
+                if (popoverEl.contains(e.target)) return;
+                hideLanguageMenu();
+            }, true);
+
+            return popoverEl;
+        }
+
+        function openLanguageMenu(anchor) {
+            if (editorIsBusy()) return;
+            var el = buildPopover();
+            var search = el.querySelector(".md-popover-search");
+            langAnchorEl = anchor;
+
+            search.value = "";
+            renderLanguageItems("");
+            el.classList.remove("hidden");
+
+            var rect = anchor.getBoundingClientRect();
+            var width = 330;
+            var height = 340;
+            var left = Math.max(12, Math.min(rect.left, window.innerWidth - width - 12));
+            var top = rect.bottom + 8;
+            if (top + height > window.innerHeight - 12) top = Math.max(12, rect.top - height - 8);
+
+            el.style.left = left + "px";
+            el.style.top = top + "px";
+            setTimeout(function () { search.focus(); }, 20);
+        }
+
+        /* ==========================================================
+           Table builder
+           ========================================================== */
+        function buildTableModal() {
+            if (tableModalEl) return tableModalEl;
+
+            tableModalEl = document.createElement("div");
+            tableModalEl.className = "md-modal";
+            tableModalEl.innerHTML = [
+                '<div class="md-modal-card">',
+                '  <div class="md-modal-title"><i class="fas fa-table" style="color:#2563eb"></i> ဇယား ဖန်တီးရန် (Table Builder)</div>',
+                '  <div class="md-modal-grid">',
+                '    <div class="md-field"><label>Columns (ကော်လံ)</label>',
+                '      <input id="mdTableCols" class="md-input" type="number" min="1" max="12" value="3"></div>',
+                '    <div class="md-field"><label>Rows (အတန်း)</label>',
+                '      <input id="mdTableRows" class="md-input" type="number" min="1" max="50" value="3"></div>',
+                '  </div>',
+                '  <div class="md-field"><label>Alignment (ချိန်ညှိမှု)</label>',
+                '    <select id="mdTableAlign" class="md-select">',
+                '      <option value="left">Left (ဘယ်ညှိ)</option>',
+                '      <option value="center">Center (အလယ်ညှိ)</option>',
+                '      <option value="right">Right (ညာညှိ)</option>',
+                '      <option value="none">Default (မညှိ)</option>',
+                '    </select></div>',
+                '  <div class="md-field"><label>Header Row</label>',
+                '    <select id="mdTableHeader" class="md-select">',
+                '      <option value="yes">Header ထည့်မည်</option>',
+                '      <option value="no">Header မထည့်</option>',
+                '    </select></div>',
+                '  <div class="md-modal-actions">',
+                '    <button type="button" class="md-btn ghost" id="mdTableCancel">Cancel</button>',
+                '    <button type="button" class="md-btn primary" id="mdTableInsert"><i class="fas fa-check" style="margin-right:6px"></i>Insert Table</button>',
+                '  </div>',
+                '</div>'
+            ].join("");
+
+            document.body.appendChild(tableModalEl);
+
+            function closeTableModal() {
+                tableModalEl.classList.remove("open");
+            }
+
+            tableModalEl.addEventListener("click", function (e) {
+                if (e.target === tableModalEl) closeTableModal();
+            });
+            tableModalEl.querySelector("#mdTableCancel").addEventListener("click", closeTableModal);
+            tableModalEl.querySelector("#mdTableInsert").addEventListener("click", function () {
+                var cols = Math.min(12, Math.max(1, parseInt(tableModalEl.querySelector("#mdTableCols").value, 10) || 1));
+                var rows = Math.min(50, Math.max(0, parseInt(tableModalEl.querySelector("#mdTableRows").value, 10) || 0));
+                var align = tableModalEl.querySelector("#mdTableAlign").value;
+                var withHeader = tableModalEl.querySelector("#mdTableHeader").value === "yes";
+                closeTableModal();
+                easyMDE.codemirror.replaceSelection(buildTableMarkdown(cols, rows, align, withHeader));
+                focusEditor();
+            });
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Escape" && tableModalEl.classList.contains("open")) closeTableModal();
+            });
+
+            return tableModalEl;
+        }
+
+        function openTableBuilder() {
+            if (editorIsBusy()) return;
+            buildTableModal().classList.add("open");
+        }
+
+        /* ==========================================================
+           EasyMDE
+           ========================================================== */
+        var easyMDE = new EasyMDE({
+            element: editorEl,
+            spellChecker: false,
+            highlightFormatting: true,
+            status: ["lines", "words", {
+                className: "char-count",
+                defaultValue: function(el) { el.innerHTML = "0 chars"; },
+                onUpdate: function(el) { el.innerHTML = easyMDE.value().length + " chars"; }
+            }, "cursor", {
+                className: "read-time",
+                defaultValue: function(el) { el.innerHTML = '<i class="far fa-clock mr-1"></i> 0 min read'; },
+                onUpdate: function(el) {
+                    var words = easyMDE.value().split(/\s+/).filter(function(w) { return w.length > 0; }).length;
+                    var minutes = Math.max(1, Math.ceil(words / 200));
+                    el.innerHTML = '<i class="far fa-clock mr-1"></i> ' + minutes + ' min read';
+                }
+            }],
+            placeholder: "# ခေါင်းစဉ် (H1)\n\nအကြောင်းအရာ အကျဉ်းချုပ်။\n\n[TOC]\n\n## ခေါင်းစဉ်ခွဲ (H2)\n\n### H3 + ==Highlight== + <span style=\"color:#be123c\">အနီရောင် စာသား</span>\n\nစာကြောင်းထဲက ကိုဒ် `npm install` နှင့် ညာဘက်ညှိဇယား:\n\n| Parameter | Type | Description |\n| :--- | :---: | ---: |\n| token | string | API key |\n\n### ကိုဒ်အကွက် (Code Block + Language)\n\n```python\n# Code ခလုတ် (▶ Code) နှိပ်၍ ဘာသာစကား ရွေးပါ\ndef connect(host, port=5432):\n    return f\"{host}:{port}\"\n```\n\n```yaml\nservice:\n  image: nginx:alpine\n  ports:\n    - \"80:80\"\n```\n\n### ဂဏန်းသင်္ချာ (KaTeX)\n\nPythagorean: $a^2 + b^2 = c^2$\n\n$$\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}$$\n\n### မှတ်ချက် Box (Callout)\n\n!!! note \"သတိပြုရန်\"\n    ဒီအချက်ကို သေချာမှတ်ထားပါ။\n\n!!! warning \"အန္တရာယ်\"\n    မှားလျှင် ပျောက်ဆုံးနိုင်ပါတယ်။\n\n### Collapsible Section\n\n<details><summary>👉 ဖတ်ရန် နှိပ်ပါ</summary>\n\nထဲက အကြောင်းအရာ အရှည်လျားတာတွေ\n\n</details>",
+            forceSync: true,
+            autosave: { enabled: true, uniqueId: autosaveKey, delay: 1500 },
+            tabSize: 4,
+            indentWithTabs: false,
+            lineNumbers: true,
+            inputStyle: "contenteditable",
+            renderingConfig: {
+                singleLineBreaks: true,
+                codeSyntaxHighlighting: true,
+                hljs: (typeof hljs !== "undefined" ? hljs : undefined),
+                markedOptions: { breaks: true, gfm: true }
+            },
+            previewRender: function(plainText, preview) {
+                setTimeout(function() {
+                    var rendered = easyMDE.markdown(plainText);
+                    rendered = applyMarkdownEnhancements(rendered);
+                    preview.innerHTML = rendered;
+                    renderTableOfContents(preview);
+                    renderMathInPreview(preview);
+                    decorateCodeBlocks(preview);
+                }, 0);
+                return '<div class="markdown-preview-enhanced"><div class="animate-pulse text-slate-400 text-sm p-4">Rendering...</div></div>';
+            },
+            toolbar: [
+                { name: "bold", action: EasyMDE.toggleBold, className: "fas fa-bold tbtn-basic", title: "Bold (Ctrl+B)" },
+                { name: "italic", action: EasyMDE.toggleItalic, className: "fas fa-italic tbtn-basic", title: "Italic (Ctrl+I)" },
+                { name: "strikethrough", action: EasyMDE.toggleStrikethrough, className: "fas fa-strikethrough tbtn-basic", title: "Strikethrough (ဖြတ်မျဉ်း)" },
+                { name: "underline", action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<u>', '</u>', 'Underline text'); }, className: "fas fa-underline tbtn-basic", title: "Underline (အောက်မျဉ်း)" },
+                "|",
+                { name: "heading-smaller", action: EasyMDE.toggleHeadingSmaller, className: "fas fa-heading tbtn-heading", title: "Heading Smaller (Ctrl+2 / Ctrl+3 ...)" },
+                { name: "heading-bigger", action: EasyMDE.toggleHeadingBigger, className: "fas fa-heading tbtn-heading", title: "Heading Bigger (Ctrl+1 / Ctrl+2 ...)" },
+                "|",
+                { name: "quote", action: EasyMDE.toggleBlockquote, className: "fas fa-quote-left tbtn-quote", title: "Quote (ကိုးကားချက်)" },
+                { name: "unordered-list", action: EasyMDE.toggleUnorderedList, className: "fas fa-list-ul tbtn-list", title: "Bullet List (အစက်စာရင်း)" },
+                { name: "ordered-list", action: EasyMDE.toggleOrderedList, className: "fas fa-list-ol tbtn-list", title: "Numbered List (ဂဏန်းစဉ်)" },
+                { name: "checklist", action: EasyMDE.toggleTaskList, className: "fas fa-check-square tbtn-checklist", title: "Checklist (စစ်ဆေးရန်စာရင်း)" },
+                "|",
+                { name: "code", action: EasyMDE.toggleCodeBlock, className: "fas fa-code tbtn-code", title: "Code Block (ကိုဒ်အကွက်)" },
+                { name: "inline-code", action: EasyMDE.toggleInlineCode, className: "fas fa-code tbtn-code", title: "Inline Code (စာကြောင်းထဲကိုဒ်)" },
+                "|",
+                {
+                    name: "math-inline",
+                    action: function(ed) { wrapSelectionInHTML(ed.codemirror, '$', '$', 'a^2+b^2=c^2'); },
+                    className: "fas fa-square-root-variable tbtn-math",
+                    title: "$Inline Math$ (ဂဏန်းသင်္ချာ အတို)"
+                },
+                {
+                    name: "math-block",
+                    action: function(ed) {
+                        var cm = ed.codemirror;
+                        var formula = cm.getSelection() || '\\sum_{n=1}^{\\infty} \\frac{1}{n^2}';
+                        cm.replaceSelection('\n$$' + formula + '$$\n');
+                    },
+                    className: "fas fa-calculator tbtn-math",
+                    title: "$$Math Block$$ (ဂဏန်းသင်္ချာ အကွက်ကြီး)"
+                },
+                "|",
+                {
+                    name: "callout-note",
+                    action: function(ed) {
+                        var cm = ed.codemirror;
+                        var content = cm.getSelection() || 'ဒီနေရာမှာ မှတ်ချက် အကြောင်းအရာ ရေးပါ';
+                        cm.replaceSelection('\n!!! note "သတိပြုရန် မှတ်ချက်"\n    ' + content + '\n\n');
+                    },
+                    className: "fas fa-info-circle tbtn-callout-note",
+                    title: "💡 Note (အသိပေး)"
+                },
+                {
+                    name: "callout-warning",
+                    action: function(ed) {
+                        var cm = ed.codemirror;
+                        var content = cm.getSelection() || 'ဒီနေရာမှာ သတိပြုရန် ရေးပါ';
+                        cm.replaceSelection('\n!!! warning "သတိထားရန်"\n    ' + content + '\n\n');
+                    },
+                    className: "fas fa-exclamation-triangle tbtn-callout-warning",
+                    title: "⚠️ Warning (သတိပြု)"
+                },
+                {
+                    name: "callout-success",
+                    action: function(ed) {
+                        var cm = ed.codemirror;
+                        var content = cm.getSelection() || 'အောင်မြင်ပါသည်';
+                        cm.replaceSelection('\n!!! success "အောင်မြင်သည်"\n    ' + content + '\n\n');
+                    },
+                    className: "fas fa-check-circle tbtn-callout-success",
+                    title: "✅ Success (အောင်မြင်)"
+                },
+                {
+                    name: "callout-danger",
+                    action: function(ed) {
+                        var cm = ed.codemirror;
+                        var content = cm.getSelection() || 'မှားယွင်းချက်';
+                        cm.replaceSelection('\n!!! danger "မှားယွင်းနေသည်"\n    ' + content + '\n\n');
+                    },
+                    className: "fas fa-times-circle tbtn-callout-danger",
+                    title: "❌ Danger (အန္တရာယ်)"
+                },
+                "|",
+                {
+                    name: "highlight-yellow",
+                    action: function(ed) { wrapSelectionInHTML(ed.codemirror, '==', '==', 'Highlight'); },
+                    className: "fas fa-highlighter tbtn-hl-yellow",
+                    title: "==Highlight== (အဝါရောင် မီးမောင်း)"
+                },
+                {
+                    name: "color-red",
+                    action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<span style="color:#be123c;font-weight:600">', '</span>', 'Red Text'); },
+                    className: "fas fa-fill-drip tbtn-txt-red",
+                    title: "🔴 Red Color (နီရဲရဲ)"
+                },
+                {
+                    name: "color-blue",
+                    action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<span style="color:#2563eb;font-weight:600">', '</span>', 'Blue Text'); },
+                    className: "fas fa-fill-drip tbtn-txt-blue",
+                    title: "🔵 Blue Color (အပြာ)"
+                },
+                {
+                    name: "color-green",
+                    action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<span style="color:#059669;font-weight:600">', '</span>', 'Green Text'); },
+                    className: "fas fa-fill-drip tbtn-txt-green",
+                    title: "🟢 Green Color (အစိမ်း)"
+                },
+                {
+                    name: "color-orange",
+                    action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<span style="color:#ea580c;font-weight:600">', '</span>', 'Orange Text'); },
+                    className: "fas fa-fill-drip tbtn-txt-orange",
+                    title: "🟠 Orange Color (လိမ္မော်ရောင်)"
+                },
+                {
+                    name: "color-purple",
+                    action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<span style="color:#7c3aed;font-weight:600">', '</span>', 'Purple Text'); },
+                    className: "fas fa-fill-drip tbtn-txt-purple",
+                    title: "🟣 Purple Color (ခရမ်းရောင်)"
+                },
+                "|",
+                { name: "superscript", action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<sup>', '</sup>', 'exp'); }, className: "fas fa-superscript tbtn-sup", title: "Superscript (x² လို အပေါ်ထည့်)" },
+                { name: "subscript", action: function(ed) { wrapSelectionInHTML(ed.codemirror, '<sub>', '</sub>', 'idx'); }, className: "fas fa-subscript tbtn-sub", title: "Subscript (H₂O လို အောက်ထည့်)" },
+                "|",
+                {
+                    name: "collapsible",
+                    action: function(ed) {
+                        var cm = ed.codemirror;
+                        var content = cm.getSelection() || 'ထဲက အကြောင်းအရာ';
+                        cm.replaceSelection('\n<details><summary>👉 ဖတ်ရန် နှိပ်ပါ</summary>\n\n' + content + '\n\n</details>\n\n');
+                    },
+                    className: "fas fa-folder-open tbtn-collapse",
+                    title: "📂 Collapsible (ဖွင့်/ပိတ် ခေါက်ထား)"
+                },
+                {
+                    name: "youtube",
+                    action: function(ed) {
+                        var url = prompt('YouTube URL (သို့) YouTube Video ID ကိုထည့်ပါ:', 'https://www.youtube.com/watch?v=');
+                        if (!url) return;
+                        var id = url;
+                        var match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+                        if (match) id = match[1];
+                        ed.codemirror.replaceSelection('\n<div style="padding:15px;background:#fff1f2;border:1px solid #fecdd3;border-radius:16px;margin:20px 0;"><div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;"><iframe style="position:absolute;top:0;left:0;width:100%;height:100%;" src="https://www.youtube.com/embed/' + id + '" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div></div>\n\n');
+                    },
+                    className: "fab fa-youtube tbtn-youtube",
+                    title: "🎥 YouTube Embed (ဗီဒီယိုထည့်)"
+                },
+                "|",
+                { name: "horizontal-rule", action: EasyMDE.drawHorizontalRule, className: "fas fa-minus tbtn-basic", title: "Horizontal Line (မျဉ်းကြောင်း)" },
+                {
+                    name: "datetime",
+                    action: function(ed) {
+                        var dt = new Date().toLocaleString('my-MM', { dateStyle: 'full', timeStyle: 'short' });
+                        ed.codemirror.replaceSelection('<small style="color:#64748b;font-style:italic">✍️ ရေးသားချိန်: ' + dt + '</small>\n\n');
+                    },
+                    className: "fas fa-calendar-day tbtn-date",
+                    title: "📅 Date/Time (ရေးသားချိန် ထည့်)"
+                },
+                { name: "link", action: EasyMDE.drawLink, className: "fas fa-link tbtn-basic", title: "Link (Ctrl+K)" },
+                { name: "image", action: EasyMDE.drawImage, className: "fas fa-image tbtn-basic", title: "Image (ပုံထည့်)" },
+                { name: "table", action: function() { openTableBuilder(); }, className: "fas fa-table tbtn-basic", title: "Table Builder (ဇယား ဖန်တီး)" },
+                "|",
+                {
+                    name: "clear-formatting",
+                    action: function(ed) {
+                        var cm = ed.codemirror;
+                        var sel = cm.getSelection();
+                        if (!sel) return;
+                        var clean = sel
+                            .replace(/^\s*#{1,6}\s+/gm, '')
+                            .replace(/\*\*([^*]+)\*\*/g, '$1')
+                            .replace(/\*([^*]+)\*/g, '$1')
+                            .replace(/__([^_]+)__/g, '$1')
+                            .replace(/~~([^~]+)~~/g, '$1')
+                            .replace(/==([^=]+)==/g, '$1')
+                            .replace(/`([^`]+)`/g, '$1')
+                            .replace(/```[\s\S]*?```/g, '$1')
+                            .replace(/^\s*[-*+]\s+/gm, '')
+                            .replace(/^\s*\d+\.\s+/gm, '')
+                            .replace(/^\s*>+\s?/gm, '')
+                            .replace(/<[^>]+>/g, '')
+                            .replace(/\!?\[([^\]]+)\]\([^)]+\)/g, '$1')
+                            .replace(/^\s*[-*]{3,}\s*$/gm, '');
+                        cm.replaceSelection(clean);
+                    },
+                    className: "fas fa-eraser tbtn-clear",
+                    title: "🧹 Clear Format (ဖော်မတ် ရှင်းလင်း)"
+                },
+                {
+                    name: "help",
+                    action: function() {
+                        var m = document.getElementById('editorHelpModal');
+                        m.classList.remove('hidden');
+                        m.classList.add('flex');
+                    },
+                    className: "fas fa-question-circle no-disable tbtn-help",
+                    title: "❓ Shortcut Help (ကီးဘုတ် အတိုကောက်)"
+                },
+                "|",
+                { name: "preview", action: EasyMDE.togglePreview, className: "fas fa-eye no-disable tbtn-view", title: "👁️ Preview (မြင်ကွင်း)" },
+                { name: "side-by-side", action: EasyMDE.toggleSideBySide, className: "fas fa-columns no-disable no-mobile tbtn-view", title: "🖥️ Side by Side" },
+                { name: "fullscreen", action: EasyMDE.toggleFullScreen, className: "fas fa-expand no-disable no-mobile tbtn-view", title: "⛶ Fullscreen (အပြည့်အဝ)" },
+                "|",
+                { name: "undo", action: EasyMDE.undo, className: "fas fa-undo-alt no-disable tbtn-history", title: "↶ Undo (ပြန်ဖျက်)" },
+                { name: "redo", action: EasyMDE.redo, className: "fas fa-redo-alt no-disable tbtn-history", title: "↷ Redo (ပြန်လုပ်)" }
+            ]
+        });
+
+        /* ==========================================================
+           Extra technical toolbar group (owned by this script, so the
+           markup and hooks never depend on EasyMDE internals).
+           ========================================================== */
+        (function addTechnicalToolbar() {
+            var toolbar = document.querySelector(".editor-toolbar");
+            if (!toolbar) return;
+
+            var separator = document.createElement("span");
+            separator.className = "md-toolbar-sep";
+            toolbar.appendChild(separator);
+
+            langButtonEl = document.createElement("button");
+            langButtonEl.type = "button";
+            langButtonEl.className = "md-tbtn md-tbtn-accent";
+            langButtonEl.title = "Code Block + Language (Ctrl/Cmd + Shift + C)";
+            langButtonEl.innerHTML = '<i class="fas fa-terminal"></i><span>Code</span><span class="md-tbtn-caret">▼</span>';
+            langButtonEl.addEventListener("click", function (e) {
+                e.preventDefault();
+                openLanguageMenu(langButtonEl);
+            });
+            toolbar.appendChild(langButtonEl);
+
+            var tocButton = document.createElement("button");
+            tocButton.type = "button";
+            tocButton.className = "md-tbtn";
+            tocButton.title = "Table of Contents — [TOC] (မာတိကာ ထည့်)";
+            tocButton.innerHTML = '<i class="fas fa-list-ol"></i><span>TOC</span>';
+            tocButton.addEventListener("click", function (e) {
+                e.preventDefault();
+                if (editorIsBusy()) return;
+                insertTableOfContents();
+            });
+            toolbar.appendChild(tocButton);
+        })();
+
+        /* ==========================================================
+           Keyboard shortcuts owned by this script
+           ========================================================== */
+        try {
+            var keyMap = {};
+            for (var level = 1; level <= 6; level++) {
+                (function (lv) {
+                    var setHeading = function () { transformHeading(lv); };
+                    keyMap["Ctrl-" + lv] = setHeading;
+                    keyMap["Cmd-" + lv] = setHeading;
+                })(level);
+            }
+            var resetHeading = function () { transformHeading(0); };
+            keyMap["Ctrl-0"] = resetHeading;
+            keyMap["Cmd-0"] = resetHeading;
+            var openPicker = function () { if (langButtonEl) openLanguageMenu(langButtonEl); };
+            keyMap["Ctrl-Shift-C"] = openPicker;
+            keyMap["Cmd-Shift-C"] = openPicker;
+            easyMDE.codemirror.addKeyMap(keyMap);
+        } catch (e) {}
+
+        if (formEl) {
+            formEl.addEventListener("submit", function () {
+                if (typeof easyMDE.save === "function") easyMDE.save();
+                if (typeof easyMDE.clearAutosavedValue === "function") easyMDE.clearAutosavedValue();
+            });
+        }
+
+        // Ctrl/Cmd + S saves the record.
+        document.addEventListener("keydown", function (e) {
+            if ((e.ctrlKey || e.metaKey) && (e.key === "s" || e.key === "S")) {
+                e.preventDefault();
+                if (formEl) {
+                    if (typeof formEl.requestSubmit === "function") formEl.requestSubmit();
+                    else formEl.submit();
+                }
+            }
+        });
+    });
+</script>

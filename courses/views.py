@@ -1000,7 +1000,7 @@ def remove_enrollment(request, enrollment_pk):
         )
         messages.success(request, f"{student_name} ကို {course_title} မှ ထုတ်ပယ်ပြီးပါပြီ")
         return redirect('manage_enrollments')
-    return render(request, 'courses/management/confirm_delete.html', {'item': enrollment, 'type': f'Enrollment ({enrollment.student.username} - {enrollment.course.title})'})
+    return render(request, 'courses/confirm_delete.html', {'item': enrollment, 'type': f'Enrollment ({enrollment.student.username} - {enrollment.course.title})'})
 
 @login_required
 @user_passes_test(is_admin)

@@ -1,0 +1,26 @@
+{# Shared keyboard-shortcut help modal for the Markdown editor. #}
+<div id="editorHelpModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[9999] hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-8">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-black text-slate-800"><i class="fas fa-keyboard text-blue-500 mr-3"></i> Keyboard Shortcuts</h3>
+            <button type="button" onclick="document.getElementById('editorHelpModal').classList.add('hidden'); document.getElementById('editorHelpModal').classList.remove('flex');" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+            <div class="p-3 bg-slate-50 rounded-xl"><kbd class="px-2 py-1 bg-white rounded-md border border-slate-200 font-mono font-bold text-xs">Ctrl/Cmd + B</kbd> <span class="ml-2 text-slate-600">Bold (အနက်)</span></div>
+            <div class="p-3 bg-slate-50 rounded-xl"><kbd class="px-2 py-1 bg-white rounded-md border border-slate-200 font-mono font-bold text-xs">Ctrl/Cmd + I</kbd> <span class="ml-2 text-slate-600">Italic (စောင်း)</span></div>
+            <div class="p-3 bg-slate-50 rounded-xl"><kbd class="px-2 py-1 bg-white rounded-md border border-slate-200 font-mono font-bold text-xs">Ctrl/Cmd + K</kbd> <span class="ml-2 text-slate-600">Link (ချိတ်ဆက်)</span></div>
+            <div class="p-3 bg-slate-50 rounded-xl"><kbd class="px-2 py-1 bg-white rounded-md border border-slate-200 font-mono font-bold text-xs">Ctrl/Cmd + S</kbd> <span class="ml-2 text-slate-600">Save (သိမ်းရန်)</span></div>
+            <div class="p-3 bg-slate-50 rounded-xl"><kbd class="px-2 py-1 bg-white rounded-md border border-slate-200 font-mono font-bold text-xs">Ctrl/Cmd + Z</kbd> <span class="ml-2 text-slate-600">Undo (ပြန်ဖျက်)</span></div>
+            <div class="p-3 bg-slate-50 rounded-xl"><kbd class="px-2 py-1 bg-white rounded-md border border-slate-200 font-mono font-bold text-xs">Ctrl/Cmd + Y</kbd> <span class="ml-2 text-slate-600">Redo (ပြန်လုပ်)</span></div>
+            <div class="p-3 bg-slate-50 rounded-xl"><kbd class="px-2 py-1 bg-white rounded-md border border-slate-200 font-mono font-bold text-xs">Tab</kbd> <span class="ml-2 text-slate-600">Indent (အတွင်းသို့ရွှေ့)</span></div>
+            <div class="p-3 bg-slate-50 rounded-xl"><kbd class="px-2 py-1 bg-white rounded-md border border-slate-200 font-mono font-bold text-xs">Shift + Tab</kbd> <span class="ml-2 text-slate-600">Outdent (အပြင်သို့ရွှေ့)</span></div>
+            <div class="p-3 bg-slate-50 rounded-xl"><kbd class="px-2 py-1 bg-white rounded-md border border-slate-200 font-mono font-bold text-xs">Ctrl/Cmd + 1 … 6</kbd> <span class="ml-2 text-slate-600">Heading H1-H6 (ခေါင်းစဉ်အဆင့်)</span></div>
+            <div class="p-3 bg-slate-50 rounded-xl"><kbd class="px-2 py-1 bg-white rounded-md border border-slate-200 font-mono font-bold text-xs">Ctrl/Cmd + 0</kbd> <span class="ml-2 text-slate-600">Normal text (ခေါင်းစဉ် ဖြုတ်)</span></div>
+            <div class="p-3 bg-slate-50 rounded-xl"><kbd class="px-2 py-1 bg-white rounded-md border border-slate-200 font-mono font-bold text-xs">Ctrl/Cmd + Shift + C</kbd> <span class="ml-2 text-slate-600">Code + Language Picker (ကိုဒ်ဘာသာစကား ရွေး)</span></div>
+        </div>
+        <p class="mt-5 text-xs text-slate-500"><i class="fas fa-terminal mr-1 text-blue-500"></i> နည်းပညာစာ အတွက် အထူး: <span class="font-bold">Code</span> ခလုတ်ဖြင့် ဘာသာစကား ရွေးပြီး ကိုဒ်အကွက် ထည့်နိုင်သည်။ <span class="font-bold">TOC</span> ခလုတ်က <code class="px-1 bg-slate-100 rounded">[TOC]</code> မာတိကာ ထည့်ပေးသည်။ <span class="font-bold">Table</span> ခလုတ်က ကော်လံ/အတန်း/ချိန်ညှိမှု ရွေးနိုင်သော ဇယားဖန်တီးစက် ဖွင့်ပေးသည်။</p>
+        <p class="mt-5 text-xs text-slate-400 italic"><i class="fas fa-info-circle mr-1"></i> စာရေးနေစဉ် အလိုအလျောက် Draft အလုပ်လုပ်ပါသည်။ သတိမထားမိဘဲ စာမျက်နှာပိတ်သွားပါက ပြန်ဖွင့်ချိန်တွင် Draft ကို ပြန်လည်ရယူနိုင်ပါသည်။</p>
+    </div>
+</div>

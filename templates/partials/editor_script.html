@@ -1,16 +1,4 @@
-{# ------------------------------------------------------------------
-   Shared EasyMDE initialiser for the Arakkha Tech technical editor.
-   Works for any page whose Markdown textarea has id="markdown-editor":
-   the form and the autosave slot are detected automatically.
 
-   Extra technical-writing tools added on top of EasyMDE:
-     - searchable code-language picker for fenced code blocks
-     - table builder (columns / rows / alignment)
-     - [TOC] table of contents, rendered live in the preview
-     - Ctrl/Cmd + 1..6 heading shortcuts (+ 0 to reset)
-
-   Used by: courses lesson_form, blogs blog_form, docs chapter_form.
-   ------------------------------------------------------------------ #}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var editorEl = document.getElementById("markdown-editor");
